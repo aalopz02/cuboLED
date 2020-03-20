@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="760.0" prefWidth="800.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <children>
+      <AnchorPane prefHeight="80.0" prefWidth="200.0" style="-fx-background-color: #d40000ff;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane layoutY="60.0" prefHeight="40.0" prefWidth="470.0" AnchorPane.topAnchor="60.0">
+               <children>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="10.0">
+                     <children>
+                        <Label fx:id="fileName" prefHeight="30.0" prefWidth="220.0" text="Filename" AnchorPane.leftAnchor="3.0">
+                           <font>
+                              <Font name="AdobeMyungjoStd-Medium" size="21.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </AnchorPane>
+            <HBox prefHeight="60.0" prefWidth="631.0" style="-fx-background-color: #7e0000ff;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Separator prefWidth="50.0" visible="false" />
+                  <ImageView fx:id="nuevo" fitHeight="40.0" fitWidth="40.0" onMousePressed="#pressNuevo" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icon/new.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets top="10.0" />
+                     </HBox.margin>
+                  </ImageView>
+                  <Separator prefWidth="50.0" visible="false" />
+                  <ImageView fx:id="abrir" fitHeight="40.0" fitWidth="40.0" onMousePressed="#pressCargar" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icon/open.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets top="10.0" />
+                     </HBox.margin>
+                  </ImageView>
+                  <Separator prefWidth="50.0" visible="false" />
+                  <ImageView fx:id="salvar" fitHeight="40.0" fitWidth="40.0" onMousePressed="#pressGuardar" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icon/save.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets top="10.0" />
+                     </HBox.margin>
+                  </ImageView>
+                  <Separator prefWidth="50.0" visible="false" />
+                  <ImageView fx:id="compilar" fitHeight="40.0" fitWidth="40.0" onMousePressed="#pressCompilar" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icon/compile.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets top="10.0" />
+                     </HBox.margin>
+                  </ImageView>
+               </children>
+            </HBox>
+         </children>
+      </AnchorPane>
+      <AnchorPane prefHeight="500.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
+         <children>
+            <JFXTextArea fx:id="TextComp" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children>
+      </AnchorPane>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="600.0">
+         <children>
+            <AnchorPane prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #f12323ff;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
+               <children>
+                  <JFXTextArea fx:id="Error_TextArea" layoutY="14.0" prefHeight="100.0" prefWidth="800.0" style="-fx-background-color: #000000;" unFocusColor="#e85912" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               </children>
+               <padding>
+                  <Insets top="20.0" />
+               </padding>
+            </AnchorPane>
+            <AnchorPane prefHeight="25.0" prefWidth="200.0" style="-fx-background-color: #7e0000ff;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="135.0" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

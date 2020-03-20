@@ -1,0 +1,83 @@
+Inicio:
+DCL a;
+DCL b DEFAULT 12;
+DCL c DEFAULT 7;
+DCL d;
+
+EnCaso 
+ Cuando a > 12 EnTons {
+ 	Inc(a,b);
+	Dec(c,9);
+	Llamar a1();
+	Llamar b1(a,b);
+ }
+ Cuando b < 1 EnTons {
+	Ini(a,c);
+ }
+ SiNo {
+	Repita {
+		Inc(a,1);
+	}
+	HastaEncontrar a = 6;
+ }
+Fin-EnCaso;
+
+Desde i := 0 Hasta 5 Haga{
+Mover(AF);
+	EnCaso d 
+		Cuando > 9 EnTons {
+			Inc(d,3);
+		}
+		Cuando = 1 EnTons {
+			EnCaso 
+ 				Cuando a > 12 EnTons {
+ 					Inc(a,b);
+					Dec(c,9);
+ 				}
+ 				Cuando b < 1 EnTons {
+					Ini(a,c);
+ 				}
+ 				SiNo {
+					Repita {
+						Inc(a,1);
+						Llamar b1(a,b);
+					}
+					HastaEncontrar a = 6;
+ 				}
+				Fin-EnCaso;
+		}
+		SiNo {
+			Dec(c,0);
+			Llamar b1(a,b);
+		}
+	Fin-EnCaso;
+}
+Fin-Desde;
+
+Final;
+
+Proc a1 ()
+ Inicio{
+	Ini(a,5);
+ }
+Final;
+
+Proc b1 (n,m)
+ Inicio{
+	EnCaso 
+ 		Cuando a > 12 EnTons {
+ 			Inc(a,b);
+			Dec(c,9);
+ 		}
+ 		Cuando b < 1 EnTons {
+			Ini(a,c);
+ 		}
+ 		SiNo {
+			Repita {
+				Inc(a,1);
+			}
+			HastaEncontrar a = 6;
+ 		}
+		Fin-EnCaso;
+ }
+Final;

@@ -1,0 +1,52 @@
+package temp;
+
+class temp{
+   private String commands = "";
+   private int AF = 1;
+   private int F = 2;
+   private int DFA = 3;
+   private int IFA = 4;
+   private int DFB = 5;
+   private int IFB = 6;
+   private int A = 7;
+   private int DAA = 8;
+   private int IAA = 9;
+   private int DAB = 10;
+   private int IAB = 11;
+   private int AA = 12;
+
+public send(){
+
+}
+}
+   public void Mover(int move){
+        String[] var = {"AF", "F", "DFA", "IFA","DFB","IFB","A","DAA","IAA","DAB","IAB","AA"};
+        commands += var[move-1];
+        commands += ";";
+    }
+
+    public void Aleatorio(){
+        String[] var = {"AF", "F", "DFA", "IFA","DFB","IFB","A","DAA","IAA","DAB","IAB","AA"};
+        for (int i = 0; i < 10; i++) {
+            int rand = (int)(Math.random() * 12);
+            commands += var[rand];
+            commands += ";";
+        }
+    }
+
+    public void Rotar(){
+        commands += "R";
+        commands += ";";
+    }
+
+public static void main(String[] args){
+    temp run = new temp();
+    run.start();
+}
+
+public void start(){
+
+    System.out.println(commands);
+}
+
+}
