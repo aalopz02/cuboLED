@@ -1,0 +1,271 @@
+PARSER_BEGIN(SyntaxChecker)
+
+import javax.swing.JOptionPane;
+import java.util.*;
+import java.io.*;
+
+
+public class SyntaxChecker {
+
+	private static int parentesis = 0;
+	private static int mainDefinido = 0;
+	private static int scope = 0;
+	private static int inMain = 0;
+	
+    public static void main(String[] args) {
+        try {
+			File file = new File("eje.txt"); 
+			BufferedReader br = new BufferedReader(new FileReader(file)); 
+			String st; 	
+			String in = "";
+			while ((st = br.readLine()) != null) {
+				in += st;
+				in += '\n';
+			}
+			System.out.println(in);
+            new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
+            System.out.println("Syntax is okay");
+        } catch (Throwable e) {
+            // Catching Throwable is ugly but JavaCC throws Error objects!
+            System.out.println("Syntax check failed: " + e.getMessage());
+        }
+    }
+	
+	static void checkMainDefined(int llamada){
+		if (mainDefinido == 0){
+			if (llamada ==  1){
+				System.out.println("Main method not defined");
+				ParseException e = generateParseException();  
+				System.out.println(e.toString()); 
+			} else {
+				mainDefinido = 1;
+			}
+		} else {
+			System.out.println("Main method already defined");
+			ParseException e = generateParseException();  
+			System.out.println(e.toString());
+		}
+	}
+	
+	static void checkDefinicionProc(){
+		if (scope != 0){
+			System.out.println("Illegal declaration of method");
+			ParseException e = generateParseException();  
+			System.out.println(e.toString());
+		}
+	}
+	
+	static void checkMainDCL() {
+		if (inMain == 1){
+			System.out.println("Illegal declaration in main method");
+			ParseException e = generateParseException();  
+			System.out.println(e.toString());
+		}
+	}
+}
+
+PARSER_END(SyntaxChecker)
+
+TOKEN: { "(" | ")" | "," | "=" | "{" | "}"|"."
+		| <NUM: (["0"-"9"])+> 
+		| <BOOL: "true"|"false">
+		| <TIMER: "Timer">
+		| <RANGO_TIMER: "Rango_Timer" >
+		| <OPCIONESRANGO: "Seg" | "Mil" | "Min" >
+		| <DIM_FILAS: "Dim_Filas" >
+		| <DIM_COLUMNAS: "Dim_Columnas" >
+		| <CUBO: "Cubo">
+		| <LIST: "list">
+		| <MAIN: "Main">
+		| <RANGO: "range">
+		| <NEG: "Neg">
+		| <T: "T">
+		| <F: "F">
+		| <INSERT: "insert">
+		| <DELETE: "del">
+		| <LENGTH: "len">
+		| "if" | "for" | "Call" | "Procedure" | "Delay" | "in" | "Step"| "Blink" 
+		| <SHAPEF: "shapeF">
+		| <SHAPEC: "shapeC">
+		| <ID: (["a"-"z"](["a"-"z" ,"0"-"9" ,"_","&","@","A"-"Z"]){0,9})>
+		| <OPERADORES: ("+" | "*" | "-" | "**" | "/" | "//" | "%")>
+		| <OPERADOR_COMPARADOR: ( "==" | "<" | "<" | "=>" | ">=" | "<>")>
+		}
+		
+SKIP:  { " " | "\t" | "\n" | "\r" | <COMMENT: (["-"]["-"]([";",",","a"-"z","0"-"9","_","&","@","A"-"Z"," ","+","*","-","/","%","=","(",")"])+)>}	
+
+void INICIAR(): {} {Constantes() S()} 		
+
+void S(): {} { Sder() | <EOF> }
+	
+void Sder(): {} {Inicial() S() 
+				|ifFunction() S() 
+				|Delay_Function() S() 
+				|Blink_Function() S()
+				|Procedure() S() 
+				|Call() S() 
+				|forFunction() S()
+				|Empty()
+				}
+
+
+void Inicial(): {} { Identificadores() ( "." OperacionesListas() | Igualdad()  ) ";"}
+
+void Identificadores(): {Token id;} { id=<ID> {
+	System.out.print("id: ");
+	System.out.print(id.image);
+	System.out.println("");
+	}
+	IdentificadoresAux() 
+	}
+
+void IdentificadoresAux(): {} {"," Identificadores() | "=" {System.out.println("="); checkMainDCL();} | Listas() ("=" {System.out.println("="); checkMainDCL();} | Empty()) | Empty()}
+
+void IgualdadValoresOperables(): {Token aux;} {aux = <ID> {System.out.println(aux);} 
+												(aux = <OPERADORES> {System.out.println(aux);} IgualdadAux() | "." FuncionesShape() | Listas() | Empty()) 
+							| aux = <NUM> {System.out.println(aux);} (aux = <OPERADORES> {System.out.println(aux);} IgualdadAux() | Empty())
+							| aux = "(" {System.out.println(aux);} IgualdadAux() ")" {System.out.println(")");} 
+										((aux = <OPERADORES> {System.out.println(aux);} IgualdadValoresOperables()) | IgualdadValoresOperables())
+							| Empty()}
+
+void IgualdadAux(): {Token aux;} {  aux = <BOOL> {System.out.println(aux);} 
+									| aux = "(" {System.out.println(aux);} IgualdadValoresOperables() ")" {System.out.println(")");} 
+														((aux = <OPERADORES> {System.out.println(aux);} IgualdadValoresOperables()) | IgualdadValoresOperables())
+									| aux = "["  {System.out.println(aux);} ValoresListas() "]" {System.out.println("]");} 
+									| aux = <LIST> {System.out.println(aux);} CrearLista() Listas()
+									| FuncionLen() 
+									| IgualdadValoresOperables() }
+
+void Igualdad(): {Token aux;} { IgualdadAux() ("," Igualdad() | Empty())}
+	
+void Listas(): {Token aux;} { aux = "[" {System.out.println(aux);} AccesoLista() "]" {System.out.println("]");} ( "." FuncionesListas() | Empty()) Listas()
+							| aux = <LIST> {System.out.println(aux);} CrearLista() Listas()
+							| Empty()}
+
+void AccesoLista(): {} { ":" "," Numeros() | Numeros() AccesoListaAux() | ValoresListas() }
+
+void AccesoListaAux(): {} { ":"  Numeros() | "," Numeros() | Numeros() | Empty()}
+
+void ValoresListas(): {Token aux;} { aux = <BOOL> {System.out.println(aux);} ValoresListasAux()
+									| Listas() ValoresListasAux()
+									| Empty()}	
+									
+void ValoresListasAux(): {} {"," (ValoresListas() | Listas()) | Empty()}
+
+void FuncionesListas(): {Token aux;} {(aux = <NEG> | aux = <T> | aux = <F>) {System.out.println(aux);} }
+	
+void CrearLista(): {Token aux;} { "(" aux = <RANGO> "(" {System.out.println(aux);} RangeParam()}
+
+void RangeParam(): {Token n;} { Numeros() RangeParamVal()}
+
+void RangeParamVal(): {Token val;} { "," val = <BOOL> {System.out.println(val.image);} ")" ")" }	
+	
+void OperacionesListas(): {Token aux;} { aux = <INSERT> {System.out.println(aux.image);} "(" valoresInsert() ")"
+										| aux = <DELETE> {System.out.println(aux.image);} "(" valoresDel() ")"}	
+	
+void valoresInsert(): {} { Listas() InsertMatriz()
+						 | InsertListas()}	
+	
+void InsertMatriz(): {} { Listas() "," Numeros() ("," Numeros() | Empty())}	
+	
+void valoresDel(): {} {Numeros() ("," Numeros() | Empty())}	
+	
+void InsertListas(): {Token val;} { Numeros() "," (val = <BOOL> {System.out.println(val.image);} | Listas())}	
+	
+void Numeros(): {Token index;} { (index = <NUM> | index = <ID> ("." FuncionesShape() | Empty())) {System.out.println(index.image);} | FuncionLen()} 	
+	
+void FuncionesShape(): {Token aux;} { (aux = <SHAPEC> | aux = <SHAPEF>) {System.out.println(aux.image); }}	
+	
+void FuncionLen(): {Token aux;} { aux = <LENGTH> {System.out.println(aux.image);} "(" <ID> Listas() ")" }	
+
+void Iterable():{Token aux;}{ aux = <ID> {System.out.println(aux.image);} Iterable_Aux() | <NUM> | FuncionLen()}
+
+void Iterable_Aux(): {} {"[" { System.out.print("["); } Adentro_Lista() "]" { System.out.print("]"); } Iterable_Aux() | "." FuncionesShape() | Empty()}
+
+void ifFunction(): {Token aux;} { aux = "if" {System.out.println(aux);} Iterable() aux = <OPERADOR_COMPARADOR> {System.out.println(aux);} 
+								(aux = <BOOL> {System.out.println(aux);} | Iterable() ) "{" S() "}"}		
+	
+void Constantes(): {} { Timer() Rango_Timer() Dim_Filas() Dim_Columnas() Cubo() }	
+	
+void Timer(): {Token n;} {<TIMER> "=" n = <NUM> ";"{
+	System.out.print("Timer: ");
+	System.out.print(n.image);
+	System.out.println("");}}
+
+void Rango_Timer(): {Token rango;} { <RANGO_TIMER> "=" rango = <OPCIONESRANGO> ";"{
+	System.out.print("Rango_Timer: ");
+	System.out.print(rango.image);
+	System.out.println("");}}
+
+void Dim_Filas(): {Token filas;} { <DIM_FILAS> "=" filas = <NUM> ";"{
+	System.out.print("Filas: ");
+	System.out.print(filas.image);
+	System.out.println("");}}
+
+void Dim_Columnas(): {Token columnas;} { <DIM_COLUMNAS> "=" columnas = <NUM> ";"{
+	System.out.print("Columnas: ");
+	System.out.print(columnas.image);
+	System.out.println("");}}
+
+void Cubo(): {Token i; Token j;} { <CUBO> "=" i = <NUM> "," j = <NUM> ";" {
+	System.out.print("Cubo: ");
+	System.out.print(i);
+	System.out.print(", ");
+	System.out.print(j);
+	System.out.println("");}}
+
+void Empty() : {}
+{
+     {}
+} 
+
+void Delay_Function(): {} { { System.out.println("Delay"); } "Delay"  "(" Delay_Expression() ")" ";"}
+
+void Delay_Expression(): {Token num; Token range;} {num=<NUM> "," range=<OPCIONESRANGO>{
+		System.out.println("(");
+		System.out.println(num);
+		System.out.println(",");
+		System.out.println(range);
+		System.out.println(")");} 
+	|  Empty() {
+		System.out.println("(");
+		System.out.println(")");}
+	}
+
+void Blink_Function(): {} {{ System.out.println("Blink"); } "Blink"  "(" { System.out.println("("); } Blink_Expression() ")" { System.out.println(")"); } ";"}
+
+void Blink_Expression(): {Token id; Token bool;} {id=<ID> { System.out.println(id); } "[" { System.out.println("["); } Adentro_Lista() "]" { System.out.println("]"); } "," { System.out.println(","); } Blink_Expression_Aux()  }
+
+void Blink_Expression_Aux(): {Token bool; Token num;}{num=<NUM> { System.out.println(num); } Blink_Expression_Aux1() | bool=<BOOL> { System.out.println(bool); }}
+
+void Blink_Expression_Aux1(): {Token range; Token bool;}{"," { System.out.println(","); } range= <OPCIONESRANGO> { System.out.println(range); } "," { System.out.println(","); } bool=<BOOL> { System.out.println(bool); }}
+
+void Adentro_Lista(): {Token num;} {(num=<NUM> | num = ":") { System.out.println(num);}  Adentro_Lista_Aux1() }
+
+void Adentro_Lista_Aux1(): {Token num;} {":" { System.out.println(":");} num=<NUM> { System.out.println(num); } | "," num=<NUM> { System.out.println(num); }| Empty() }
+
+void Procedure(): {} {"Procedure" { System.out.println("Procedure"); checkDefinicionProc();} NombreRutina() }
+
+void NombreRutina():{Token id;}{ id=<ID> { System.out.println(id); } normalProc() | <MAIN> { System.out.println("Main"); checkMainDefined(0); inMain = 1;} mainProc()}
+
+void normalProc(): {} {"(" Parametros() ")" "{" {System.out.println("Scope aumenta"); scope = 1;} S() "}" {scope = 0;}}
+
+void mainProc(): {} {"(" ")" "{" {scope = 1;} S() "}" {inMain = 0; scope = 0;}}
+
+void Call():{Token id;} {"Call" { System.out.println("Call"); } 
+							id=<ID> { System.out.print(id); } 
+							"("  
+							Igualdad() 
+							")"
+							";"
+						}
+
+void Parametros(): {Token id;} { id = <ID> {System.out.println(id);} ParametrosAux() | Empty()}
+
+void ParametrosAux(): {} {"," ParametrosAux1() | Empty()}
+
+void ParametrosAux1(): {Token id;} {id = <ID> {System.out.println(id);} ParametrosAux()}
+
+void forFunction():{Token id;} {"for" { System.out.println("for"); } id=<ID> { System.out.print(id); } "in"  { System.out.print("in"); } Iterable() Step()  "{" { System.out.println("{"); } S() "}" { System.out.println("}"); }  }
+
+void Step():{Token num;}{("Step" { System.out.print("Step"); } num=<NUM> { System.out.print(num); })|Empty() }
