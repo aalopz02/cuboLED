@@ -6,19 +6,20 @@ Cubo = 5,5;
 
 a = x + y * 10 / 4 ;
 b = x + ((y * 10) / 4);
+a = [true, false, [true]];
 c.insert([true,false], 1,2 );
 c.insert([true,false], 1);
 q.insert(21, [true,false,false]);
 l.del(1,1);
 p[1,0].T;
-x, y = 20+;
+x, y = 20, a;
 x[1][2][c.shapeC] = 1;
 e = true;
 h[1].Neg;
 y = x[0];
 z = x[1:4];
-x = list(range(5, true));
-x, q ,y = 20, 15, 1;
+ x = list(range(5, true));
+ x, q ,y = 20, 15, 1;
 
 Procedure Main()  {
 

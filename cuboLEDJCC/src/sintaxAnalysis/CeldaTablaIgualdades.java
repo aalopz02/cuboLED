@@ -10,14 +10,14 @@ public class CeldaTablaIgualdades {
     private int Scope;
 
     CeldaTablaIgualdades(int numeroVariable, int Scope, String contenido){
-        setNumeroVariable(numeroVariable);
+        setNumeroVariable(numeroVariable-1);
         setScope(Scope);
         this.contenido = new ArrayList<String>();
         this.contenido.add(contenido);
     }
 
     CeldaTablaIgualdades(int numeroVariable, int Scope, ArrayList<String> contenido){
-        setNumeroVariable(numeroVariable);
+        setNumeroVariable(numeroVariable-1);
         setScope(Scope);
         setContenido(contenido);
     }

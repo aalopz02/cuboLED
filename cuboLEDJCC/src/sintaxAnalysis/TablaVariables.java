@@ -36,6 +36,7 @@ public class TablaVariables {
             System.out.print("Ids: ");
             System.out.print(cellAux.getId());
             if (!cellAux.getIndex().equals("NA")){
+                System.out.print(", Index: ");
                 System.out.print(cellAux.getIndex());
             }
             System.out.print(", Scope: ");
@@ -43,22 +44,17 @@ public class TablaVariables {
             System.out.print(", NUMVAR: ");
             System.out.print(cellAux.getNumeroVariable());
             System.out.println("");
-        }
-    }
-
-    public void imprimirIG(){
-        for (int i = 0; i < tablaIgualdades.size(); i++){
-            CeldaTablaIgualdades cellAux = tablaIgualdades.get(i);
+            CeldaTablaIgualdades cellAuxIg = tablaIgualdades.get(i);
             System.out.print("Contenido: ");
-            ArrayList<String> aux = cellAux.getContenido();
+            ArrayList<String> aux = cellAuxIg.getContenido();
             for (int j = 0; j < aux.size(); j++){
                 System.out.print(aux.get(j));
                 System.out.print("-");
             }
-            System.out.print(", Scope: ");
-            System.out.print(cellAux.getScope());
-            System.out.print(", NUMVAR: ");
-            System.out.print(cellAux.getNumeroVariable());
+            System.out.print(", ScopeIg: ");
+            System.out.print(cellAuxIg.getScope());
+            System.out.print(", NUMVARIG: ");
+            System.out.print(cellAuxIg.getNumeroVariable());
             System.out.println("");
         }
     }
