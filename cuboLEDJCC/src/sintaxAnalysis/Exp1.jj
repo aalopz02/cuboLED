@@ -124,7 +124,7 @@ void Exp(): {} {
 }
 
 
-void Inicial(): {Token op;} { Identificadores() ( "." OperacionesListas() | Igualdad()  ) ";"}
+void Inicial(): {Token op;} { Identificadores() ( "." (OperacionesListas() | FuncionesListas()) | "=" {checkMainDCL();} Igualdad()  ) ";"}
 
 void Identificadores(): {Token id;} { id=<ID> {
 												tablaVariables.agregarVariable(numeroVariable,id.image,scope);
@@ -133,7 +133,7 @@ void Identificadores(): {Token id;} { id=<ID> {
 	IdentificadoresAux() 
 	}
 
-void IdentificadoresAux(): {} {"," Identificadores() | "=" {System.out.println("="); checkMainDCL();} | Listas() {indiceAcceso = "";} ("=" {System.out.println("="); checkMainDCL();} | Empty()) | Empty()}
+void IdentificadoresAux(): {} {"," Identificadores() | Listas() {indiceAcceso = "";} | Empty()}
 
 void IgualdadValoresOperables(): {Token aux;} {aux = <ID> {System.out.println(aux);} 
 												(aux = <OPERADORES> {System.out.println(aux);} IgualdadAux() | "." FuncionesShape() | Listas() | Empty()) 
@@ -152,7 +152,7 @@ void IgualdadAux(): {Token aux;} {  aux = <BOOL> {System.out.println(aux);}
 
 void Igualdad(): {Token aux;} { IgualdadAux() ("," Igualdad() | Empty())}
 	
-void Listas(): {} { "[" {indiceAcceso += "[";} AccesoLista() "]" {indiceAcceso += "]";} ( "." FuncionesListas() | Listas() ) {agregarVariable();}
+void Listas(): {} { "[" {indiceAcceso += "[";} AccesoLista() "]" {indiceAcceso += "]";} Listas() {agregarVariable();}
 							| <LIST> CrearLista() Listas()
 							| Empty() }
 

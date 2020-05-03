@@ -20,9 +20,9 @@ z = x[1:4];
 x = list(range(5, true));
 x, q ,y = 20, 15, 1;
 
-Procedure Main()  { 
+Procedure Main()  {
 
-	
+
 }
 
 
