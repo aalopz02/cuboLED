@@ -1,20 +1,27 @@
 PARSER_BEGIN(SyntaxChecker)
 
-import javax.swing.JOptionPane;
-import java.util.*;
-import java.io.*;
+package sintaxAnalysis;
 
+import java.io.*;
+import java.util.ArrayList;
 
 public class SyntaxChecker {
 
-	private static int parentesis = 0;
+	private static int sameLineDCL = 0;
 	private static int mainDefinido = 0;
 	private static int scope = 0;
+	private static int numeroVariable = 0;
 	private static int inMain = 0;
+	private static Boolean addVarFalg = true;
+	private static String indiceAcceso = "";
+	private static ArrayList<String> valoresIgualdadTabla;
+	private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+	private static TablaVariables tablaVariables = new TablaVariables();
+	public static ArrayList<String> constantesConfig = new ArrayList<String>();
 	
     public static void main(String[] args) {
         try {
-			File file = new File("eje.txt"); 
+			File file = new File(nombreArchivo);
 			BufferedReader br = new BufferedReader(new FileReader(file)); 
 			String st; 	
 			String in = "";
@@ -25,6 +32,7 @@ public class SyntaxChecker {
 			System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
+			tablaVariables.imprimirIDS();
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -47,14 +55,6 @@ public class SyntaxChecker {
 		}
 	}
 	
-	static void checkDefinicionProc(){
-		if (scope != 0){
-			System.out.println("Illegal declaration of method");
-			ParseException e = generateParseException();  
-			System.out.println(e.toString());
-		}
-	}
-	
 	static void checkMainDCL() {
 		if (inMain == 1){
 			System.out.println("Illegal declaration in main method");
@@ -62,9 +62,26 @@ public class SyntaxChecker {
 			System.out.println(e.toString());
 		}
 	}
+	
+	static void agregarVariable() {
+		if (addVarFalg) {
+			tablaVariables.agregarIndiceAcceso(indiceAcceso);
+		}
+	}
+	
+	static void checkSameLineDCL() {
+		if (sameLineDCL != 0) {
+			System.out.println("Expected same number of expresions as ids in same line declaration");
+			ParseException e = generateParseException();  
+			System.out.println(e.toString());
+		}
+	}
+	
 }
 
 PARSER_END(SyntaxChecker)
+
+SKIP:  { " " | "\t" | "\n" | "\r" | <COMMENT: (("--")([";",",","a"-"z","0"-"9","_","&","@","A"-"Z"," ","+","*","-","/","%","=","(",")",".","[","]"])+)"\n" >}	
 
 TOKEN: { "(" | ")" | "," | "=" | "{" | "}"|"."
 		| <NUM: (["0"-"9"])+> 
@@ -92,67 +109,95 @@ TOKEN: { "(" | ")" | "," | "=" | "{" | "}"|"."
 		| <OPERADOR_COMPARADOR: ( "==" | "<" | "<" | "=>" | ">=" | "<>")>
 		}
 		
-SKIP:  { " " | "\t" | "\n" | "\r" | <COMMENT: (["-"]["-"]([";",",","a"-"z","0"-"9","_","&","@","A"-"Z"," ","+","*","-","/","%","=","(",")"])+)>}	
 
 void INICIAR(): {} {Constantes() S()} 		
 
 void S(): {} { Sder() | <EOF> }
 	
-void Sder(): {} {Inicial() S() 
-				|ifFunction() S() 
-				|Delay_Function() S() 
-				|Blink_Function() S()
+void Sder(): {} {
+				Inicial() S() 
 				|Procedure() S() 
-				|Call() S() 
-				|forFunction() S()
-				|Empty()
 				}
 
+void Exp(): {} {
+				Call() Exp() 
+				|Inicial() Exp()
+				|forFunction() Exp()
+				|ifFunction() Exp() 
+				|Delay_Function() Exp() 
+				|Blink_Function() Exp()
+				|Empty()
+}
 
-void Inicial(): {} { Identificadores() ( "." OperacionesListas() | Igualdad()  ) ";"}
+
+void Inicial(): {Token op;} { Identificadores() ( "." (OperacionesListas() | FuncionesListas()) | "=" {checkMainDCL();} Igualdad()  ) ";" {checkSameLineDCL();}}
 
 void Identificadores(): {Token id;} { id=<ID> {
-	System.out.print("id: ");
-	System.out.print(id.image);
-	System.out.println("");
-	}
+												tablaVariables.agregarVariable(numeroVariable,id.image,scope);
+												numeroVariable++;
+												}
 	IdentificadoresAux() 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+//CAMBIAR INDICE ACCESO POR Listas
 
-void IdentificadoresAux(): {} {"," Identificadores() | "=" {System.out.println("="); checkMainDCL();} | Listas() ("=" {System.out.println("="); checkMainDCL();} | Empty()) | Empty()}
 
-void IgualdadValoresOperables(): {Token aux;} {aux = <ID> {System.out.println(aux);} 
-												(aux = <OPERADORES> {System.out.println(aux);} IgualdadAux() | "." FuncionesShape() | Listas() | Empty()) 
-							| aux = <NUM> {System.out.println(aux);} (aux = <OPERADORES> {System.out.println(aux);} IgualdadAux() | Empty())
-							| aux = "(" {System.out.println(aux);} IgualdadAux() ")" {System.out.println(")");} 
-										((aux = <OPERADORES> {System.out.println(aux);} IgualdadValoresOperables()) | IgualdadValoresOperables())
+
+
+
+
+
+
+
+
+
+void IdentificadoresAux(): {} {"," {sameLineDCL += 1;} Identificadores() | {addVarFalg = true;} Listas() {indiceAcceso = "";} | Empty()}
+
+void IgualdadValoresOperables(): {Token aux;} {aux = <ID> (<OPERADORES> {valoresIgualdadTabla.add(aux.image);} IgualdadAux() 
+																		| "." {indiceAcceso += aux.image; indiceAcceso += ".";} FuncionesShape() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
+																		| {indiceAcceso+= aux.image; addVarFalg = false;} Listas() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
+																		| Empty()) 
+							| <NUM> {valoresIgualdadTabla.add("NUM");} (<OPERADORES> IgualdadValoresOperables() | Empty())
+							| "(" IgualdadAux() ")" ((<OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
 							| Empty()}
 
-void IgualdadAux(): {Token aux;} {  aux = <BOOL> {System.out.println(aux);} 
-									| aux = "(" {System.out.println(aux);} IgualdadValoresOperables() ")" {System.out.println(")");} 
-														((aux = <OPERADORES> {System.out.println(aux);} IgualdadValoresOperables()) | IgualdadValoresOperables())
-									| aux = "["  {System.out.println(aux);} ValoresListas() "]" {System.out.println("]");} 
-									| aux = <LIST> {System.out.println(aux);} CrearLista() Listas()
+void IgualdadAux(): {Token aux;} {  aux = <BOOL> {valoresIgualdadTabla.add(aux.image);} 
+									| "(" IgualdadValoresOperables() ")" (( <OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
+									| "[" {addVarFalg = false; indiceAcceso+="[";} ValoresListas() "]" {indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
+									| <LIST> {addVarFalg = false;} CrearLista() Listas() {addVarFalg = true;}
 									| FuncionLen() 
 									| IgualdadValoresOperables() }
 
-void Igualdad(): {Token aux;} { IgualdadAux() ("," Igualdad() | Empty())}
+void Igualdad(): {Token aux;} { {valoresIgualdadTabla = new ArrayList<String>();} IgualdadAux() {tablaVariables.agregarIgualdad(numeroVariable-sameLineDCL,scope,valoresIgualdadTabla);} 
+								("," {sameLineDCL -= 1;} Igualdad() | Empty())}
 	
-void Listas(): {Token aux;} { aux = "[" {System.out.println(aux);} AccesoLista() "]" {System.out.println("]");} ( "." FuncionesListas() | Empty()) Listas()
-							| aux = <LIST> {System.out.println(aux);} CrearLista() Listas()
-							| Empty()}
+void Listas(): {} { "[" {indiceAcceso += "[";} AccesoLista() "]" {indiceAcceso += "]";} Listas() {agregarVariable();}
+							| <LIST> CrearLista() Listas()
+							| Empty() }
 
-void AccesoLista(): {} { ":" "," Numeros() | Numeros() AccesoListaAux() | ValoresListas() }
+void AccesoLista(): {} { 
+						":" "," {indiceAcceso += ":,";} Numeros()  
+						| Numeros() AccesoListaAux() 
+						| ValoresListas() }
 
-void AccesoListaAux(): {} { ":"  Numeros() | "," Numeros() | Numeros() | Empty()}
+void AccesoListaAux(): {} { ":" {indiceAcceso+=":";} Numeros() | "," {indiceAcceso+=",";} Numeros() | Numeros() | Empty()}
 
-void ValoresListas(): {Token aux;} { aux = <BOOL> {System.out.println(aux);} ValoresListasAux()
+void ValoresListas(): {Token aux;} { aux = <BOOL> {indiceAcceso+=aux.image;} ValoresListasAux()
 									| Listas() ValoresListasAux()
 									| Empty()}	
 									
-void ValoresListasAux(): {} {"," (ValoresListas() | Listas()) | Empty()}
+void ValoresListasAux(): {} {"," ( {indiceAcceso+=",";} ValoresListas() | Listas()) | Empty()}
 
-void FuncionesListas(): {Token aux;} {(aux = <NEG> | aux = <T> | aux = <F>) {System.out.println(aux);} }
+void FuncionesListas(): {Token aux;} {(aux = <NEG> | aux = <T> | aux = <F>) {tablaVariables.agregarIgualdad(numeroVariable,scope,aux.image);} }
 	
 void CrearLista(): {Token aux;} { "(" aux = <RANGO> "(" {System.out.println(aux);} RangeParam()}
 
@@ -160,59 +205,47 @@ void RangeParam(): {Token n;} { Numeros() RangeParamVal()}
 
 void RangeParamVal(): {Token val;} { "," val = <BOOL> {System.out.println(val.image);} ")" ")" }	
 	
-void OperacionesListas(): {Token aux;} { aux = <INSERT> {System.out.println(aux.image);} "(" valoresInsert() ")"
-										| aux = <DELETE> {System.out.println(aux.image);} "(" valoresDel() ")"}	
+void OperacionesListas(): {Token aux;} { aux = <INSERT> {addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresInsert() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;}
+										| aux = <DELETE> {addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresDel() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;} }	
 	
-void valoresInsert(): {} { Listas() InsertMatriz()
-						 | InsertListas()}	
+void valoresInsert(): {} { 
+							{indiceAcceso = ""; valoresIgualdadTabla.add("InsertMatriz");} Listas() {valoresIgualdadTabla.add(indiceAcceso);} InsertMatriz() | {valoresIgualdadTabla.add("InsertListas");} InsertListas() }	
 	
-void InsertMatriz(): {} { Listas() "," Numeros() ("," Numeros() | Empty())}	
+void InsertMatriz(): {} { "," {indiceAcceso = "";} Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} ("," Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} | Empty()) }	
 	
-void valoresDel(): {} {Numeros() ("," Numeros() | Empty())}	
+void valoresDel(): {} {Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} ("," Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}| Empty())}	
 	
-void InsertListas(): {Token val;} { Numeros() "," (val = <BOOL> {System.out.println(val.image);} | Listas())}	
+void InsertListas(): {Token val;} { {indiceAcceso = "";} Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} "," 
+									(val = <BOOL> {valoresIgualdadTabla.add(val.image);} 
+									| Listas() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} )}	
 	
-void Numeros(): {Token index;} { (index = <NUM> | index = <ID> ("." FuncionesShape() | Empty())) {System.out.println(index.image);} | FuncionLen()} 	
+void Numeros(): {Token index;} { 
+								index = <NUM> {indiceAcceso += index.image;}
+								| index = <ID> {indiceAcceso += index.image;} ("." {indiceAcceso+= ".";} FuncionesShape() | Empty()) 
+								| FuncionLen()} 	
 	
-void FuncionesShape(): {Token aux;} { (aux = <SHAPEC> | aux = <SHAPEF>) {System.out.println(aux.image); }}	
+void FuncionesShape(): {Token aux;} { (aux = <SHAPEC> | aux = <SHAPEF>) {indiceAcceso += aux.image;}}	
 	
-void FuncionLen(): {Token aux;} { aux = <LENGTH> {System.out.println(aux.image);} "(" <ID> Listas() ")" }	
+void FuncionLen(): {Token aux;} { aux = <LENGTH> {indiceAcceso+=aux.image;} "(" aux = <ID> {indiceAcceso+=";"; indiceAcceso+=aux.image; indiceAcceso+=";";} Listas() ")" {indiceAcceso = "";}}	
 
 void Iterable():{Token aux;}{ aux = <ID> {System.out.println(aux.image);} Iterable_Aux() | <NUM> | FuncionLen()}
 
 void Iterable_Aux(): {} {"[" { System.out.print("["); } Adentro_Lista() "]" { System.out.print("]"); } Iterable_Aux() | "." FuncionesShape() | Empty()}
 
 void ifFunction(): {Token aux;} { aux = "if" {System.out.println(aux);} Iterable() aux = <OPERADOR_COMPARADOR> {System.out.println(aux);} 
-								(aux = <BOOL> {System.out.println(aux);} | Iterable() ) "{" S() "}"}		
+								(aux = <BOOL> {System.out.println(aux);} | Iterable() ) "{" Exp() "}"}		
 	
 void Constantes(): {} { Timer() Rango_Timer() Dim_Filas() Dim_Columnas() Cubo() }	
 	
-void Timer(): {Token n;} {<TIMER> "=" n = <NUM> ";"{
-	System.out.print("Timer: ");
-	System.out.print(n.image);
-	System.out.println("");}}
+void Timer(): {Token n;} {<TIMER> "=" n = <NUM> ";" {constantesConfig.add(n.image);}}
 
-void Rango_Timer(): {Token rango;} { <RANGO_TIMER> "=" rango = <OPCIONESRANGO> ";"{
-	System.out.print("Rango_Timer: ");
-	System.out.print(rango.image);
-	System.out.println("");}}
+void Rango_Timer(): {Token rango;} { <RANGO_TIMER> "=" rango = <OPCIONESRANGO> ";" {constantesConfig.add(rango.image);}}
 
-void Dim_Filas(): {Token filas;} { <DIM_FILAS> "=" filas = <NUM> ";"{
-	System.out.print("Filas: ");
-	System.out.print(filas.image);
-	System.out.println("");}}
+void Dim_Filas(): {Token filas;} { <DIM_FILAS> "=" filas = <NUM> ";" {constantesConfig.add(filas.image);}}
 
-void Dim_Columnas(): {Token columnas;} { <DIM_COLUMNAS> "=" columnas = <NUM> ";"{
-	System.out.print("Columnas: ");
-	System.out.print(columnas.image);
-	System.out.println("");}}
+void Dim_Columnas(): {Token columnas;} { <DIM_COLUMNAS> "=" columnas = <NUM> ";" {constantesConfig.add(columnas.image);}}
 
-void Cubo(): {Token i; Token j;} { <CUBO> "=" i = <NUM> "," j = <NUM> ";" {
-	System.out.print("Cubo: ");
-	System.out.print(i);
-	System.out.print(", ");
-	System.out.print(j);
-	System.out.println("");}}
+void Cubo(): {Token i; Token j;} { <CUBO> "=" i = <NUM> "," j = <NUM> ";" {constantesConfig.add(i.image); constantesConfig.add(j.image);}}
 
 void Empty() : {}
 {
@@ -221,16 +254,7 @@ void Empty() : {}
 
 void Delay_Function(): {} { { System.out.println("Delay"); } "Delay"  "(" Delay_Expression() ")" ";"}
 
-void Delay_Expression(): {Token num; Token range;} {num=<NUM> "," range=<OPCIONESRANGO>{
-		System.out.println("(");
-		System.out.println(num);
-		System.out.println(",");
-		System.out.println(range);
-		System.out.println(")");} 
-	|  Empty() {
-		System.out.println("(");
-		System.out.println(")");}
-	}
+void Delay_Expression(): {Token num; Token range;} {num=<NUM> "," range=<OPCIONESRANGO> |  Empty() }
 
 void Blink_Function(): {} {{ System.out.println("Blink"); } "Blink"  "(" { System.out.println("("); } Blink_Expression() ")" { System.out.println(")"); } ";"}
 
@@ -244,13 +268,13 @@ void Adentro_Lista(): {Token num;} {(num=<NUM> | num = ":") { System.out.println
 
 void Adentro_Lista_Aux1(): {Token num;} {":" { System.out.println(":");} num=<NUM> { System.out.println(num); } | "," num=<NUM> { System.out.println(num); }| Empty() }
 
-void Procedure(): {} {"Procedure" { System.out.println("Procedure"); checkDefinicionProc();} NombreRutina() }
+void Procedure(): {} {"Procedure" { System.out.println("Procedure");} NombreRutina() }
 
 void NombreRutina():{Token id;}{ id=<ID> { System.out.println(id); } normalProc() | <MAIN> { System.out.println("Main"); checkMainDefined(0); inMain = 1;} mainProc()}
 
-void normalProc(): {} {"(" Parametros() ")" "{" {System.out.println("Scope aumenta"); scope = 1;} S() "}" {scope = 0;}}
+void normalProc(): {} {"(" Parametros() ")" "{" {System.out.println("Scope aumenta"); scope = 1;} Exp() "}" }
 
-void mainProc(): {} {"(" ")" "{" {scope = 1;} S() "}" {inMain = 0; scope = 0;}}
+void mainProc(): {} {"(" ")" "{" Exp() "}" {inMain = 0;}}
 
 void Call():{Token id;} {"Call" { System.out.println("Call"); } 
 							id=<ID> { System.out.print(id); } 
@@ -266,6 +290,6 @@ void ParametrosAux(): {} {"," ParametrosAux1() | Empty()}
 
 void ParametrosAux1(): {Token id;} {id = <ID> {System.out.println(id);} ParametrosAux()}
 
-void forFunction():{Token id;} {"for" { System.out.println("for"); } id=<ID> { System.out.print(id); } "in"  { System.out.print("in"); } Iterable() Step()  "{" { System.out.println("{"); } S() "}" { System.out.println("}"); }  }
+void forFunction():{Token id;} {"for" { System.out.println("for"); } id=<ID> { System.out.print(id); } "in"  { System.out.print("in"); } Iterable() Step()  "{" { System.out.println("{"); } Exp() "}" { System.out.println("}"); }  }
 
 void Step():{Token num;}{("Step" { System.out.print("Step"); } num=<NUM> { System.out.print(num); })|Empty() }

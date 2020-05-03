@@ -1,4 +1,4 @@
-Timer = 1;
+Timer = 1; --asdsaascsscxsdd
 Rango_Timer = Seg;
 Dim_Filas = 12;
 Dim_Columnas = 2;
@@ -6,72 +6,24 @@ Cubo = 5,5;
 
 a = x + y * 10 / 4 ;
 b = x + ((y * 10) / 4);
-c=  ((x + y) * 10) / 4;
-x, y = 20, 15; 
+a = [true, false, [true]];
+c.insert([true,false], 1,2 );
+c.insert([true,false], 1);
+q.insert(21, [true,false,false]);
+l.del(1,1);
+p[1,0].T;
+x, y = 20, a;
+x[1][2][c.shapeC] = 1;
 e = true;
-h = 5;
-y = x[0] ;
+h[1].Neg;
+y = x[0];
 z = x[1:4];
-x = list(range(5, true)) ;
-milista[0] =true;
-milista[1:3] = [true, false] ; 
-ista.insert(2,false);
-ista.insert(len(a[1][t]),false);
-sta.del(2) ;
-a, b = a.shapeF,len(lopij) ;
-x[1].Neg;
-milista[1].T;
-milista[1:3].F;
+ x = list(range(5, true));
+ x, q ,y = 20, 15, 1;
 
-for var1 in a.shapeF {
-	x[var1].Neg;
-	Blink(x[1],5, Seg, true);
-	Blink(x[1], false);
-	Delay( 5,  Mil );
-	Delay(15,Seg);
-	for a in len(a[2]) Step 2 {
-		mi_varia = [];
-		x = [true, true, false, false, false, false, true, true, true, true];
-	}
-}
-
-matriz3d[1][1][1] = le[1][1][1];
-
-if matriz3d[1][1][1] == le[1][1][1]    {   
-	a = 1;
-	matriz3d[1][1][1] = true; 
-	for var1 in milista[1:3]   { 
-    		 x[var1].Neg;
-	 }
- }
-
-if m == 1  {   
-	a = 2;
-	if  a[:, 1] ==  true    { 
-		a = 23;
-	}
- }
+Procedure Main()  {
 
 
-Procedure p1(a,b,c,a)  {   
-	a = m[1];
-	a = m[1,1];
-	a = m[:,1];
-	w.insert([[true, false, true]],  0);
-	x.insert([[true], [true] , [true]], 1);
-	y.insert([[false, false, false, false]],  0, 0);
-	z.insert([[true], [true] , [true] , [true]], 1,0);
-	z1.del(0,0);
-	z2.del(1,0);
-}
-
-
-Procedure Main()  {   
-	z1.del(0,0);
-	z2.del(1,0);
-	Call miproc();
-	Call miproc(1,a,m[:,1],[[true], [true] , [true] , [true]],true);
-	Call miproc(le[1][1][1],m[1]);
 }
 
 
