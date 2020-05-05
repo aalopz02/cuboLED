@@ -22,6 +22,11 @@ public class CeldaTablaIgualdades {
         setContenido(contenido);
     }
 
+    CeldaTablaIgualdades(int Scope, ArrayList<String> contenido){
+        setScope(Scope);
+        setContenido(contenido);
+    }
+
     public int getNumeroVariable() {
         return numeroVariable;
     }

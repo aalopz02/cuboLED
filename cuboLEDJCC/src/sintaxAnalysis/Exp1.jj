@@ -138,27 +138,6 @@ void Identificadores(): {Token id;} { id=<ID> {
 												}
 	IdentificadoresAux() 
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-//CAMBIAR INDICE ACCESO POR Listas
-
-
-
-
-
-
-
-
-
-
 
 void IdentificadoresAux(): {} {"," {sameLineDCL += 1;} Identificadores() | {addVarFalg = true;} Listas() {indiceAcceso = "";} | Empty()}
 
@@ -173,15 +152,15 @@ void IgualdadValoresOperables(): {Token aux;} {aux = <ID> (<OPERADORES> {valores
 void IgualdadAux(): {Token aux;} {  aux = <BOOL> {valoresIgualdadTabla.add(aux.image);} 
 									| "(" IgualdadValoresOperables() ")" (( <OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
 									| "[" {addVarFalg = false; indiceAcceso+="[";} ValoresListas() "]" {indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
-									| <LIST> {addVarFalg = false;} CrearLista() Listas() {addVarFalg = true;}
-									| FuncionLen() 
+									| <LIST> {addVarFalg = false; valoresIgualdadTabla.add("createList");} CrearLista() Listas() {addVarFalg = true;}
+									| FuncionLen() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
 									| IgualdadValoresOperables() }
 
 void Igualdad(): {Token aux;} { {valoresIgualdadTabla = new ArrayList<String>();} IgualdadAux() {tablaVariables.agregarIgualdad(numeroVariable-sameLineDCL,scope,valoresIgualdadTabla);} 
 								("," {sameLineDCL -= 1;} Igualdad() | Empty())}
 	
 void Listas(): {} { "[" {indiceAcceso += "[";} AccesoLista() "]" {indiceAcceso += "]";} Listas() {agregarVariable();}
-							| <LIST> CrearLista() Listas()
+							| <LIST> {addVarFalg = false; valoresIgualdadTabla.add("createList");} CrearLista() Listas() 
 							| Empty() }
 
 void AccesoLista(): {} { 
@@ -199,11 +178,11 @@ void ValoresListasAux(): {} {"," ( {indiceAcceso+=",";} ValoresListas() | Listas
 
 void FuncionesListas(): {Token aux;} {(aux = <NEG> | aux = <T> | aux = <F>) {tablaVariables.agregarIgualdad(numeroVariable,scope,aux.image);} }
 	
-void CrearLista(): {Token aux;} { "(" aux = <RANGO> "(" {System.out.println(aux);} RangeParam()}
+void CrearLista(): {Token aux;} { "(" <RANGO> "(" RangeParam()}
 
-void RangeParam(): {Token n;} { Numeros() RangeParamVal()}
+void RangeParam(): {Token n;} { Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso="";} RangeParamVal()}
 
-void RangeParamVal(): {Token val;} { "," val = <BOOL> {System.out.println(val.image);} ")" ")" }	
+void RangeParamVal(): {Token val;} { "," val = <BOOL> {valoresIgualdadTabla.add(val.image);} ")" ")" }	
 	
 void OperacionesListas(): {Token aux;} { aux = <INSERT> {addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresInsert() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;}
 										| aux = <DELETE> {addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresDel() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;} }	
@@ -222,11 +201,11 @@ void InsertListas(): {Token val;} { {indiceAcceso = "";} Numeros() {valoresIgual
 void Numeros(): {Token index;} { 
 								index = <NUM> {indiceAcceso += index.image;}
 								| index = <ID> {indiceAcceso += index.image;} ("." {indiceAcceso+= ".";} FuncionesShape() | Empty()) 
-								| FuncionLen()} 	
+								| FuncionLen() } 	
 	
 void FuncionesShape(): {Token aux;} { (aux = <SHAPEC> | aux = <SHAPEF>) {indiceAcceso += aux.image;}}	
 	
-void FuncionLen(): {Token aux;} { aux = <LENGTH> {indiceAcceso+=aux.image;} "(" aux = <ID> {indiceAcceso+=";"; indiceAcceso+=aux.image; indiceAcceso+=";";} Listas() ")" {indiceAcceso = "";}}	
+void FuncionLen(): {Token aux;} { <LENGTH> {valoresIgualdadTabla.add("len");} "(" aux = <ID> {indiceAcceso+=aux.image;} Listas() ")"}	
 
 void Iterable():{Token aux;}{ aux = <ID> {System.out.println(aux.image);} Iterable_Aux() | <NUM> | FuncionLen()}
 
@@ -268,27 +247,19 @@ void Adentro_Lista(): {Token num;} {(num=<NUM> | num = ":") { System.out.println
 
 void Adentro_Lista_Aux1(): {Token num;} {":" { System.out.println(":");} num=<NUM> { System.out.println(num); } | "," num=<NUM> { System.out.println(num); }| Empty() }
 
-void Procedure(): {} {"Procedure" { System.out.println("Procedure");} NombreRutina() }
+void Procedure(): {} {"Procedure" NombreRutina() }
 
-void NombreRutina():{Token id;}{ id=<ID> { System.out.println(id); } normalProc() | <MAIN> { System.out.println("Main"); checkMainDefined(0); inMain = 1;} mainProc()}
+void NombreRutina():{Token id;}{ id=<ID> {tablaVariables.agregarProc(id.image, true);} normalProc() | <MAIN> {checkMainDefined(0); inMain = 1;} mainProc()}
 
-void normalProc(): {} {"(" Parametros() ")" "{" {System.out.println("Scope aumenta"); scope = 1;} Exp() "}" }
+void normalProc(): {} {"(" (Parametros() | Empty()) ")" "{" {scope = 1;} Exp() "}" }
 
 void mainProc(): {} {"(" ")" "{" Exp() "}" {inMain = 0;}}
 
-void Call():{Token id;} {"Call" { System.out.println("Call"); } 
-							id=<ID> { System.out.print(id); } 
-							"("  
-							Igualdad() 
-							")"
-							";"
-						}
+void Call():{Token id;} {"Call" id=<ID> {tablaVariables.agregarProc(id.image,false);} "(" Igualdad() ")" ";"}
 
-void Parametros(): {Token id;} { id = <ID> {System.out.println(id);} ParametrosAux() | Empty()}
+void Parametros(): {Token id;} { id = <ID> {tablaVariables.agregarParamProc(id.image);} ParametrosAux()}
 
-void ParametrosAux(): {} {"," ParametrosAux1() | Empty()}
-
-void ParametrosAux1(): {Token id;} {id = <ID> {System.out.println(id);} ParametrosAux()}
+void ParametrosAux(): {} {"," Parametros() | Empty()}
 
 void forFunction():{Token id;} {"for" { System.out.println("for"); } id=<ID> { System.out.print(id); } "in"  { System.out.print("in"); } Iterable() Step()  "{" { System.out.println("{"); } Exp() "}" { System.out.println("}"); }  }
 

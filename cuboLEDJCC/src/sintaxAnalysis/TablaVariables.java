@@ -6,9 +6,23 @@ public class TablaVariables {
 
     private ArrayList<CeldaTablaVariables> tabla = new ArrayList<>();
     private ArrayList<CeldaTablaIgualdades> tablaIgualdades = new ArrayList<>();
+    private ArrayList<CeldaTablaProc> tablaProc = new ArrayList<CeldaTablaProc>();
 
     public void agregarIndiceAcceso(String index){
         tabla.get(tabla.size()-1).setIndex(index);
+    }
+
+    public void agregarProc(String id, boolean dcl){
+        CeldaTablaProc cell = new CeldaTablaProc(id, dcl);
+        tablaProc.add(cell);
+    }
+
+    public void agregarParamProc(String paramIn){
+        tablaProc.get(tablaProc.size()-1).setParam(paramIn);
+    }
+
+    public void agregarParamProc(ArrayList<String> paramsCall, int scope){
+        tablaProc.get(tablaProc.size()-1).setParam(paramsCall,scope);
     }
 
     public void agregarVariable(int numeroVariable, String id, int Scope){
@@ -17,8 +31,12 @@ public class TablaVariables {
     }
 
     public void agregarIgualdad(int numeroVariable, int Scope, ArrayList<String> contenido){
-        CeldaTablaIgualdades cell = new CeldaTablaIgualdades(numeroVariable,Scope,contenido);
-        tablaIgualdades.add(cell);
+        if (numeroVariable == -1){
+            agregarParamProc(contenido, Scope);
+        } else {
+            CeldaTablaIgualdades cell = new CeldaTablaIgualdades(numeroVariable,Scope,contenido);
+            tablaIgualdades.add(cell);
+        }
     }
 
     public void agregarIgualdad(int numeroVariable, int Scope, String contenido){
@@ -56,6 +74,21 @@ public class TablaVariables {
             System.out.print(", NUMVARIG: ");
             System.out.print(cellAuxIg.getNumeroVariable());
             System.out.println("");
+        }
+        for (int i = 0; i < tablaProc.size(); i++){
+            CeldaTablaProc cell = tablaProc.get(i);
+            System.out.print("IDPROC: ");
+            System.out.print(cell.getId());
+            System.out.print(", Param: ");
+            if (cell.getParam() == null) {
+                System.out.println("NA");
+            } else {
+                ArrayList<String> params = cell.getParam();
+                System.out.println();
+                for (int j = 0; j < params.size(); j++) {
+                    System.out.println(params.get(j));
+                }
+            }
         }
     }
 }
