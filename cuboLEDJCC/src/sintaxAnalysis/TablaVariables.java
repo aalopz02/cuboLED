@@ -51,19 +51,19 @@ public class TablaVariables {
     public void imprimirIDS(){
         for (int i = 0; i < tabla.size(); i++){
             CeldaTablaVariables cellAux = tabla.get(i);
-            System.out.print("Ids: ");
-            System.out.print(cellAux.getId());
-            if (!cellAux.getIndex().equals("NA")){
-                System.out.print(", Index: ");
-                System.out.print(cellAux.getIndex());
-            }
-            System.out.print(", Scope: ");
-            System.out.print(cellAux.getScope());
-            System.out.print(", NUMVAR: ");
-            System.out.print(cellAux.getNumeroVariable());
-            System.out.println("");
+                System.out.print("Ids: ");
+                System.out.print(cellAux.getId());
+                if (!cellAux.getIndex().equals("NA")){
+                    System.out.print(", Index: ");
+                    System.out.print(cellAux.getIndex());
+                }
+                System.out.print(", Scope: ");
+                System.out.print(cellAux.getScope());
+                System.out.print(", NUMVAR: ");
+                System.out.print(cellAux.getNumeroVariable());
+                System.out.println("");
+
             CeldaTablaIgualdades cellAuxIg = tablaIgualdades.get(i);
-            if (cellAuxIg.getNumeroVariable() != -99) {
                 System.out.print("Contenido: ");
                 ArrayList<String> aux = cellAuxIg.getContenido();
                 for (int j = 0; j < aux.size(); j++){
@@ -75,7 +75,6 @@ public class TablaVariables {
                 System.out.print(", NUMVARIG: ");
                 System.out.print(cellAuxIg.getNumeroVariable());
                 System.out.println("");
-            }
 
         }
         for (int i = 0; i < tablaProc.size(); i++){

@@ -15,7 +15,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static String indiceAcceso = "";
         private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+        private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/full.txt";
         private static TablaVariables tablaVariables = new TablaVariables();
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
 
@@ -173,6 +173,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_consume_token(9);
                                                                                                        checkMainDCL();
       Igualdad();
+                                                                                                                                    checkSameLineDCL();
       break;
     default:
       jj_la1[4] = jj_gen;
@@ -180,7 +181,6 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       throw new ParseException();
     }
     jj_consume_token(43);
-                                                                                                                                           checkSameLineDCL();
   }
 
   static final public void Identificadores() throws ParseException {
@@ -632,16 +632,16 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       aux = jj_consume_token(ID);
                                           tablaVariables.agregarVariable(numeroVariable,aux.image,scope);
       Iterable_Aux();
-                                                                                                                           tablaVariables.agregarIndiceAcceso(indiceAcceso); indiceAcceso = "";
+                                                                                                                           tablaVariables.agregarIndiceAcceso(indiceAcceso); indiceAcceso = ""; tablaVariables.agregarIgualdad(-99,scope,"");
       break;
     case NUM:
       jj_consume_token(NUM);
-                                                                 tablaVariables.agregarIgualdad(numeroVariable,scope,"NUM");
+                                                                 tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"NUM");
       break;
     case LENGTH:
                                                            valoresIgualdadTabla = new ArrayList<String>();
       FuncionLen();
-                                                                                                                          tablaVariables.agregarIgualdad(numeroVariable, scope, valoresIgualdadTabla); indiceAcceso = "";
+                                                                                                                          tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable, scope, valoresIgualdadTabla); indiceAcceso = "";
       break;
     default:
       jj_la1[27] = jj_gen;
@@ -672,16 +672,15 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void ifFunction() throws ParseException {
-                    Token aux;
-    aux = jj_consume_token(30);
-                                              System.out.println(aux);
+                    Token bool;
+    jj_consume_token(30);
+                                         int aux = numeroVariable; numeroVariable=-2;
     Iterable();
-    aux = jj_consume_token(OPERADOR_COMPARADOR);
-                                                                                                                System.out.println(aux);
+    jj_consume_token(OPERADOR_COMPARADOR);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BOOL:
-      aux = jj_consume_token(BOOL);
-                                                                               System.out.println(aux);
+      bool = jj_consume_token(BOOL);
+                                                                                        tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,bool.image);
       break;
     case NUM:
     case LENGTH:
@@ -693,6 +692,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
+                                                                   numeroVariable=aux;
     jj_consume_token(10);
     Exp();
     jj_consume_token(11);
@@ -964,17 +964,16 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     jj_consume_token(31);
                                        scope += 1;
     id = jj_consume_token(ID);
-                                                             tablaVariables.agregarVariable(-1,id.image,scope);
+                                                             tablaVariables.agregarVariable(-1,id.image,scope); tablaVariables.agregarIgualdad(-1,scope,"");
     jj_consume_token(35);
-                                                                      int aux = numeroVariable; numeroVariable=0;
+                                                                      int aux = numeroVariable; numeroVariable=-1;
     Iterable();
-                                                                                                                               numeroVariable=aux;
+                                                                                                                                numeroVariable=aux;
     Step();
     jj_consume_token(10);
     Exp();
     jj_consume_token(11);
                                                                                       scope -= 1;
-                                                                                                    tablaVariables.agregarIgualdad(-98,scope,""); tablaVariables.agregarIgualdad(-98,scope,"");
   }
 
   static final public void Step() throws ParseException {

@@ -7,21 +7,12 @@ Cubo = 5,5;
 a=1;
 
 Procedure atun (d1,e2,f3){
-for x in lista {
-a= 1;
-for b in lista[1:2] Step 2{
-qw= 1;
 
-}
-
-}
 
 }
 
 Procedure Main()  {
 
-
 }
-
 
 

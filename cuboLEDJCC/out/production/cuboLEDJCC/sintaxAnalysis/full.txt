@@ -32,24 +32,43 @@ aa[var1].Neg;
 ab[:, 1] =  true;
 ac = 23;
 
-Procedure p1(a,b,c)  {   
-	ad = m[1];
-	ae = m[1,1];
-	af = m[:,1];
+Procedure p1(a,b,c)  {
+    for x in lista {
+        a = 1;
+        for b in lista[1:2] Step 2{
+            al.del(0,0);
+            am.del(1,0);
+        }
+    }
+    if  aif[:, 1] ==  true    {
+        ad = m[1];
+        ae = m[1,1];
+        af = m[:,1];
+    }
+
 	ag.insert([[true, false, true]],  0);
 	ah.insert([[true], [true] , [true]], 1);
 	ai.insert([[false, false, false, false]],  0, 0);
 	aj.insert([[true], [true] , [true] , [true]], 1,0);
-	ak.del(0,0);
-	al.del(1,0);
+
 }
 
 
-Procedure Main()  {   
-	al.del(0,0);
-	am.del(1,0);
-	Call miproc();
-	Call miproc(1,a,m[:,1],[[true], [true] , [true] , [true]],true);
+Procedure Main()  {
+    if var == 2 {
+        Call miproc(1,a,m[:,1],[[true], [true] , [true] , [true]],true);
+    }
+    for xy in a {
+        Call miproc();
+        for bq in lista[1:2] Step 2{
+            if  listaX[2] ==  true{
+                 ak.del(0,0);
+                 al.del(1,0);
+            }
+
+        }
+    }
+
 	Call miproc(le[1][1][1],m[1]);
 }
 
