@@ -63,32 +63,60 @@ public class TablaVariables {
             System.out.print(cellAux.getNumeroVariable());
             System.out.println("");
             CeldaTablaIgualdades cellAuxIg = tablaIgualdades.get(i);
-            System.out.print("Contenido: ");
-            ArrayList<String> aux = cellAuxIg.getContenido();
-            for (int j = 0; j < aux.size(); j++){
-                System.out.print(aux.get(j));
-                System.out.print("-");
+            if (cellAuxIg.getNumeroVariable() != -99) {
+                System.out.print("Contenido: ");
+                ArrayList<String> aux = cellAuxIg.getContenido();
+                for (int j = 0; j < aux.size(); j++){
+                    System.out.print(aux.get(j));
+                    System.out.print("-");
+                }
+                System.out.print(", ScopeIg: ");
+                System.out.print(cellAuxIg.getScope());
+                System.out.print(", NUMVARIG: ");
+                System.out.print(cellAuxIg.getNumeroVariable());
+                System.out.println("");
             }
-            System.out.print(", ScopeIg: ");
-            System.out.print(cellAuxIg.getScope());
-            System.out.print(", NUMVARIG: ");
-            System.out.print(cellAuxIg.getNumeroVariable());
-            System.out.println("");
+
         }
         for (int i = 0; i < tablaProc.size(); i++){
             CeldaTablaProc cell = tablaProc.get(i);
-            System.out.print("IDPROC: ");
-            System.out.print(cell.getId());
-            System.out.print(", Param: ");
-            if (cell.getParam() == null) {
-                System.out.println("NA");
+            if (cell.isDcl()) {
+                System.out.print("IDPROC: ");
+                System.out.print(cell.getId());
+                System.out.print(", Param: ");
+                if (cell.getParam() == null) {
+                    System.out.println("NA");
+                } else {
+                    ArrayList<String> params = cell.getParam();
+                    System.out.println();
+                    for (int j = 0; j < params.size(); j++) {
+                        System.out.println(params.get(j));
+                    }
+                }
             } else {
-                ArrayList<String> params = cell.getParam();
-                System.out.println();
-                for (int j = 0; j < params.size(); j++) {
-                    System.out.println(params.get(j));
+                System.out.print("Call to: ");
+                System.out.print(cell.getId());
+                System.out.print(", Param: ");
+                if (cell.getVars().isEmpty()) {
+                    System.out.println();
+                    System.out.print("NA");
+                } else {
+                    ArrayList<CeldaTablaIgualdades> params = cell.getVars();
+                    for (int j = 0; j < params.size(); j++) {
+                        CeldaTablaIgualdades aux = params.get(j);
+                        ArrayList<String> auxParams = aux.getContenido();
+                        System.out.println();
+                        for (int k = 0; k < auxParams.size(); k++) {
+                            System.out.print(auxParams.get(k));
+                            System.out.print("-");
+                        }
+                        System.out.print(" Scope: ");
+                        System.out.print(aux.getScope());
+                    }
                 }
             }
+            System.out.println("");
         }
+
     }
 }

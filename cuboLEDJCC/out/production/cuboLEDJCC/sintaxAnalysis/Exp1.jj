@@ -14,6 +14,7 @@ public class SyntaxChecker {
 	private static int inMain = 0;
 	private static Boolean addVarFalg = true;
 	private static String indiceAcceso = "";
+	private static Boolean inCall = false;
 	private static ArrayList<String> valoresIgualdadTabla;
 	private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
 	private static TablaVariables tablaVariables = new TablaVariables();
@@ -156,7 +157,13 @@ void IgualdadAux(): {Token aux;} {  aux = <BOOL> {valoresIgualdadTabla.add(aux.i
 									| FuncionLen() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
 									| IgualdadValoresOperables() }
 
-void Igualdad(): {Token aux;} { {valoresIgualdadTabla = new ArrayList<String>();} IgualdadAux() {tablaVariables.agregarIgualdad(numeroVariable-sameLineDCL,scope,valoresIgualdadTabla);} 
+void Igualdad(): {Token aux;} { {valoresIgualdadTabla = new ArrayList<String>();} IgualdadAux() {
+																									if (!inCall){
+																										tablaVariables.agregarIgualdad(numeroVariable-sameLineDCL,scope,valoresIgualdadTabla);
+																									} else {
+																										tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+																									}
+																								} 
 								("," {sameLineDCL -= 1;} Igualdad() | Empty())}
 	
 void Listas(): {} { "[" {indiceAcceso += "[";} AccesoLista() "]" {indiceAcceso += "]";} Listas() {agregarVariable();}
@@ -207,9 +214,11 @@ void FuncionesShape(): {Token aux;} { (aux = <SHAPEC> | aux = <SHAPEF>) {indiceA
 	
 void FuncionLen(): {Token aux;} { <LENGTH> {valoresIgualdadTabla.add("len");} "(" aux = <ID> {indiceAcceso+=aux.image;} Listas() ")"}	
 
-void Iterable():{Token aux;}{ aux = <ID> {System.out.println(aux.image);} Iterable_Aux() | <NUM> | FuncionLen()}
+void Iterable():{Token aux;}{ aux = <ID> {tablaVariables.agregarVariable(numeroVariable,aux.image,scope);} Iterable_Aux() {tablaVariables.agregarIndiceAcceso(indiceAcceso); indiceAcceso = "";}
+							| <NUM> {tablaVariables.agregarIgualdad(numeroVariable,scope,"NUM");}
+							| {valoresIgualdadTabla = new ArrayList<String>();} FuncionLen() {tablaVariables.agregarIgualdad(numeroVariable, scope, valoresIgualdadTabla); indiceAcceso = "";}}
 
-void Iterable_Aux(): {} {"[" { System.out.print("["); } Adentro_Lista() "]" { System.out.print("]"); } Iterable_Aux() | "." FuncionesShape() | Empty()}
+void Iterable_Aux(): {} {"[" {indiceAcceso+="[";} Adentro_Lista() "]" {indiceAcceso+="]";} Iterable_Aux() | "."  {indiceAcceso+= ".";} FuncionesShape() | Empty()}
 
 void ifFunction(): {Token aux;} { aux = "if" {System.out.println(aux);} Iterable() aux = <OPERADOR_COMPARADOR> {System.out.println(aux);} 
 								(aux = <BOOL> {System.out.println(aux);} | Iterable() ) "{" Exp() "}"}		
@@ -243,24 +252,26 @@ void Blink_Expression_Aux(): {Token bool; Token num;}{num=<NUM> { System.out.pri
 
 void Blink_Expression_Aux1(): {Token range; Token bool;}{"," { System.out.println(","); } range= <OPCIONESRANGO> { System.out.println(range); } "," { System.out.println(","); } bool=<BOOL> { System.out.println(bool); }}
 
-void Adentro_Lista(): {Token num;} {(num=<NUM> | num = ":") { System.out.println(num);}  Adentro_Lista_Aux1() }
+void Adentro_Lista(): {Token num;} {(num=<NUM> {indiceAcceso+=num.image;}| num = ":" {indiceAcceso+=num.image;} ) Adentro_Lista_Aux1() }
 
-void Adentro_Lista_Aux1(): {Token num;} {":" { System.out.println(":");} num=<NUM> { System.out.println(num); } | "," num=<NUM> { System.out.println(num); }| Empty() }
+void Adentro_Lista_Aux1(): {Token num;} {":" {indiceAcceso+=":";} num=<NUM> {indiceAcceso+=num.image;} | "," {indiceAcceso+=",";} num=<NUM> {indiceAcceso+=num.image;} | Empty() }
 
 void Procedure(): {} {"Procedure" NombreRutina() }
 
 void NombreRutina():{Token id;}{ id=<ID> {tablaVariables.agregarProc(id.image, true);} normalProc() | <MAIN> {checkMainDefined(0); inMain = 1;} mainProc()}
 
-void normalProc(): {} {"(" (Parametros() | Empty()) ")" "{" {scope = 1;} Exp() "}" }
+void normalProc(): {} {"(" (Parametros() | Empty()) ")" "{" {scope = 1;} Exp() "}" {scope = 0;}}
 
-void mainProc(): {} {"(" ")" "{" Exp() "}" {inMain = 0;}}
+void mainProc(): {} {"(" ")" "{" Exp() "}" {inMain = 0; scope = 0;}}
 
-void Call():{Token id;} {"Call" id=<ID> {tablaVariables.agregarProc(id.image,false);} "(" Igualdad() ")" ";"}
+void Call():{Token id;} {"Call" id=<ID> {tablaVariables.agregarProc(id.image,false); inCall = true;} "(" Igualdad() ")" ";" { inCall = false;}}
 
 void Parametros(): {Token id;} { id = <ID> {tablaVariables.agregarParamProc(id.image);} ParametrosAux()}
 
 void ParametrosAux(): {} {"," Parametros() | Empty()}
 
-void forFunction():{Token id;} {"for" { System.out.println("for"); } id=<ID> { System.out.print(id); } "in"  { System.out.print("in"); } Iterable() Step()  "{" { System.out.println("{"); } Exp() "}" { System.out.println("}"); }  }
+void forFunction():{Token id;} {"for" {scope += 1;} id=<ID> {tablaVariables.agregarVariable(-1,id.image,scope);} 
+								"in" {int aux = numeroVariable; numeroVariable=0;} Iterable() {numeroVariable=aux;} 
+								Step() "{" Exp() "}" {scope -= 1;} {tablaVariables.agregarIgualdad(-98,scope,""); tablaVariables.agregarIgualdad(-98,scope,"");} }
 
-void Step():{Token num;}{("Step" { System.out.print("Step"); } num=<NUM> { System.out.print(num); })|Empty() }
+void Step():{}{"Step" <NUM> | Empty() }

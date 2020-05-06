@@ -13,8 +13,9 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static int inMain = 0;
         private static Boolean addVarFalg = true;
         private static String indiceAcceso = "";
+        private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/full.txt";
+        private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
         private static TablaVariables tablaVariables = new TablaVariables();
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
 
@@ -311,7 +312,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                   Token aux;
                                  valoresIgualdadTabla = new ArrayList<String>();
     IgualdadAux();
-                                                                                                 tablaVariables.agregarIgualdad(numeroVariable-sameLineDCL,scope,valoresIgualdadTabla);
+                                                                                                                                                                                                        if (!inCall){
+                                                                                                                                                                                                                tablaVariables.agregarIgualdad(numeroVariable-sameLineDCL,scope,valoresIgualdadTabla);
+                                                                                                                                                                                                        } else {
+                                                                                                                                                                                                                tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+                                                                                                                                                                                                        }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 8:
       jj_consume_token(8);
@@ -625,14 +630,18 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ID:
       aux = jj_consume_token(ID);
-                                          System.out.println(aux.image);
+                                          tablaVariables.agregarVariable(numeroVariable,aux.image,scope);
       Iterable_Aux();
+                                                                                                                           tablaVariables.agregarIndiceAcceso(indiceAcceso); indiceAcceso = "";
       break;
     case NUM:
       jj_consume_token(NUM);
+                                                                 tablaVariables.agregarIgualdad(numeroVariable,scope,"NUM");
       break;
     case LENGTH:
+                                                           valoresIgualdadTabla = new ArrayList<String>();
       FuncionLen();
+                                                                                                                          tablaVariables.agregarIgualdad(numeroVariable, scope, valoresIgualdadTabla); indiceAcceso = "";
       break;
     default:
       jj_la1[27] = jj_gen;
@@ -645,14 +654,15 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 44:
       jj_consume_token(44);
-                               System.out.print("[");
+                              indiceAcceso+="[";
       Adentro_Lista();
       jj_consume_token(45);
-                                                                              System.out.print("]");
+                                                                       indiceAcceso+="]";
       Iterable_Aux();
       break;
     case 12:
       jj_consume_token(12);
+                                                                                                                  indiceAcceso+= ".";
       FuncionesShape();
       break;
     default:
@@ -831,16 +841,17 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUM:
       num = jj_consume_token(NUM);
+                                                indiceAcceso+=num.image;
       break;
     case 46:
       num = jj_consume_token(46);
+                                                                                      indiceAcceso+=num.image;
       break;
     default:
       jj_la1[32] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-                                                              System.out.println(num);
     Adentro_Lista_Aux1();
   }
 
@@ -849,14 +860,15 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 46:
       jj_consume_token(46);
-                                               System.out.println(":");
+                                              indiceAcceso+=":";
       num = jj_consume_token(NUM);
-                                                                                     System.out.println(num);
+                                                                             indiceAcceso+=num.image;
       break;
     case 8:
       jj_consume_token(8);
+                                                                                                              indiceAcceso+=",";
       num = jj_consume_token(NUM);
-                                                                                                                                  System.out.println(num);
+                                                                                                                                             indiceAcceso+=num.image;
       break;
     default:
       jj_la1[33] = jj_gen;
@@ -904,6 +916,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                                                              scope = 1;
     Exp();
     jj_consume_token(11);
+                                                                                    scope = 0;
   }
 
   static final public void mainProc() throws ParseException {
@@ -912,18 +925,19 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     jj_consume_token(10);
     Exp();
     jj_consume_token(11);
-                                            inMain = 0;
+                                            inMain = 0; scope = 0;
   }
 
   static final public void Call() throws ParseException {
              Token id;
     jj_consume_token(32);
     id = jj_consume_token(ID);
-                                         tablaVariables.agregarProc(id.image,false);
+                                         tablaVariables.agregarProc(id.image,false); inCall = true;
     jj_consume_token(6);
     Igualdad();
     jj_consume_token(7);
     jj_consume_token(43);
+                                                                                                                              inCall = false;
   }
 
   static final public void Parametros() throws ParseException {
@@ -948,28 +962,26 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void forFunction() throws ParseException {
                     Token id;
     jj_consume_token(31);
-                                        System.out.println("for");
+                                       scope += 1;
     id = jj_consume_token(ID);
-                                                                               System.out.print(id);
+                                                             tablaVariables.agregarVariable(-1,id.image,scope);
     jj_consume_token(35);
-                                                                                                               System.out.print("in");
+                                                                      int aux = numeroVariable; numeroVariable=0;
     Iterable();
+                                                                                                                               numeroVariable=aux;
     Step();
     jj_consume_token(10);
-                                                                                                                                                                  System.out.println("{");
     Exp();
     jj_consume_token(11);
-                                                                                                                                                                                                         System.out.println("}");
+                                                                                      scope -= 1;
+                                                                                                    tablaVariables.agregarIgualdad(-98,scope,""); tablaVariables.agregarIgualdad(-98,scope,"");
   }
 
   static final public void Step() throws ParseException {
-             Token num;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 36:
       jj_consume_token(36);
-                                   System.out.print("Step");
-      num = jj_consume_token(NUM);
-                                                                           System.out.print(num);
+      jj_consume_token(NUM);
       break;
     default:
       jj_la1[37] = jj_gen;
