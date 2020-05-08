@@ -781,44 +781,59 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void Blink_Function() throws ParseException {
-                             System.out.println("Blink");
+                             tablaVariables.agregarProc("Blink",false); indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>();
     jj_consume_token(37);
     jj_consume_token(6);
-                                                                           System.out.println("(");
     Blink_Expression();
     jj_consume_token(7);
-                                                                                                                               System.out.println(")");
     jj_consume_token(43);
   }
 
+  static final public void ListaBlink() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 44:
+      jj_consume_token(44);
+                             indiceAcceso += "[";
+      Numeros();
+      jj_consume_token(45);
+                                                                  indiceAcceso += "]";
+      ListaBlink();
+      break;
+    default:
+      jj_la1[31] = jj_gen;
+      Empty();
+    }
+  }
+
   static final public void Blink_Expression() throws ParseException {
-                          Token id; Token bool;
+                          Token id;
     id = jj_consume_token(ID);
-                                                            System.out.println(id);
+                                               indiceAcceso+=id.image; indiceAcceso+="[";
     jj_consume_token(44);
-                                                                                            System.out.println("[");
-    Adentro_Lista();
+    Numeros();
     jj_consume_token(45);
-                                                                                                                                             System.out.println("]");
+                                                         indiceAcceso+="]";
+    ListaBlink();
+                                                                                           valoresIgualdadTabla.add(indiceAcceso); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
     jj_consume_token(8);
-                                                                                                                                                                              System.out.println(",");
     Blink_Expression_Aux();
   }
 
   static final public void Blink_Expression_Aux() throws ParseException {
                               Token bool; Token num;
+                                                        valoresIgualdadTabla = new ArrayList<String>();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUM:
       num = jj_consume_token(NUM);
-                                                                  System.out.println(num);
+                                                                                                                    valoresIgualdadTabla.add(num.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
       Blink_Expression_Aux1();
       break;
     case BOOL:
       bool = jj_consume_token(BOOL);
-                                                                                                                                     System.out.println(bool);
+                                                                                                                       valoresIgualdadTabla.add(bool.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
       break;
     default:
-      jj_la1[31] = jj_gen;
+      jj_la1[32] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -827,13 +842,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void Blink_Expression_Aux1() throws ParseException {
                                Token range; Token bool;
     jj_consume_token(8);
-                                                               System.out.println(",");
+                                                              valoresIgualdadTabla = new ArrayList<String>();
     range = jj_consume_token(OPCIONESRANGO);
-                                                                                                                   System.out.println(range);
+                                                                                                                                       valoresIgualdadTabla.add(range.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
     jj_consume_token(8);
-                                                                                                                                                      System.out.println(",");
+                                                                                                                     valoresIgualdadTabla = new ArrayList<String>();
     bool = jj_consume_token(BOOL);
-                                                                                                                                                                                               System.out.println(bool);
+                                                                                                                                                                                   valoresIgualdadTabla.add(bool.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
   }
 
   static final public void Adentro_Lista() throws ParseException {
@@ -845,10 +860,10 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       break;
     case 46:
       num = jj_consume_token(46);
-                                                                                      indiceAcceso+=num.image;
+                                                                                       indiceAcceso+=num.image;
       break;
     default:
-      jj_la1[32] = jj_gen;
+      jj_la1[33] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -871,7 +886,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                                                                                                                                              indiceAcceso+=num.image;
       break;
     default:
-      jj_la1[33] = jj_gen;
+      jj_la1[34] = jj_gen;
       Empty();
     }
   }
@@ -895,7 +910,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       mainProc();
       break;
     default:
-      jj_la1[34] = jj_gen;
+      jj_la1[35] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -908,7 +923,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       Parametros();
       break;
     default:
-      jj_la1[35] = jj_gen;
+      jj_la1[36] = jj_gen;
       Empty();
     }
     jj_consume_token(7);
@@ -954,7 +969,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       Parametros();
       break;
     default:
-      jj_la1[36] = jj_gen;
+      jj_la1[37] = jj_gen;
       Empty();
     }
   }
@@ -983,7 +998,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_consume_token(NUM);
       break;
     default:
-      jj_la1[37] = jj_gen;
+      jj_la1[38] = jj_gen;
       Empty();
     }
   }
@@ -998,7 +1013,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[38];
+  static final private int[] jj_la1 = new int[39];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1006,10 +1021,10 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1,0x0,0xc0000000,0x1f000000,0x1200,0x100,0x1000,0x0,0x0,0x2040,0x0,0x20204040,0x100,0x200000,0x20002000,0x20002100,0x4000,0x100,0x7000000,0x18000000,0x20202100,0x100,0x100,0x4000,0x1000,0x20002000,0x0,0x20002000,0x1000,0x20006000,0x2000,0x6000,0x2000,0x100,0x400000,0x0,0x100,0x0,};
+      jj_la1_0 = new int[] {0x1,0x0,0xc0000000,0x1f000000,0x1200,0x100,0x1000,0x0,0x0,0x2040,0x0,0x20204040,0x100,0x200000,0x20002000,0x20002100,0x4000,0x100,0x7000000,0x18000000,0x20202100,0x100,0x100,0x4000,0x1000,0x20002000,0x0,0x20002000,0x1000,0x20006000,0x2000,0x0,0x6000,0x2000,0x100,0x400000,0x0,0x100,0x0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x102,0x102,0x125,0x0,0x0,0x0,0x200,0x200,0x200,0x100,0x200,0x1000,0x0,0x1000,0x4100,0x4100,0x0,0x0,0x0,0x0,0x1100,0x0,0x0,0x0,0x0,0x100,0xc0,0x100,0x1000,0x100,0x0,0x0,0x4000,0x4000,0x100,0x100,0x0,0x10,};
+      jj_la1_1 = new int[] {0x102,0x102,0x125,0x0,0x0,0x0,0x200,0x200,0x200,0x100,0x200,0x1000,0x0,0x1000,0x4100,0x4100,0x0,0x0,0x0,0x0,0x1100,0x0,0x0,0x0,0x0,0x100,0xc0,0x100,0x1000,0x100,0x0,0x1000,0x0,0x4000,0x4000,0x100,0x100,0x0,0x10,};
    }
 
   /** Constructor with InputStream. */
@@ -1030,7 +1045,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1044,7 +1059,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -1061,7 +1076,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1071,7 +1086,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -1087,7 +1102,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1096,7 +1111,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -1152,7 +1167,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 38; i++) {
+    for (int i = 0; i < 39; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

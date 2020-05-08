@@ -237,24 +237,27 @@ void Dim_Columnas(): {Token columnas;} { <DIM_COLUMNAS> "=" columnas = <NUM> ";"
 
 void Cubo(): {Token i; Token j;} { <CUBO> "=" i = <NUM> "," j = <NUM> ";" {constantesConfig.add(i.image); constantesConfig.add(j.image);}}
 
-void Empty() : {}
-{
-     {}
-} 
+void Empty() : {} { {} } 
 
 void Delay_Function(): {} { { System.out.println("Delay"); } "Delay"  "(" Delay_Expression() ")" ";"}
 
 void Delay_Expression(): {Token num; Token range;} {num=<NUM> "," range=<OPCIONESRANGO> |  Empty() }
 
-void Blink_Function(): {} {{ System.out.println("Blink"); } "Blink"  "(" { System.out.println("("); } Blink_Expression() ")" { System.out.println(")"); } ";"}
+void Blink_Function(): {} { {tablaVariables.agregarProc("Blink",false); indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>();} "Blink" "("  Blink_Expression() ")" ";"}
 
-void Blink_Expression(): {Token id; Token bool;} {id=<ID> { System.out.println(id); } "[" { System.out.println("["); } Adentro_Lista() "]" { System.out.println("]"); } "," { System.out.println(","); } Blink_Expression_Aux()  }
+void ListaBlink(): {} { "[" {indiceAcceso += "[";} Numeros() "]" {indiceAcceso += "]";} ListaBlink() | Empty()}
 
-void Blink_Expression_Aux(): {Token bool; Token num;}{num=<NUM> { System.out.println(num); } Blink_Expression_Aux1() | bool=<BOOL> { System.out.println(bool); }}
+void Blink_Expression(): {Token id;} {id=<ID> {indiceAcceso+=id.image; indiceAcceso+="[";} "[" Numeros() "]"
+							{indiceAcceso+="]";} ListaBlink() {valoresIgualdadTabla.add(indiceAcceso); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} "," Blink_Expression_Aux()  }
 
-void Blink_Expression_Aux1(): {Token range; Token bool;}{"," { System.out.println(","); } range= <OPCIONESRANGO> { System.out.println(range); } "," { System.out.println(","); } bool=<BOOL> { System.out.println(bool); }}
+void Blink_Expression_Aux(): {Token bool; Token num;}{ {valoresIgualdadTabla = new ArrayList<String>();}
+													(num=<NUM> {valoresIgualdadTabla.add(num.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} Blink_Expression_Aux1() 
+													| bool=<BOOL> {valoresIgualdadTabla.add(bool.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);})}
 
-void Adentro_Lista(): {Token num;} {(num=<NUM> {indiceAcceso+=num.image;}| num = ":" {indiceAcceso+=num.image;} ) Adentro_Lista_Aux1() }
+void Blink_Expression_Aux1(): {Token range; Token bool;}{"," {valoresIgualdadTabla = new ArrayList<String>();} range= <OPCIONESRANGO> {valoresIgualdadTabla.add(range.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} 
+														"," {valoresIgualdadTabla = new ArrayList<String>();} bool=<BOOL> {valoresIgualdadTabla.add(bool.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} }
+
+void Adentro_Lista(): {Token num;} {(num=<NUM> {indiceAcceso+=num.image;} | num = ":" {indiceAcceso+=num.image;} ) Adentro_Lista_Aux1() }
 
 void Adentro_Lista_Aux1(): {Token num;} {":" {indiceAcceso+=":";} num=<NUM> {indiceAcceso+=num.image;} | "," {indiceAcceso+=",";} num=<NUM> {indiceAcceso+=num.image;} | Empty() }
 

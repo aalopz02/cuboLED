@@ -6,8 +6,7 @@ Cubo = 5,5;
 
 a=1;
 
-Procedure atun (d1,e2,f3){
-
+Procedure atun (){
 
 }
 
