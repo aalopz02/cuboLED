@@ -6,12 +6,9 @@ Cubo = 5,5;
 
 a=1;
 
-Procedure atun (){
-
+Procedure Main (){
+ a=a;
 }
 
-Procedure Main()  {
-
-}
 
 

@@ -40,27 +40,33 @@ public class SyntaxChecker {
         }
     }
 	
-	static void checkMainDefined(int llamada){
+	static void checkMainDefined(int llamada, Token token) throws ParseException{
 		if (mainDefinido == 0){
 			if (llamada ==  1){
 				System.out.println("Main method not defined");
+				System.out.println("In line: ");
+			    System.out.println(token.beginLine);
 				ParseException e = generateParseException();  
-				System.out.println(e.toString()); 
+				throw e;
 			} else {
 				mainDefinido = 1;
 			}
 		} else {
 			System.out.println("Main method already defined");
+			System.out.println("In line: ");
+			System.out.println(token.beginLine);
 			ParseException e = generateParseException();  
-			System.out.println(e.toString());
+			throw e;
 		}
 	}
 	
-	static void checkMainDCL() {
+	static void checkMainDCL(Token token) throws ParseException{
 		if (inMain == 1){
 			System.out.println("Illegal declaration in main method");
+			System.out.println("In line: ");
+			System.out.println(token.beginLine);
 			ParseException e = generateParseException();  
-			System.out.println(e.toString());
+			throw e;
 		}
 	}
 	
@@ -70,11 +76,13 @@ public class SyntaxChecker {
 		}
 	}
 	
-	static void checkSameLineDCL() {
+	static void checkSameLineDCL(Token token) throws ParseException{
 		if (sameLineDCL != 0) {
 			System.out.println("Expected same number of expresions as ids in same line declaration");
+			System.out.println("In line: ");
+			System.out.println(token.beginLine);
 			ParseException e = generateParseException();  
-			System.out.println(e.toString());
+			throw e;
 		}
 	}
 	
@@ -131,7 +139,7 @@ void Exp(): {} {
 }
 
 
-void Inicial(): {Token op;} { Identificadores() ( "." (OperacionesListas() | FuncionesListas()) | "=" {checkMainDCL();} Igualdad() {checkSameLineDCL();} ) ";" }
+void Inicial(): {Token aux;} { Identificadores() ( "." (OperacionesListas() | FuncionesListas()) | aux = "="  {checkMainDCL(aux);} Igualdad() {checkSameLineDCL(aux);} ) ";" }
 
 void Identificadores(): {Token id;} { id=<ID> {
 												tablaVariables.agregarVariable(numeroVariable,id.image,scope);
@@ -239,9 +247,9 @@ void Cubo(): {Token i; Token j;} { <CUBO> "=" i = <NUM> "," j = <NUM> ";" {const
 
 void Empty() : {} { {} } 
 
-void Delay_Function(): {} { { System.out.println("Delay"); } "Delay"  "(" Delay_Expression() ")" ";"}
+void Delay_Function(): {} {"Delay"  "(" Delay_Expression() ")" ";"}
 
-void Delay_Expression(): {Token num; Token range;} {num=<NUM> "," range=<OPCIONESRANGO> |  Empty() }
+void Delay_Expression(): {} {<NUM> "," <OPCIONESRANGO> |  Empty() }
 
 void Blink_Function(): {} { {tablaVariables.agregarProc("Blink",false); indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>();} "Blink" "("  Blink_Expression() ")" ";"}
 
@@ -263,7 +271,7 @@ void Adentro_Lista_Aux1(): {Token num;} {":" {indiceAcceso+=":";} num=<NUM> {ind
 
 void Procedure(): {} {"Procedure" NombreRutina() }
 
-void NombreRutina():{Token id;}{ id=<ID> {tablaVariables.agregarProc(id.image, true);} normalProc() | <MAIN> {checkMainDefined(0); inMain = 1;} mainProc()}
+void NombreRutina():{Token id;}{ id=<ID> {tablaVariables.agregarProc(id.image, true);} normalProc() | id = <MAIN> {checkMainDefined(0,id); inMain = 1;} mainProc()}
 
 void normalProc(): {} {"(" (Parametros() | Empty()) ")" "{" {scope = 1;} Exp() "}" {scope = 0;}}
 

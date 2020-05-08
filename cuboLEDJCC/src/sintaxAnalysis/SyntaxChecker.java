@@ -15,7 +15,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static String indiceAcceso = "";
         private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/full.txt";
+        private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
         private static TablaVariables tablaVariables = new TablaVariables();
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
 
@@ -39,27 +39,33 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         }
     }
 
-        static void checkMainDefined(int llamada){
+        static void checkMainDefined(int llamada, Token token) throws ParseException{
                 if (mainDefinido == 0){
                         if (llamada ==  1){
                                 System.out.println("Main method not defined");
+                                System.out.println("In line: ");
+                            System.out.println(token.beginLine);
                                 ParseException e = generateParseException();
-                                System.out.println(e.toString());
+                                throw e;
                         } else {
                                 mainDefinido = 1;
                         }
                 } else {
                         System.out.println("Main method already defined");
+                        System.out.println("In line: ");
+                        System.out.println(token.beginLine);
                         ParseException e = generateParseException();
-                        System.out.println(e.toString());
+                        throw e;
                 }
         }
 
-        static void checkMainDCL() {
+        static void checkMainDCL(Token token) throws ParseException{
                 if (inMain == 1){
                         System.out.println("Illegal declaration in main method");
+                        System.out.println("In line: ");
+                        System.out.println(token.beginLine);
                         ParseException e = generateParseException();
-                        System.out.println(e.toString());
+                        throw e;
                 }
         }
 
@@ -69,11 +75,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                 }
         }
 
-        static void checkSameLineDCL() {
+        static void checkSameLineDCL(Token token) throws ParseException{
                 if (sameLineDCL != 0) {
                         System.out.println("Expected same number of expresions as ids in same line declaration");
+                        System.out.println("In line: ");
+                        System.out.println(token.beginLine);
                         ParseException e = generateParseException();
-                        System.out.println(e.toString());
+                        throw e;
                 }
         }
 
@@ -148,7 +156,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void Inicial() throws ParseException {
-                 Token op;
+                 Token aux;
     Identificadores();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 12:
@@ -170,10 +178,10 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       }
       break;
     case 9:
-      jj_consume_token(9);
-                                                                                                       checkMainDCL();
+      aux = jj_consume_token(9);
+                                                                                                               checkMainDCL(aux);
       Igualdad();
-                                                                                                                                    checkSameLineDCL();
+                                                                                                                                               checkSameLineDCL(aux);
       break;
     default:
       jj_la1[4] = jj_gen;
@@ -758,7 +766,6 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void Delay_Function() throws ParseException {
-                              System.out.println("Delay");
     jj_consume_token(34);
     jj_consume_token(6);
     Delay_Expression();
@@ -767,12 +774,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void Delay_Expression() throws ParseException {
-                          Token num; Token range;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUM:
-      num = jj_consume_token(NUM);
+      jj_consume_token(NUM);
       jj_consume_token(8);
-      range = jj_consume_token(OPCIONESRANGO);
+      jj_consume_token(OPCIONESRANGO);
       break;
     default:
       jj_la1[30] = jj_gen;
@@ -905,8 +911,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       normalProc();
       break;
     case MAIN:
-      jj_consume_token(MAIN);
-                                                                                                              checkMainDefined(0); inMain = 1;
+      id = jj_consume_token(MAIN);
+                                                                                                                   checkMainDefined(0,id); inMain = 1;
       mainProc();
       break;
     default:
