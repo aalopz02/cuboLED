@@ -2,11 +2,25 @@ package sintaxAnalysis;
 
 import java.util.ArrayList;
 
+import static sintaxAnalysis.SyntaxChecker.generateParseException;
+
 public class TablaVariables {
 
     private ArrayList<CeldaTablaVariables> tabla = new ArrayList<>();
     private ArrayList<CeldaTablaIgualdades> tablaIgualdades = new ArrayList<>();
     private ArrayList<CeldaTablaProc> tablaProc = new ArrayList<CeldaTablaProc>();
+    private ArrayList<String> validTypes = new ArrayList<>();
+    private ArrayList<String> errors = new ArrayList<>();
+
+
+    TablaVariables() {
+        validTypes.add("BOOL");
+        validTypes.add("NUM");
+        errors.add("Not defined");
+        errors.add("Not in scope");
+        errors.add("Can not mix types");
+        errors.add("Already defined as");
+    }
 
     public void agregarIndiceAcceso(String index){
         tabla.get(tabla.size()-1).setIndex(index);
@@ -117,5 +131,77 @@ public class TablaVariables {
             System.out.println("");
         }
 
+    }
+
+    private void generateError(int errType, String cause) throws ParseException{
+        if (errType <= 1) {
+            System.out.print("Variable: ");
+            System.out.println(cause);
+            System.out.println(errors.get(errType));
+        } else if (errType == 2) {
+            System.out.println(errors.get(errType));
+            System.out.println(cause);
+        } else if (errType == 3) {
+            String[] erDescription = cause.split("-");
+            System.out.print("Variable: " + erDescription[0] + ", ");
+            System.out.println(errors.get(errType) + ": " + erDescription[1]);
+            System.out.println("New type: " + erDescription[2]);
+        }
+        ParseException e = generateParseException();
+        throw e;
+    }
+
+    public void checkVariables() throws ParseException {
+        inferTypes();
+    }
+
+    private void inferTypes() throws ParseException {
+        ArrayList<String> variablesDefinidas = new ArrayList<>();
+        ArrayList<Integer> scopeVars = new ArrayList<>();
+        ArrayList<String> types = new ArrayList<>();
+        for (int i = 0; i < tabla.size(); i ++) {
+            CeldaTablaVariables variable = tabla.get(i);
+            String idVar = variable.getId();
+            int scopeVar = variable.getScope();
+            int numbVar = variable.getNumeroVariable();
+            CeldaTablaIgualdades igualdad = tablaIgualdades.get(i);
+            ArrayList<String> contenidoIg = igualdad.getContenido();
+            String type = "";
+            String tiposOp = "NA";
+            for (String valor : contenidoIg) {
+                if (!validTypes.contains(valor)) {
+                    if (!variablesDefinidas.contains(valor)) {
+                        generateError(0, valor);
+                    } else {
+                        int indiceAssig = variablesDefinidas.indexOf(valor);
+                        int scopeVarIg = scopeVars.get(indiceAssig);
+                        if (!(scopeVarIg <= scopeVar)) {
+                            generateError(1, valor);
+                        }
+                        type = types.get(indiceAssig);
+                    }
+                } else {
+                    type = valor;
+                }
+                if (tiposOp.equals("NA")) {
+                    tiposOp = type;
+                } else if (!type.equals(tiposOp)){
+                    generateError(2,tiposOp+", "+type);
+                }
+            }
+            if (variablesDefinidas.contains(idVar)) {
+                String oldType = types.get(variablesDefinidas.indexOf(idVar));
+                if (!tiposOp.equals(oldType)) {
+                    generateError(3,idVar+"-"+oldType+"-"+tiposOp);
+                }
+            } else {
+                variablesDefinidas.add(idVar);
+            }
+            System.out.print("Nombre: " + idVar);
+            scopeVars.add(scopeVar);
+            System.out.print(", Scope: " +scopeVar);
+            types.add(type);
+            System.out.println(", Type: " + type);
+        }
     }
 }

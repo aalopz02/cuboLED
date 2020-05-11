@@ -33,6 +33,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
                         tablaVariables.imprimirIDS();
+                        tablaVariables.checkVariables();
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -272,11 +273,10 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void IgualdadAux() throws ParseException {
-                     Token aux;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BOOL:
-      aux = jj_consume_token(BOOL);
-                                                  valoresIgualdadTabla.add(aux.image);
+      jj_consume_token(BOOL);
+                                  valoresIgualdadTabla.add("BOOL");
       break;
     case 6:
       jj_consume_token(6);
@@ -407,8 +407,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                        Token aux;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BOOL:
-      aux = jj_consume_token(BOOL);
-                                                   indiceAcceso+=aux.image;
+      jj_consume_token(BOOL);
+                                             indiceAcceso+="BOOL";
       ValoresListasAux();
       break;
     default:
@@ -467,10 +467,9 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void RangeParamVal() throws ParseException {
-                       Token val;
     jj_consume_token(8);
-    val = jj_consume_token(BOOL);
-                                                       valoresIgualdadTabla.add(val.image);
+    jj_consume_token(BOOL);
+                                       valoresIgualdadTabla.add("BOOL");
     jj_consume_token(7);
     jj_consume_token(7);
   }
@@ -557,15 +556,14 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void InsertListas() throws ParseException {
-                      Token val;
-                                     indiceAcceso = "";
+                           indiceAcceso = "";
     Numeros();
-                                                                    valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
+                                                          valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
     jj_consume_token(8);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BOOL:
-      val = jj_consume_token(BOOL);
-                                                                                       valoresIgualdadTabla.add(val.image);
+      jj_consume_token(BOOL);
+                                                                                 valoresIgualdadTabla.add("BOOL");
       break;
     default:
       jj_la1[23] = jj_gen;
@@ -680,15 +678,14 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void ifFunction() throws ParseException {
-                    Token bool;
     jj_consume_token(30);
-                                         int aux = numeroVariable; numeroVariable=-2;
+                              int aux = numeroVariable; numeroVariable=-2;
     Iterable();
     jj_consume_token(OPERADOR_COMPARADOR);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BOOL:
-      bool = jj_consume_token(BOOL);
-                                                                                        tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,bool.image);
+      jj_consume_token(BOOL);
+                                                                                 tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"BOOL");
       break;
     case NUM:
     case LENGTH:
@@ -826,8 +823,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void Blink_Expression_Aux() throws ParseException {
-                              Token bool; Token num;
-                                                        valoresIgualdadTabla = new ArrayList<String>();
+                              Token num;
+                                            valoresIgualdadTabla = new ArrayList<String>();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUM:
       num = jj_consume_token(NUM);
@@ -835,8 +832,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       Blink_Expression_Aux1();
       break;
     case BOOL:
-      bool = jj_consume_token(BOOL);
-                                                                                                                       valoresIgualdadTabla.add(bool.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+      jj_consume_token(BOOL);
+                                                                                                                 valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
       break;
     default:
       jj_la1[32] = jj_gen;
@@ -846,15 +843,15 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void Blink_Expression_Aux1() throws ParseException {
-                               Token range; Token bool;
+                               Token range;
     jj_consume_token(8);
-                                                              valoresIgualdadTabla = new ArrayList<String>();
+                                                  valoresIgualdadTabla = new ArrayList<String>();
     range = jj_consume_token(OPCIONESRANGO);
-                                                                                                                                       valoresIgualdadTabla.add(range.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+                                                                                                                           valoresIgualdadTabla.add(range.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
     jj_consume_token(8);
                                                                                                                      valoresIgualdadTabla = new ArrayList<String>();
-    bool = jj_consume_token(BOOL);
-                                                                                                                                                                                   valoresIgualdadTabla.add(bool.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+    jj_consume_token(BOOL);
+                                                                                                                                                                              valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
   }
 
   static final public void Adentro_Lista() throws ParseException {

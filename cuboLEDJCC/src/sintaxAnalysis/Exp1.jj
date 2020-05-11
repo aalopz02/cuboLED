@@ -158,7 +158,7 @@ void IgualdadValoresOperables(): {Token aux;} {aux = <ID> (<OPERADORES> {valores
 							| "(" IgualdadAux() ")" ((<OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
 							| Empty()}
 
-void IgualdadAux(): {Token aux;} {  aux = <BOOL> {valoresIgualdadTabla.add(aux.image);} 
+void IgualdadAux(): {} {  <BOOL> {valoresIgualdadTabla.add("BOOL");} 
 									| "(" IgualdadValoresOperables() ")" (( <OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
 									| "[" {addVarFalg = false; indiceAcceso+="[";} ValoresListas() "]" {indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
 									| <LIST> {addVarFalg = false; valoresIgualdadTabla.add("createList");} CrearLista() Listas() {addVarFalg = true;}
@@ -185,7 +185,7 @@ void AccesoLista(): {} {
 
 void AccesoListaAux(): {} { ":" {indiceAcceso+=":";} Numeros() | "," {indiceAcceso+=",";} Numeros() | Numeros() | Empty()}
 
-void ValoresListas(): {Token aux;} { aux = <BOOL> {indiceAcceso+=aux.image;} ValoresListasAux()
+void ValoresListas(): {Token aux;} { <BOOL> {indiceAcceso+="BOOL";} ValoresListasAux()
 									| Listas() ValoresListasAux()
 									| Empty()}	
 									
@@ -197,7 +197,7 @@ void CrearLista(): {Token aux;} { "(" <RANGO> "(" RangeParam()}
 
 void RangeParam(): {Token n;} { Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso="";} RangeParamVal()}
 
-void RangeParamVal(): {Token val;} { "," val = <BOOL> {valoresIgualdadTabla.add(val.image);} ")" ")" }	
+void RangeParamVal(): {} { "," <BOOL> {valoresIgualdadTabla.add("BOOL");} ")" ")" }	
 	
 void OperacionesListas(): {Token aux;} { aux = <INSERT> {addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresInsert() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;}
 										| aux = <DELETE> {addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresDel() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;} }	
@@ -209,8 +209,8 @@ void InsertMatriz(): {} { "," {indiceAcceso = "";} Numeros() {valoresIgualdadTab
 	
 void valoresDel(): {} {Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} ("," Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}| Empty())}	
 	
-void InsertListas(): {Token val;} { {indiceAcceso = "";} Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} "," 
-									(val = <BOOL> {valoresIgualdadTabla.add(val.image);} 
+void InsertListas(): {} { {indiceAcceso = "";} Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} "," 
+									(<BOOL> {valoresIgualdadTabla.add("BOOL");} 
 									| Listas() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} )}	
 	
 void Numeros(): {Token index;} { 
@@ -228,8 +228,8 @@ void Iterable():{Token aux;}{ aux = <ID> {tablaVariables.agregarVariable(numeroV
 
 void Iterable_Aux(): {} {"[" {indiceAcceso+="[";} Adentro_Lista() "]" {indiceAcceso+="]";} Iterable_Aux() | "."  {indiceAcceso+= ".";} FuncionesShape() | Empty()}
 
-void ifFunction(): {Token bool;} {"if"  {int aux = numeroVariable; numeroVariable=-2;} Iterable() <OPERADOR_COMPARADOR> 
-									(bool = <BOOL> {tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,bool.image);} 
+void ifFunction(): {} {"if"  {int aux = numeroVariable; numeroVariable=-2;} Iterable() <OPERADOR_COMPARADOR> 
+									(<BOOL> {tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"BOOL");} 
 									| Iterable() 
 								) {numeroVariable=aux;} "{" Exp() "}"}		
 	
@@ -258,12 +258,12 @@ void ListaBlink(): {} { "[" {indiceAcceso += "[";} Numeros() "]" {indiceAcceso +
 void Blink_Expression(): {Token id;} {id=<ID> {indiceAcceso+=id.image; indiceAcceso+="[";} "[" Numeros() "]"
 							{indiceAcceso+="]";} ListaBlink() {valoresIgualdadTabla.add(indiceAcceso); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} "," Blink_Expression_Aux()  }
 
-void Blink_Expression_Aux(): {Token bool; Token num;}{ {valoresIgualdadTabla = new ArrayList<String>();}
+void Blink_Expression_Aux(): {Token num;}{ {valoresIgualdadTabla = new ArrayList<String>();}
 													(num=<NUM> {valoresIgualdadTabla.add(num.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} Blink_Expression_Aux1() 
-													| bool=<BOOL> {valoresIgualdadTabla.add(bool.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);})}
+													|<BOOL> {valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);})}
 
-void Blink_Expression_Aux1(): {Token range; Token bool;}{"," {valoresIgualdadTabla = new ArrayList<String>();} range= <OPCIONESRANGO> {valoresIgualdadTabla.add(range.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} 
-														"," {valoresIgualdadTabla = new ArrayList<String>();} bool=<BOOL> {valoresIgualdadTabla.add(bool.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} }
+void Blink_Expression_Aux1(): {Token range;}{"," {valoresIgualdadTabla = new ArrayList<String>();} range= <OPCIONESRANGO> {valoresIgualdadTabla.add(range.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} 
+														"," {valoresIgualdadTabla = new ArrayList<String>();} <BOOL> {valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} }
 
 void Adentro_Lista(): {Token num;} {(num=<NUM> {indiceAcceso+=num.image;} | num = ":" {indiceAcceso+=num.image;} ) Adentro_Lista_Aux1() }
 

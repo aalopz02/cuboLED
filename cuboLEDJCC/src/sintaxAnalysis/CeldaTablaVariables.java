@@ -6,6 +6,7 @@ public class CeldaTablaVariables {
     private String id;
     private int Scope;
     private String index = "NA";
+    private String type = "ND";
 
     CeldaTablaVariables(int numeroVariable, String id, int Scope){
         setNumeroVariable(numeroVariable);

@@ -5,9 +5,13 @@ Dim_Columnas = 2;
 Cubo = 5,5;
 
 a=1;
+b=true;
+b=false;
+c = ((2 + a) * a) / 4;
+d, da = false, 15;
 
 Procedure Main (){
- a=a;
+
 }
 
 
