@@ -2,6 +2,8 @@ PARSER_BEGIN(SyntaxChecker)
 
 package sintaxAnalysis;
 
+import Estructuras.Nodo;
+import Estructuras.Grafo;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -19,6 +21,7 @@ public class SyntaxChecker {
 	private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
 	private static TablaVariables tablaVariables = new TablaVariables();
 	public static ArrayList<String> constantesConfig = new ArrayList<String>();
+	public static Grafo grafo = new Grafo();
 	
     public static void main(String[] args) {
         try {
@@ -33,7 +36,13 @@ public class SyntaxChecker {
 			System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
-			tablaVariables.imprimirIDS();
+			//tablaVariables.imprimirIDS();
+			 Nodo aux = grafo.getInicial();
+            while (aux != null){
+                System.out.println("Tipo: " + aux.getTipo());
+                System.out.println("Contenido: " + aux.getContenido());
+                aux = aux.getNext();
+            }       
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -139,28 +148,29 @@ void Exp(): {} {
 }
 
 
-void Inicial(): {Token aux;} { Identificadores() ( "." (OperacionesListas() | FuncionesListas()) | aux = "="  {checkMainDCL(aux);} Igualdad() {checkSameLineDCL(aux);} ) ";" }
+void Inicial(): {Token aux;} { Identificadores() ( "." {grafo.addNodo("DCL",".");} (OperacionesListas() | FuncionesListas()) | aux = "="  {grafo.addNodo("DCL","="); checkMainDCL(aux);} Igualdad() {checkSameLineDCL(aux);} ) ";" {grafo.addNodo("ENDLINE","");}}
 
 void Identificadores(): {Token id;} { id=<ID> {
 												tablaVariables.agregarVariable(numeroVariable,id.image,scope);
+												grafo.addNodo("DCL",id.image);
 												numeroVariable++;
 												}
 	IdentificadoresAux() 
 	}
 
-void IdentificadoresAux(): {} {"," {sameLineDCL += 1;} Identificadores() | {addVarFalg = true;} Listas() {indiceAcceso = "";} | Empty()}
+void IdentificadoresAux(): {} {"," {grafo.addNodo("DCL",","); sameLineDCL += 1;} Identificadores() | {addVarFalg = true;} Listas() {grafo.addNodo("DCL",indiceAcceso); indiceAcceso = "";} | Empty()}
 
 void IgualdadValoresOperables(): {Token aux;} {aux = <ID> (<OPERADORES> {valoresIgualdadTabla.add(aux.image);} IgualdadAux() 
 																		| "." {indiceAcceso += aux.image; indiceAcceso += ".";} FuncionesShape() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
 																		| {indiceAcceso+= aux.image; addVarFalg = false;} Listas() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
 																		| Empty()) 
-							| <NUM> {valoresIgualdadTabla.add("NUM");} (<OPERADORES> IgualdadValoresOperables() | Empty())
+							| aux = <NUM> {valoresIgualdadTabla.add("NUM"); grafo.addNodo("DCL",aux.image);} (<OPERADORES> IgualdadValoresOperables() | Empty())
 							| "(" IgualdadAux() ")" ((<OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
 							| Empty()}
 
 void IgualdadAux(): {} {  <BOOL> {valoresIgualdadTabla.add("BOOL");} 
 									| "(" IgualdadValoresOperables() ")" (( <OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
-									| "[" {addVarFalg = false; indiceAcceso+="[";} ValoresListas() "]" {indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
+									| "[" {addVarFalg = false;} ValoresListas() "]" {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
 									| <LIST> {addVarFalg = false; valoresIgualdadTabla.add("createList");} CrearLista() Listas() {addVarFalg = true;}
 									| FuncionLen() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
 									| IgualdadValoresOperables() }
@@ -172,14 +182,14 @@ void Igualdad(): {Token aux;} { {valoresIgualdadTabla = new ArrayList<String>();
 																										tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
 																									}
 																								} 
-								("," {sameLineDCL -= 1;} Igualdad() | Empty())}
+								("," {grafo.addNodo("DCL",","); sameLineDCL -= 1;} Igualdad() | Empty())}
 	
 void Listas(): {} { "[" {indiceAcceso += "[";} AccesoLista() "]" {indiceAcceso += "]";} Listas() {agregarVariable();}
 							| <LIST> {addVarFalg = false; valoresIgualdadTabla.add("createList");} CrearLista() Listas() 
 							| Empty() }
 
 void AccesoLista(): {} { 
-						":" "," {indiceAcceso += ":,";} Numeros()  
+						":" "," {indiceAcceso += ":,";} Numeros() (AccesoLista() | Empty())
 						| Numeros() AccesoListaAux() 
 						| ValoresListas() }
 

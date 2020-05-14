@@ -88,7 +88,10 @@ public class TablaVariables {
                 System.out.print(cellAuxIg.getScope());
                 System.out.print(", NUMVARIG: ");
                 System.out.print(cellAuxIg.getNumeroVariable());
-                System.out.println("");
+                System.out.println("Lista");
+                //cellAuxIg.checkList();
+                System.out.println();
+
 
         }
         for (int i = 0; i < tablaProc.size(); i++){
@@ -152,7 +155,7 @@ public class TablaVariables {
     }
 
     public void checkVariables() throws ParseException {
-        inferTypes();
+        //inferTypes();
     }
 
     private void inferTypes() throws ParseException {
