@@ -170,7 +170,7 @@ void IgualdadValoresOperables(): {Token aux;} {aux = <ID> (<OPERADORES> {valores
 
 void IgualdadAux(): {} {  <BOOL> {valoresIgualdadTabla.add("BOOL");} 
 									| "(" IgualdadValoresOperables() ")" (( <OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
-									| "[" {addVarFalg = false;} ValoresListas() "]" {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
+									| "[" {indiceAcceso+="["; addVarFalg = false;} ValoresListas() "]" {indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
 									| <LIST> {addVarFalg = false; valoresIgualdadTabla.add("createList");} CrearLista() Listas() {addVarFalg = true;}
 									| FuncionLen() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
 									| IgualdadValoresOperables() }
@@ -195,7 +195,7 @@ void AccesoLista(): {} {
 
 void AccesoListaAux(): {} { ":" {indiceAcceso+=":";} Numeros() | "," {indiceAcceso+=",";} Numeros() | Numeros() | Empty()}
 
-void ValoresListas(): {Token aux;} { <BOOL> {indiceAcceso+="BOOL";} ValoresListasAux()
+void ValoresListas(): {Token aux;} { aux = <BOOL> {indiceAcceso+=aux.image;} ValoresListasAux()
 									| Listas() ValoresListasAux()
 									| Empty()}	
 									
@@ -209,19 +209,19 @@ void RangeParam(): {Token n;} { Numeros() {valoresIgualdadTabla.add(indiceAcceso
 
 void RangeParamVal(): {} { "," <BOOL> {valoresIgualdadTabla.add("BOOL");} ")" ")" }	
 	
-void OperacionesListas(): {Token aux;} { aux = <INSERT> {addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresInsert() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;}
-										| aux = <DELETE> {addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresDel() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;} }	
+void OperacionesListas(): {Token aux;} { aux = <INSERT> {grafo.addNodo("FUN.INSERT","insert"); addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresInsert() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;}
+										| aux = <DELETE> {grafo.addNodo("FUN.DEL","delete"); addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);} "(" valoresDel() ")" {tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;} }	
 	
 void valoresInsert(): {} { 
-							{indiceAcceso = ""; valoresIgualdadTabla.add("InsertMatriz");} Listas() {valoresIgualdadTabla.add(indiceAcceso);} InsertMatriz() | {valoresIgualdadTabla.add("InsertListas");} InsertListas() }	
+							{indiceAcceso = ""; valoresIgualdadTabla.add("InsertMatriz");} Listas() {grafo.addNodo("INSERT.MATRIZ",""); grafo.addNodo("VAL",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso);} InsertMatriz() | {valoresIgualdadTabla.add("InsertListas"); grafo.addNodo("INSERT.LISTA","");} InsertListas() }	
 	
-void InsertMatriz(): {} { "," {indiceAcceso = "";} Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} ("," Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} | Empty()) }	
+void InsertMatriz(): {} { "," {indiceAcceso = "";} Numeros() {grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} ("," Numeros() {grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} | Empty()) {grafo.addNodo("ENDINSERT","");}}	
 	
-void valoresDel(): {} {Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} ("," Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}| Empty())}	
+void valoresDel(): {} {Numeros() {grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} ("," Numeros() {grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}| Empty()) {grafo.addNodo("ENDDELETE","");}}	
 	
-void InsertListas(): {} { {indiceAcceso = "";} Numeros() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} "," 
-									(<BOOL> {valoresIgualdadTabla.add("BOOL");} 
-									| Listas() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} )}	
+void InsertListas(): {Token aux;} { {indiceAcceso = "";} Numeros() {grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} "," 
+									(aux = <BOOL> {valoresIgualdadTabla.add("BOOL"); grafo.addNodo("BOOL",aux.image);} 
+									| Listas() {grafo.addNodo("VAL",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";} ) {grafo.addNodo("ENDINSERT","");}}	
 	
 void Numeros(): {Token index;} { 
 								index = <NUM> {indiceAcceso += index.image;}

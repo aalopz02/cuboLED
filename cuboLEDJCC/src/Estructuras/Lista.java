@@ -11,8 +11,16 @@ public class Lista {
 
     }
 
+    public Lista(int size){
+        this.size = size;
+    }
+
     public int getSize(){
         return size;
+    }
+
+    public ArrayList<Lista> getLista(){
+        return lista;
     }
 
     public void addList(Lista lista){

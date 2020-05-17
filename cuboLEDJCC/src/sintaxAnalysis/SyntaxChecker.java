@@ -35,13 +35,16 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                         System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
-                        //tablaVariables.imprimirIDS();
-                         Nodo aux = grafo.getInicial();
+                        tablaVariables.imprimirIDS();
+                        tablaVariables.checkVariables();
+                        /* Nodo aux = grafo.getInicial();
             while (aux != null){
                 System.out.println("Tipo: " + aux.getTipo());
                 System.out.println("Contenido: " + aux.getContenido());
                 aux = aux.getNext();
             }
+
+                         */
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -305,10 +308,10 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       break;
     case 44:
       jj_consume_token(44);
-                                                                               addVarFalg = false;
+                                                                               indiceAcceso+="["; addVarFalg = false;
       ValoresListas();
       jj_consume_token(45);
-                                                                                                                         valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;
+                                                                                                                                            indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;
       break;
     case LIST:
       jj_consume_token(LIST);
@@ -419,8 +422,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                        Token aux;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BOOL:
-      jj_consume_token(BOOL);
-                                             indiceAcceso+="BOOL";
+      aux = jj_consume_token(BOOL);
+                                                   indiceAcceso+=aux.image;
       ValoresListasAux();
       break;
     default:
@@ -491,19 +494,19 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INSERT:
       aux = jj_consume_token(INSERT);
-                                                         addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);
+                                                         grafo.addNodo("FUN.INSERT","insert"); addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);
       jj_consume_token(6);
       valoresInsert();
       jj_consume_token(7);
-                                                                                                                                                                                            tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;
+                                                                                                                                                                                                                                  tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;
       break;
     case DELETE:
       aux = jj_consume_token(DELETE);
-                                                                                                  addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);
+                                                                                                  grafo.addNodo("FUN.DEL","delete"); addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);
       jj_consume_token(6);
       valoresDel();
       jj_consume_token(7);
-                                                                                                                                                                                                                                  tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;
+                                                                                                                                                                                                                                                                     tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;
       break;
     default:
       jj_la1[19] = jj_gen;
@@ -519,13 +522,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     case 44:
                                                          indiceAcceso = ""; valoresIgualdadTabla.add("InsertMatriz");
       Listas();
-                                                                                                                                 valoresIgualdadTabla.add(indiceAcceso);
+                                                                                                                                 grafo.addNodo("INSERT.MATRIZ",""); grafo.addNodo("VAL",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso);
       InsertMatriz();
       break;
     case NUM:
     case LENGTH:
     case ID:
-                                                                                                                                                                                            valoresIgualdadTabla.add("InsertListas");
+                                                                                                                                                                                                                                                                  valoresIgualdadTabla.add("InsertListas"); grafo.addNodo("INSERT.LISTA","");
       InsertListas();
       break;
     default:
@@ -539,49 +542,53 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     jj_consume_token(8);
                                indiceAcceso = "";
     Numeros();
-                                                              valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
+                                                              grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 8:
       jj_consume_token(8);
       Numeros();
-                                                                                                                                          valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
+                                                                                                                                                                             grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
       break;
     default:
       jj_la1[21] = jj_gen;
       Empty();
     }
+                                                                                                                                                                                                                                                                                        grafo.addNodo("ENDINSERT","");
   }
 
   static final public void valoresDel() throws ParseException {
     Numeros();
-                                  valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
+                                  grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 8:
       jj_consume_token(8);
       Numeros();
-                                                                                                              valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
+                                                                                                                                                 grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
       break;
     default:
       jj_la1[22] = jj_gen;
       Empty();
     }
+                                                                                                                                                                                                                                                           grafo.addNodo("ENDDELETE","");
   }
 
   static final public void InsertListas() throws ParseException {
-                           indiceAcceso = "";
+                      Token aux;
+                                     indiceAcceso = "";
     Numeros();
-                                                          valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
+                                                                    grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
     jj_consume_token(8);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BOOL:
-      jj_consume_token(BOOL);
-                                                                                 valoresIgualdadTabla.add("BOOL");
+      aux = jj_consume_token(BOOL);
+                                                                                       valoresIgualdadTabla.add("BOOL"); grafo.addNodo("BOOL",aux.image);
       break;
     default:
       jj_la1[23] = jj_gen;
       Listas();
-                                                                                    valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
+                                                                                    grafo.addNodo("VAL",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
     }
+                                                                                                                                                                                      grafo.addNodo("ENDINSERT","");
   }
 
   static final public void Numeros() throws ParseException {

@@ -16,10 +16,12 @@ public class TablaVariables {
     TablaVariables() {
         validTypes.add("BOOL");
         validTypes.add("NUM");
+        validTypes.add("LIST");
         errors.add("Not defined");
         errors.add("Not in scope");
         errors.add("Can not mix types");
         errors.add("Already defined as");
+        errors.add("Is not of type list");
     }
 
     public void agregarIndiceAcceso(String index){
@@ -88,8 +90,9 @@ public class TablaVariables {
                 System.out.print(cellAuxIg.getScope());
                 System.out.print(", NUMVARIG: ");
                 System.out.print(cellAuxIg.getNumeroVariable());
+                System.out.println();
                 System.out.println("Lista");
-                //cellAuxIg.checkList();
+                cellAuxIg.checkList();
                 System.out.println();
 
 
@@ -149,13 +152,24 @@ public class TablaVariables {
             System.out.print("Variable: " + erDescription[0] + ", ");
             System.out.println(errors.get(errType) + ": " + erDescription[1]);
             System.out.println("New type: " + erDescription[2]);
+        } else if (errType == 4){
+            System.out.println(cause);
+            System.out.println(errors.get(errType));
         }
         ParseException e = generateParseException();
         throw e;
     }
 
+    public String checkShape(String in){
+        String[] dividido = in.split("\\.");
+        if (dividido[dividido.length-1].equals("shapeF") || dividido[dividido.length - 1].equals("shapeC")){
+            return dividido[0];
+        }
+        return "";
+    }
+
     public void checkVariables() throws ParseException {
-        //inferTypes();
+        inferTypes();
     }
 
     private void inferTypes() throws ParseException {
@@ -174,7 +188,20 @@ public class TablaVariables {
             for (String valor : contenidoIg) {
                 if (!validTypes.contains(valor)) {
                     if (!variablesDefinidas.contains(valor)) {
-                        generateError(0, valor);
+                        String checkShapeOut = checkShape(valor);
+                        if (!checkShapeOut.isEmpty()){
+                            if (variablesDefinidas.contains(checkShapeOut)){
+                                if (types.get(variablesDefinidas.indexOf(checkShapeOut)).equals("LIST")){
+                                    type = "NUM";
+                                } else {
+                                    generateError(4,checkShapeOut);
+                                }
+                            } else {
+                                generateError(0,checkShapeOut);
+                            }
+                        } else {
+                            generateError(0, valor);
+                        }
                     } else {
                         int indiceAssig = variablesDefinidas.indexOf(valor);
                         int scopeVarIg = scopeVars.get(indiceAssig);

@@ -1,6 +1,8 @@
 package sintaxAnalysis;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import Estructuras.*;
 
 public class CeldaTablaIgualdades {
@@ -8,8 +10,6 @@ public class CeldaTablaIgualdades {
     private int numeroVariable;
     private ArrayList<String> contenido;
     private int Scope;
-    private Matriz3d matriz3d;
-    private Cara cara;
     private Lista lista;
     String valor;
 
@@ -63,20 +63,34 @@ public class CeldaTablaIgualdades {
         this.contenido = contenido;
     }
 
-    public void checkList(){
-        for (String valor:contenido) {
-            valor = valor.replace("BOOL","B");
+    public void checkList() {
+        if (contenido.get(0).equals("createList")) {
+            this.lista = new Lista(Integer.parseInt(contenido.get(1)));
+            System.out.println("NEWLIST");
+            contenido = new ArrayList<>();
+            contenido.add("LIST");
+            return;
+        }
+        if (contenido.get(0).charAt(0) != '[') {
+            System.out.println("NOLIST");
+            return;
+        }
+        for (String valor : contenido) {
+            valor = valor.replace("true", "B");
+            valor = valor.replace("false", "B");
+            valor = valor.substring(1);
+            valor = valor.substring(0, valor.length() - 1);
             System.out.println(valor);
             this.valor = valor;
             lista = countElements();
-            int a =1;
-            a++;
+            contenido = new ArrayList<>();
+            contenido.add("LIST");
         }
     }
 
     public Lista countElements() {
         Lista listaReturn = new Lista();
-        while (valor.charAt(0) != ']'){
+        while (!valor.isEmpty()) {
             if (valor.charAt(0) == '[') {
                 valor = valor.substring(1);
                 listaReturn.addList(countElements());
@@ -85,9 +99,11 @@ public class CeldaTablaIgualdades {
                 listaReturn.addBool();
             } else if (valor.charAt(0) == ',') {
                 valor = valor.substring(1);
+            } else if (valor.charAt(0) == ']') {
+                valor = valor.substring(1);
+                return listaReturn;
             }
         }
-        valor = valor.substring(1);
         return listaReturn;
     }
 
