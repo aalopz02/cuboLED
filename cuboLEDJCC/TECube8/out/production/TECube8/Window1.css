@@ -1,0 +1,13 @@
+#pane{
+    -fx-background-image: url("file:/C:/Users/Usuario/IdeaProjects/8CubeTEC/fondo.jpg");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 800 700;
+    -fx-background-position: center center;
+    -fx-effect: dropshadow(three-pass-box, black, 30, 0.5, 0, 0);
+}
+
+.button{
+    -fx-background-color: linear-gradient(#F4E900, #F40600);
+    -fx-text-fill: #032564;
+    -fx-background-radius: 6;
+}
