@@ -1,5 +1,7 @@
 package sintaxAnalysis;
 
+import Estructuras.Lista;
+
 import java.util.ArrayList;
 
 import static sintaxAnalysis.SyntaxChecker.generateParseException;
@@ -11,17 +13,23 @@ public class TablaVariables {
     private ArrayList<CeldaTablaProc> tablaProc = new ArrayList<CeldaTablaProc>();
     private ArrayList<String> validTypes = new ArrayList<>();
     private ArrayList<String> errors = new ArrayList<>();
-
+    private ArrayList<String> variablesDefinidas = new ArrayList<>();
+    private ArrayList<Integer> scopeVars = new ArrayList<>();
+    private ArrayList<String> types = new ArrayList<>();
+    private ArrayList<Lista> matrices = new ArrayList<>();
+    private ArrayList<Integer> indexMatriz = new ArrayList<>();
 
     TablaVariables() {
-        validTypes.add("BOOL");
-        validTypes.add("NUM");
-        validTypes.add("LIST");
-        errors.add("Not defined");
-        errors.add("Not in scope");
-        errors.add("Can not mix types");
-        errors.add("Already defined as");
-        errors.add("Is not of type list");
+        validTypes.add("BOOL"); //0
+        validTypes.add("NUM"); //1
+        validTypes.add("LIST");  //2
+        errors.add("Not defined");  //0
+        errors.add("Not in scope");//1
+        errors.add("Can not mix types");//2
+        errors.add("Already defined as");//3
+        errors.add("Is not of type list");//4
+        errors.add("Index out of range");//5
+        errors.add("Needed int");//6
     }
 
     public void agregarIndiceAcceso(String index){
@@ -94,8 +102,6 @@ public class TablaVariables {
                 System.out.println("Lista");
                 cellAuxIg.checkList();
                 System.out.println();
-
-
         }
         for (int i = 0; i < tablaProc.size(); i++){
             CeldaTablaProc cell = tablaProc.get(i);
@@ -155,28 +161,113 @@ public class TablaVariables {
         } else if (errType == 4){
             System.out.println(cause);
             System.out.println(errors.get(errType));
+        } else if (errType == 5){
+            System.out.println(errors.get(errType));
+            System.out.println("Tried to access: " + cause);
+        } else if (errType == 6){
+            System.out.println(errors.get(errType));
+            System.out.println("Provided with: "+ cause);
         }
         ParseException e = generateParseException();
         throw e;
     }
 
-    public String checkShape(String in){
+    public String checkShape(String in, boolean flagDCL){
         String[] dividido = in.split("\\.");
-        if (dividido[dividido.length-1].equals("shapeF") || dividido[dividido.length - 1].equals("shapeC")){
-            return dividido[0];
+        if (dividido[dividido.length-1].equals("shapeF")){
+            if (flagDCL){
+                return dividido[0];
+            }
+            return "f"+dividido[0];
+        } else if (dividido[dividido.length - 1].equals("shapeC")){
+            if (flagDCL){
+                return dividido[0];
+            }
+            return "c"+dividido[0];
         }
         return "";
+    }
+
+    public String checkLen(ArrayList<String> contenido, int indice){
+        String variable = contenido.get(indice+1);
+        if (variable.contains("[")){
+            //verifica con indice
+            return "NUM";
+        }
+        return "NUM";
     }
 
     public void checkVariables() throws ParseException {
         inferTypes();
     }
 
+    private Lista lookForMatriz(int indiceId){
+        return matrices.get(indexMatriz.indexOf(indiceId));
+    }
+
+    private String checkIndexAux(){
+        return "BOOL";
+    }
+
+    private String checkIndex(String id, String index) throws ParseException {
+        ArrayList<Integer> indices = new ArrayList<>();
+        String[] indexAux;
+        if (!index.equals("")) {
+            id += index;
+        }
+        id = id.replace("]", "");
+        indexAux = id.split("\\[");
+        id = indexAux[0];
+
+        boolean flagPrimerIter = true;
+        for (String subindex : indexAux) {
+            try {
+                indices.add(Integer.parseInt(subindex));
+            } catch (NumberFormatException e) {
+                String checkShapeOut = checkShape(subindex, false);
+                if (!checkShapeOut.isEmpty()) {
+                    if (variablesDefinidas.contains(checkShapeOut.substring(1))) {
+                        if (types.get(variablesDefinidas.indexOf(checkShapeOut.substring(1))).equals("LIST")) {
+                            Lista listaShape = lookForMatriz(variablesDefinidas.indexOf(checkShapeOut.substring(1)));
+                            if (checkShapeOut.charAt(0) == 'c') {
+                                indices.add(listaShape.shapeC());
+                            } else {
+                                indices.add(listaShape.shapeF());
+                            }
+                        } else {
+                            generateError(4, checkShapeOut.substring(1));
+                        }
+                    } else {
+                        generateError(0, checkShapeOut);
+                    }
+                } else {
+                    if (variablesDefinidas.contains(subindex)) {
+                        if (flagPrimerIter) {
+                            if (!types.get(variablesDefinidas.indexOf(subindex)).equals("LIST")) {
+                                generateError(4, subindex);
+                            }
+                        } else {
+                            if (types.get(variablesDefinidas.indexOf(subindex)).equals("NUM")) {
+                                indices.add(0);
+                            } else {
+                                generateError(6, types.get(variablesDefinidas.indexOf(subindex)));
+                            }
+                        }
+                    } else {
+                        generateError(0, subindex);
+                    }
+                }
+            }
+            flagPrimerIter = false;
+        }
+        for (Integer in : indices) {
+            System.out.println("Index: " + in);
+        }
+        return checkIndexAux();
+    }
+
     private void inferTypes() throws ParseException {
-        ArrayList<String> variablesDefinidas = new ArrayList<>();
-        ArrayList<Integer> scopeVars = new ArrayList<>();
-        ArrayList<String> types = new ArrayList<>();
-        for (int i = 0; i < tabla.size(); i ++) {
+        for (int i = 0; i < tabla.size(); i++) {
             CeldaTablaVariables variable = tabla.get(i);
             String idVar = variable.getId();
             int scopeVar = variable.getScope();
@@ -185,22 +276,42 @@ public class TablaVariables {
             ArrayList<String> contenidoIg = igualdad.getContenido();
             String type = "";
             String tiposOp = "NA";
-            for (String valor : contenidoIg) {
+            for (int j = 0; j < contenidoIg.size(); j++) {
+                String valor = contenidoIg.get(j);
+                if (!variable.getIndex().equals("NA")) {
+                    tiposOp = checkIndex(idVar, variable.getIndex());
+                    if (tiposOp.equals("ERR")) {
+                        generateError(5, idVar);
+                    }
+                }
                 if (!validTypes.contains(valor)) {
                     if (!variablesDefinidas.contains(valor)) {
-                        String checkShapeOut = checkShape(valor);
-                        if (!checkShapeOut.isEmpty()){
-                            if (variablesDefinidas.contains(checkShapeOut)){
-                                if (types.get(variablesDefinidas.indexOf(checkShapeOut)).equals("LIST")){
-                                    type = "NUM";
+                        if (!valor.contains("[")) {
+                            String checkShapeOut = checkShape(valor, true);
+                            if (!checkShapeOut.isEmpty()) {
+                                if (variablesDefinidas.contains(checkShapeOut)) {
+                                    if (types.get(variablesDefinidas.indexOf(checkShapeOut)).equals("LIST")) {
+                                        type = "NUM";
+                                    } else {
+                                        generateError(4, checkShapeOut);
+                                    }
                                 } else {
-                                    generateError(4,checkShapeOut);
+                                    generateError(0, checkShapeOut);
                                 }
                             } else {
-                                generateError(0,checkShapeOut);
+                                if (valor.equals("len")) {
+                                    type = checkLen(contenidoIg, j);
+                                    contenidoIg = new ArrayList<>();
+                                    contenidoIg.add(type);
+                                } else {
+                                    generateError(0, valor);
+                                }
                             }
                         } else {
-                            generateError(0, valor);
+                            type = checkIndex(valor, "");
+                            if (type.substring(0, 3).equals("ERR")) {
+                                generateError(5, type.substring(3));
+                            }
                         }
                     } else {
                         int indiceAssig = variablesDefinidas.indexOf(valor);
@@ -215,21 +326,26 @@ public class TablaVariables {
                 }
                 if (tiposOp.equals("NA")) {
                     tiposOp = type;
-                } else if (!type.equals(tiposOp)){
-                    generateError(2,tiposOp+", "+type);
+                } else if (!type.equals(tiposOp)) {
+                    generateError(2, tiposOp + ", " + type);
                 }
             }
             if (variablesDefinidas.contains(idVar)) {
                 String oldType = types.get(variablesDefinidas.indexOf(idVar));
                 if (!tiposOp.equals(oldType)) {
-                    generateError(3,idVar+"-"+oldType+"-"+tiposOp);
+                    generateError(3, idVar + "-" + oldType + "-" + tiposOp);
+                }
+                if (tiposOp.equals("LIST")) {
+                    matrices.add(variablesDefinidas.indexOf(idVar), igualdad.getLista());
                 }
             } else {
                 variablesDefinidas.add(idVar);
+                indexMatriz.add(variablesDefinidas.indexOf(idVar));
+                matrices.add(variablesDefinidas.indexOf(idVar), igualdad.getLista());
             }
             System.out.print("Nombre: " + idVar);
             scopeVars.add(scopeVar);
-            System.out.print(", Scope: " +scopeVar);
+            System.out.print(", Scope: " + scopeVar);
             types.add(type);
             System.out.println(", Type: " + type);
         }

@@ -36,13 +36,14 @@ public class SyntaxChecker {
 			System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
-			//tablaVariables.imprimirIDS();
-			 Nodo aux = grafo.getInicial();
+			tablaVariables.imprimirIDS();
+            tablaVariables.checkVariables();
+            /* Nodo aux = grafo.getInicial();
             while (aux != null){
-                System.out.println("Tipo: " + aux.getTipo());
-                System.out.println("Contenido: " + aux.getContenido());
-                aux = aux.getNext();
-            }       
+                 System.out.println("Tipo: " + aux.getTipo());
+                 System.out.println("Contenido: " + aux.getContenido());
+                  aux = aux.getNext();
+            }
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());

@@ -6,6 +6,7 @@ public class Lista {
 
     private int size = 0;
     private ArrayList<Lista> lista = null;
+    private int id = 0;
 
     public Lista(){
 
@@ -13,6 +14,14 @@ public class Lista {
 
     public Lista(int size){
         this.size = size;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getSize(){
@@ -35,4 +44,11 @@ public class Lista {
         this.size++;
     }
 
+    public int shapeF(){
+        return size;
+    }
+
+    public int shapeC(){
+        return lista.size();
+    }
 }

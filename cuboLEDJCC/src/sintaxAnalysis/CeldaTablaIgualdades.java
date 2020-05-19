@@ -9,6 +9,7 @@ public class CeldaTablaIgualdades {
 
     private int numeroVariable;
     private ArrayList<String> contenido;
+    private ArrayList<Integer> contenedorNumeros;
     private int Scope;
     private Lista lista;
     String valor;
@@ -107,4 +108,7 @@ public class CeldaTablaIgualdades {
         return listaReturn;
     }
 
+    public Lista getLista() {
+        return lista;
+    }
 }

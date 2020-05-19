@@ -1,13 +1,11 @@
-Timer = 1; --asdsaascsscxsdd
+Timer = 1;
 Rango_Timer = Seg;
 Dim_Filas = 12;
 Dim_Columnas = 2;
 Cubo = 5,5;
 
-
-
-a =[];
-o, p = a.shapeF,len(lopij) ;
+a = 12;
+a = 1+2;
 
 Procedure Main (){
 
