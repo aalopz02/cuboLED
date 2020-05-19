@@ -30,7 +30,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                         String in = "";
                         while ((st = br.readLine()) != null) {
                                 in += st;
-                                in += '\u005cn';
+     //                           in += '\u005cn';
                         }
                         System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
@@ -40,7 +40,36 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
             while (aux != null){
                 System.out.println("Tipo: " + aux.getTipo());
                 System.out.println("Contenido: " + aux.getContenido());
+
                 aux = aux.getNext();
+
+                /* Agregar .py al grafo*/
+                FileWriter fichero = null;
+                PrintWriter pw = null;
+                try
+                {
+                    fichero = new FileWriter("C:\\Users\\1001001164\\Documents\\GitHub\\cuboLED\\cuboLEDJCC\\src\\sintaxAnalysis\\prueba.py");
+                    pw = new PrintWriter(fichero);
+
+                    while (aux != null){
+                        pw.println("Tipo: " + aux.getTipo());
+                        pw.println("Contenido: " + aux.getContenido());
+
+                        aux = aux.getNext();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        /*  aprovechamos el finally
+                        para asegurarnos que se cierra el fichero.*/
+                        if (null != fichero)
+                            fichero.close();
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
+                }
             }
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
