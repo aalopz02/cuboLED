@@ -36,16 +36,12 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
                         //tablaVariables.imprimirIDS();
-                        //tablaVariables.checkVariables();
-                        Nodo aux = grafo.getInicial();
-
+                         Nodo aux = grafo.getInicial();
             while (aux != null){
                 System.out.println("Tipo: " + aux.getTipo());
                 System.out.println("Contenido: " + aux.getContenido());
                 aux = aux.getNext();
             }
-
-
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -256,10 +252,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       break;
     case NUM:
       aux = jj_consume_token(NUM);
-                                                                       valoresIgualdadTabla.add("NUM"); grafo.addNodo("DCL",aux.image);
+                                                                       grafo.addNodo("NUM",aux.image); valoresIgualdadTabla.add("NUM");
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OPERADORES:
-        jj_consume_token(OPERADORES);
+        aux = jj_consume_token(OPERADORES);
+                                                                                                                                                              grafo.addNodo("OPER",aux.image);
         IgualdadValoresOperables();
         break;
       default:
@@ -269,11 +266,14 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       break;
     case 6:
       jj_consume_token(6);
+                                                               grafo.addNodo("OPENPAR","(");
       IgualdadAux();
       jj_consume_token(7);
+                                                                                                                 grafo.addNodo("CLOSEPAR",")");
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OPERADORES:
-        jj_consume_token(OPERADORES);
+        aux = jj_consume_token(OPERADORES);
+                                                                                                                                                                       grafo.addNodo("OPER",aux.image);
         IgualdadValoresOperables();
         break;
       default:
@@ -288,18 +288,22 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void IgualdadAux() throws ParseException {
+                     Token aux;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BOOL:
-      jj_consume_token(BOOL);
-                                  valoresIgualdadTabla.add("BOOL");
+      aux = jj_consume_token(BOOL);
+                                                  grafo.addNodo("BOOL",aux.image); valoresIgualdadTabla.add("BOOL");
       break;
     case 6:
       jj_consume_token(6);
+                                                                               grafo.addNodo("OPENPAR","(");
       IgualdadValoresOperables();
       jj_consume_token(7);
+                                                                                                                                              grafo.addNodo("CLOSEPAR",")");
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OPERADORES:
-        jj_consume_token(OPERADORES);
+        aux = jj_consume_token(OPERADORES);
+                                                                                                                                                                                                    grafo.addNodo("OPER",aux.image);
         IgualdadValoresOperables();
         break;
       default:

@@ -4,12 +4,17 @@ Dim_Filas = 12;
 Dim_Columnas = 2;
 Cubo = 5,5;
 
-a = 12;
-a = 1+2;
+a = x + y * 10 / 4 ;
+b = x + ((y * 10) / 4);
+c=  ((x + y) * 10) / 4;
+d, da = 20, 15;
+e = true;
+f = 5;
 
 Procedure Main (){
 
 }
+
 
 
 

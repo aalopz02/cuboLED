@@ -36,14 +36,13 @@ public class SyntaxChecker {
 			System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
-			tablaVariables.imprimirIDS();
-            tablaVariables.checkVariables();
-            /* Nodo aux = grafo.getInicial();
+			//tablaVariables.imprimirIDS();
+			 Nodo aux = grafo.getInicial();
             while (aux != null){
-                 System.out.println("Tipo: " + aux.getTipo());
-                 System.out.println("Contenido: " + aux.getContenido());
-                  aux = aux.getNext();
-            }
+                System.out.println("Tipo: " + aux.getTipo());
+                System.out.println("Contenido: " + aux.getContenido());
+                aux = aux.getNext();
+            }       
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -165,12 +164,12 @@ void IgualdadValoresOperables(): {Token aux;} {aux = <ID> (<OPERADORES> {valores
 																		| "." {indiceAcceso += aux.image; indiceAcceso += ".";} FuncionesShape() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
 																		| {indiceAcceso+= aux.image; addVarFalg = false;} Listas() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
 																		| Empty()) 
-							| aux = <NUM> {valoresIgualdadTabla.add("NUM"); grafo.addNodo("DCL",aux.image);} (<OPERADORES> IgualdadValoresOperables() | Empty())
-							| "(" IgualdadAux() ")" ((<OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
+							| aux = <NUM> {grafo.addNodo("NUM",aux.image); valoresIgualdadTabla.add("NUM");} (aux = <OPERADORES> {grafo.addNodo("OPER",aux.image);} IgualdadValoresOperables() | Empty())
+							| "(" {grafo.addNodo("OPENPAR","(");} IgualdadAux() ")" {grafo.addNodo("CLOSEPAR",")");} ((aux = <OPERADORES> {grafo.addNodo("OPER",aux.image);} IgualdadValoresOperables()) | IgualdadValoresOperables())
 							| Empty()}
 
-void IgualdadAux(): {} {  <BOOL> {valoresIgualdadTabla.add("BOOL");} 
-									| "(" IgualdadValoresOperables() ")" (( <OPERADORES> IgualdadValoresOperables()) | IgualdadValoresOperables())
+void IgualdadAux(): {Token aux;} { aux = <BOOL> { grafo.addNodo("BOOL",aux.image); valoresIgualdadTabla.add("BOOL");} 
+									| "(" {grafo.addNodo("OPENPAR","(");} IgualdadValoresOperables() ")" {grafo.addNodo("CLOSEPAR",")");} ((aux = <OPERADORES> {grafo.addNodo("OPER",aux.image);} IgualdadValoresOperables()) | IgualdadValoresOperables())
 									| "[" {indiceAcceso+="["; addVarFalg = false;} ValoresListas() "]" {indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
 									| <LIST> {addVarFalg = false; valoresIgualdadTabla.add("createList");} CrearLista() Listas() {addVarFalg = true;}
 									| FuncionLen() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
