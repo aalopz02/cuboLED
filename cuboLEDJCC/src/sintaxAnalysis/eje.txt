@@ -1,0 +1,26 @@
+Timer = 1;
+Rango_Timer = Seg;
+Dim_Filas = 12;
+Dim_Columnas = 2;
+Cubo = 5,5;
+
+m = [[true], [true] , [true] , [true]];
+w = [true, true, false, false, false, false, true, true, true, true];
+x= [true,false,[false,[true,false]],true,[],[true,false,[true]]];
+ma = x[2][1][0];
+mb = m[0];
+mc = m[3];
+md = w[5];
+me = x[5][2][0];
+p = [];
+m[0][0] = false;
+x[2] = [];
+
+
+Procedure Main (){
+
+}
+
+
+
+
