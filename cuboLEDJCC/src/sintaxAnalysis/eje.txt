@@ -26,6 +26,7 @@ n.del(2) ;
 
 o, p = i.shapeF,[];
 q = [true,false];
+
 q[1].Neg;
 r = [];
 r[1].T;
