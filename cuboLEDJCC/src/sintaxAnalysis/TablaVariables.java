@@ -31,6 +31,7 @@ public class TablaVariables {
         errors.add("Index out of range");//5
         errors.add("Needed int");//6
         errors.add("Not expected");//7
+        errors.add("Expected 1 or 0 in MatrizInsert"); //8
     }
 
     public void agregarIndiceAcceso(String index){
@@ -171,6 +172,9 @@ public class TablaVariables {
         } else if (errType == 7){
             System.out.println("Expresion: "+ cause);
             System.out.println(errors.get(errType));
+        } else if (errType == 8){
+            System.out.println(errors.get(errType));
+            System.out.println("Provided with: " + cause);
         }
         ParseException e = generateParseException();
         throw e;
@@ -326,6 +330,14 @@ public class TablaVariables {
                             if (subindex.contains("true") || subindex.contains("false")){
                                 generateError(7,"BOOL");
                             }
+                            String[] range =  subindex.split(":");
+                            for (String indx: range){
+                                System.out.println("Index: " + indx);
+                                ArrayList<Integer> indexRange = new ArrayList<>();
+                                indexRange.add(Integer.parseInt(indx));
+                                checkIndexAux(indexRange,id);
+
+                            }
                             return "LIST";
                         } else {
                             generateError(0, subindex);
@@ -341,6 +353,27 @@ public class TablaVariables {
         return checkIndexAux(indices,id);
     }
 
+    private String checkInsert(CeldaTablaIgualdades igualdad) throws ParseException {
+        ArrayList<Integer> indexInsert = new ArrayList<>();
+        ArrayList<String> contenido = igualdad.getContenido();
+        String tipoInsert = contenido.get(1);
+        if (tipoInsert.equals("InsertMatriz")){
+            int columRow = Integer.parseInt(contenido.get(3));
+            if (!(columRow == 1 || columRow == 0)){
+                generateError(8, String.valueOf(columRow));
+            } else {
+                igualdad.InsertMatriz();
+            }
+        } else {
+            igualdad.InsertLista();
+        }
+        return "LIST";
+    }
+
+    private String checkDel(CeldaTablaIgualdades igualdad) throws ParseException{
+        return "LIST";
+    }
+
     private void inferTypes() throws ParseException {
         for (int i = 0; i < tabla.size(); i++) {
             CeldaTablaVariables variable = tabla.get(i);
@@ -354,6 +387,16 @@ public class TablaVariables {
             boolean flagAccess = false;
             for (int j = 0; j < contenidoIg.size(); j++) {
                 String valor = contenidoIg.get(j);
+                if (valor.equals("insert")){
+                    tiposOp = checkInsert(igualdad);
+                    flagAccess = true;
+                    break;
+                }
+                if (valor.equals("del")){
+                    tiposOp = checkDel(igualdad);
+                    flagAccess = true;
+                    break;
+                }
                 if (!variable.getIndex().equals("NA")) {
                     tiposOp = checkIndex(idVar, variable.getIndex());
                     flagAccess = true;

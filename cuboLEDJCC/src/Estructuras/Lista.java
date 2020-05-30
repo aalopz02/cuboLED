@@ -14,6 +14,9 @@ public class Lista {
 
     public Lista(int size){
         this.size = size;
+        for (int i = 0; i < size; i++){
+            addBool();
+        }
     }
 
     public String getContenido() {

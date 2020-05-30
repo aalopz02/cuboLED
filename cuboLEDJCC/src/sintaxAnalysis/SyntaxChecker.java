@@ -17,7 +17,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static String indiceAcceso = "";
         private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
         private static TablaVariables tablaVariables = new TablaVariables();
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
         public static Grafo grafo = new Grafo();

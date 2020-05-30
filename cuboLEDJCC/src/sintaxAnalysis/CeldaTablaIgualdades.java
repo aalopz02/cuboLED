@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Estructuras.*;
+import jdk.internal.cmm.SystemResourcePressureImpl;
 
 public class CeldaTablaIgualdades {
 
     private int numeroVariable;
     private ArrayList<String> contenido;
-    private ArrayList<Integer> contenedorNumeros;
     private int Scope;
     private Lista lista;
     String valor;
@@ -64,6 +64,14 @@ public class CeldaTablaIgualdades {
         this.contenido = contenido;
     }
 
+    public void InsertMatriz(){
+
+    }
+
+    public void InsertLista(){
+
+    }
+
     public void checkList() {
         if (contenido.get(0).equals("createList")) {
             this.lista = new Lista(Integer.parseInt(contenido.get(1)));
@@ -111,4 +119,5 @@ public class CeldaTablaIgualdades {
     public Lista getLista() {
         return lista;
     }
+
 }
