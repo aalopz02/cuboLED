@@ -73,6 +73,9 @@ public class CeldaTablaIgualdades {
     }
 
     public void checkList() {
+        if (contenido.get(0).isEmpty()){
+            return;
+        }
         if (contenido.get(0).equals("createList")) {
             this.lista = new Lista(Integer.parseInt(contenido.get(1)));
             System.out.println("NEWLIST");

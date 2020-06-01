@@ -92,8 +92,8 @@ public class TablaVariables {
             CeldaTablaIgualdades cellAuxIg = tablaIgualdades.get(i);
                 System.out.print("Contenido: ");
                 ArrayList<String> aux = cellAuxIg.getContenido();
-                for (int j = 0; j < aux.size(); j++){
-                    System.out.print(aux.get(j));
+                for (String s : aux) {
+                    System.out.print(s);
                     System.out.print("-");
                 }
                 System.out.print(", ScopeIg: ");
@@ -105,8 +105,7 @@ public class TablaVariables {
                 cellAuxIg.checkList();
                 System.out.println();
         }
-        for (int i = 0; i < tablaProc.size(); i++){
-            CeldaTablaProc cell = tablaProc.get(i);
+        for (CeldaTablaProc cell : tablaProc) {
             if (cell.isDcl()) {
                 System.out.print("IDPROC: ");
                 System.out.print(cell.getId());
@@ -116,8 +115,8 @@ public class TablaVariables {
                 } else {
                     ArrayList<String> params = cell.getParam();
                     System.out.println();
-                    for (int j = 0; j < params.size(); j++) {
-                        System.out.println(params.get(j));
+                    for (String param : params) {
+                        System.out.println(param);
                     }
                 }
             } else {
@@ -129,12 +128,11 @@ public class TablaVariables {
                     System.out.print("NA");
                 } else {
                     ArrayList<CeldaTablaIgualdades> params = cell.getVars();
-                    for (int j = 0; j < params.size(); j++) {
-                        CeldaTablaIgualdades aux = params.get(j);
+                    for (CeldaTablaIgualdades aux : params) {
                         ArrayList<String> auxParams = aux.getContenido();
                         System.out.println();
-                        for (int k = 0; k < auxParams.size(); k++) {
-                            System.out.print(auxParams.get(k));
+                        for (String auxParam : auxParams) {
+                            System.out.print(auxParam);
                             System.out.print("-");
                         }
                         System.out.print(" Scope: ");
@@ -327,16 +325,18 @@ public class TablaVariables {
                         }
                     } else {
                         if (subindex.contains(":") || subindex.contains(",")){
+                            subindex = subindex.replace(",","");
                             if (subindex.contains("true") || subindex.contains("false")){
                                 generateError(7,"BOOL");
                             }
                             String[] range =  subindex.split(":");
                             for (String indx: range){
-                                System.out.println("Index: " + indx);
-                                ArrayList<Integer> indexRange = new ArrayList<>();
-                                indexRange.add(Integer.parseInt(indx));
-                                checkIndexAux(indexRange,id);
-
+                                if (!indx.isEmpty()) {
+                                    System.out.println("Index: " + indx);
+                                    ArrayList<Integer> indexRange = new ArrayList<>();
+                                    indexRange.add(Integer.parseInt(indx));
+                                    checkIndexAux(indexRange,id);
+                                }
                             }
                             return "LIST";
                         } else {
@@ -390,11 +390,25 @@ public class TablaVariables {
                 if (valor.equals("insert")){
                     tiposOp = checkInsert(igualdad);
                     flagAccess = true;
+                    if (!variablesDefinidas.contains(idVar)){
+                        generateError(0,idVar);
+                    }
                     break;
                 }
                 if (valor.equals("del")){
                     tiposOp = checkDel(igualdad);
                     flagAccess = true;
+                    if (!variablesDefinidas.contains(idVar)){
+                        generateError(0,idVar);
+                    }
+                    break;
+                }
+                if (valor.equals("Neg") || valor.equals("T") || valor.equals("F")){
+                    tiposOp = checkIndex(idVar,variable.getIndex());
+                    flagAccess = true;
+                    if (!variablesDefinidas.contains(idVar)){
+                        generateError(0,idVar);
+                    }
                     break;
                 }
                 if (!variable.getIndex().equals("NA")) {
@@ -459,16 +473,16 @@ public class TablaVariables {
                 variablesDefinidas.add(idVar);
                 indexMatriz.add(variablesDefinidas.indexOf(idVar));
                 matrices.add(variablesDefinidas.indexOf(idVar), igualdad.getLista());
+                types.add(type);
+                scopeVars.add(scopeVar);
             }
             if (!flagAccess){
                 System.out.print("Nombre: " + idVar);
+                System.out.print(", Scope: " + scopeVar);
+                System.out.println(", Type: " + type);
             } else {
-                System.out.print("Acceso: " + idVar);
+                System.out.println("Acceso: " + idVar);
             }
-            scopeVars.add(scopeVar);
-            System.out.print(", Scope: " + scopeVar);
-            types.add(type);
-            System.out.println(", Type: " + type);
         }
     }
 }
