@@ -44,7 +44,26 @@ y = 1;
 u[:, 1] =  [];
 ac = 23;
 
+Procedure p1(a,b,c)  {
+    for x in lista {
+        a = 1;
+        for b in lista[1:2] Step 2{
+            am.del(1,0);
+        }
+    }
+    if  aif[:, 1] ==  true    {
+        ad = m[1];
+        ae = m[1,1];
+        af = m[:,1];
+        Blink(a[c.shapeC][ab],true);
+    }
 
+	ag.insert([[true, false, true]],  0);
+	ah.insert([[true], [true] , [true]], 1);
+	ai.insert([[false, false, false, false]],  0, 0);
+	aj.insert(, 1,0);
+
+}
 
 Procedure Main()  {
     if var == 2 {

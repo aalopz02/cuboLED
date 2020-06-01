@@ -4,6 +4,7 @@ import Estructuras.Lista;
 
 import java.util.ArrayList;
 
+import static sintaxAnalysis.SyntaxChecker.S;
 import static sintaxAnalysis.SyntaxChecker.generateParseException;
 
 public class TablaVariables {
@@ -32,6 +33,9 @@ public class TablaVariables {
         errors.add("Needed int");//6
         errors.add("Not expected");//7
         errors.add("Expected 1 or 0 in MatrizInsert"); //8
+        errors.add("Cannot compare"); //9
+        errors.add("Not defined in for loop"); //10
+        errors.add("Cannot be used as iterable object"); //11
     }
 
     public void agregarIndiceAcceso(String index){
@@ -173,6 +177,14 @@ public class TablaVariables {
         } else if (errType == 8){
             System.out.println(errors.get(errType));
             System.out.println("Provided with: " + cause);
+        } else if (errType == 9){
+            System.out.println(errors.get(errType));
+            String[] erDescription = cause.split("-");
+            System.out.println(erDescription[0] + " with " + erDescription[1]);
+        } else if (errType == 10){
+            System.out.println(cause + ", " + errors.get(errType));
+        } else if (errType == 11){
+            System.out.println(cause + ", " +errors.get(errType));
         }
         ParseException e = generateParseException();
         throw e;
@@ -385,104 +397,134 @@ public class TablaVariables {
             String type = "";
             String tiposOp = "NA";
             boolean flagAccess = false;
-            for (int j = 0; j < contenidoIg.size(); j++) {
-                String valor = contenidoIg.get(j);
-                if (valor.equals("insert")){
-                    tiposOp = checkInsert(igualdad);
-                    flagAccess = true;
-                    if (!variablesDefinidas.contains(idVar)){
-                        generateError(0,idVar);
+            if (numbVar == -2){
+                igualdad = tablaIgualdades.get(i+1);
+                contenidoIg = igualdad.getContenido();
+            }
+            if (numbVar != -99){
+                for (int j = 0; j < contenidoIg.size(); j++) {
+                    String valor = contenidoIg.get(j);
+                    if (valor.equals("insert")){
+                        tiposOp = checkInsert(igualdad);
+                        flagAccess = true;
+                        if (!variablesDefinidas.contains(idVar)){
+                            generateError(0,idVar);
+                        }
+                        break;
                     }
-                    break;
-                }
-                if (valor.equals("del")){
-                    tiposOp = checkDel(igualdad);
-                    flagAccess = true;
-                    if (!variablesDefinidas.contains(idVar)){
-                        generateError(0,idVar);
+                    if (valor.equals("del")){
+                        tiposOp = checkDel(igualdad);
+                        flagAccess = true;
+                        if (!variablesDefinidas.contains(idVar)){
+                            generateError(0,idVar);
+                        }
+                        break;
                     }
-                    break;
-                }
-                if (valor.equals("Neg") || valor.equals("T") || valor.equals("F")){
-                    tiposOp = checkIndex(idVar,variable.getIndex());
-                    flagAccess = true;
-                    if (!variablesDefinidas.contains(idVar)){
-                        generateError(0,idVar);
+                    if (valor.equals("Neg") || valor.equals("T") || valor.equals("F")){
+                        tiposOp = checkIndex(idVar,variable.getIndex());
+                        flagAccess = true;
+                        if (!variablesDefinidas.contains(idVar)){
+                            generateError(0,idVar);
+                        }
+                        break;
                     }
-                    break;
-                }
-                if (!variable.getIndex().equals("NA")) {
-                    tiposOp = checkIndex(idVar, variable.getIndex());
-                    flagAccess = true;
-                }
-                if (!validTypes.contains(valor)) {
-                    if (!variablesDefinidas.contains(valor)) {
-                        if (!valor.contains("[")) {
-                            String checkShapeOut = checkShape(valor, true);
-                            if (!checkShapeOut.isEmpty()) {
-                                if (variablesDefinidas.contains(checkShapeOut)) {
-                                    if (types.get(variablesDefinidas.indexOf(checkShapeOut)).equals("LIST")) {
-                                        type = "NUM";
+                    if (!variable.getIndex().equals("NA")) {
+                        tiposOp = checkIndex(idVar, variable.getIndex());
+                        flagAccess = true;
+                    }
+                    if (!validTypes.contains(valor) && numbVar != -1) {
+                        if (!variablesDefinidas.contains(valor)) {
+                            if (!valor.contains("[")) {
+                                String checkShapeOut = checkShape(valor, true);
+                                if (!checkShapeOut.isEmpty()) {
+                                    if (variablesDefinidas.contains(checkShapeOut)) {
+                                        if (types.get(variablesDefinidas.indexOf(checkShapeOut)).equals("LIST")) {
+                                            type = "NUM";
+                                        } else {
+                                            generateError(4, checkShapeOut);
+                                        }
                                     } else {
-                                        generateError(4, checkShapeOut);
+                                        generateError(0, checkShapeOut);
                                     }
                                 } else {
-                                    generateError(0, checkShapeOut);
+                                    if (valor.equals("len")) {
+                                        type = checkLen(contenidoIg, j);
+                                        contenidoIg = new ArrayList<>();
+                                        contenidoIg.add(type);
+                                    } else {
+                                        generateError(0, valor);
+                                    }
                                 }
                             } else {
-                                if (valor.equals("len")) {
-                                    type = checkLen(contenidoIg, j);
-                                    contenidoIg = new ArrayList<>();
-                                    contenidoIg.add(type);
-                                } else {
-                                    generateError(0, valor);
+                                type = checkIndex(valor, "");
+                                if (type.substring(0, 3).equals("ERR")) {
+                                    generateError(5, type.substring(3));
                                 }
                             }
                         } else {
-                            type = checkIndex(valor, "");
-                            if (type.substring(0, 3).equals("ERR")) {
-                                generateError(5, type.substring(3));
+                            int indiceAssig = variablesDefinidas.indexOf(valor);
+                            int scopeVarIg = scopeVars.get(indiceAssig);
+                            if (!(scopeVarIg <= scopeVar)) {
+                                generateError(1, valor);
                             }
+                            type = types.get(indiceAssig);
                         }
                     } else {
-                        int indiceAssig = variablesDefinidas.indexOf(valor);
-                        int scopeVarIg = scopeVars.get(indiceAssig);
-                        if (!(scopeVarIg <= scopeVar)) {
-                            generateError(1, valor);
+                        type = valor;
+                    }
+                    if (tiposOp.equals("NA")) {
+                        tiposOp = type;
+                    } else if (!type.equals(tiposOp) && numbVar != -2) {
+                        generateError(2, tiposOp + ", " + type);
+                    }
+                }
+                if (variablesDefinidas.contains(idVar)) {
+                    if (numbVar != -1){
+                        String oldType = types.get(variablesDefinidas.indexOf(idVar));
+                        if (!tiposOp.equals(oldType) && !flagAccess) {
+                            if (numbVar == -2){
+                                if (!(tiposOp.equals("BOOL") && oldType.equals("LIST"))){
+                                    generateError(9, oldType + "-" + tiposOp);
+                                }
+                            } else {
+                                generateError(3, idVar + "-" + oldType + "-" + tiposOp);
+                            }
                         }
-                        type = types.get(indiceAssig);
+                        if (tiposOp.equals("LIST") && !flagAccess) {
+                            matrices.add(variablesDefinidas.indexOf(idVar), igualdad.getLista());
+                        }
+                    } else {
+                        System.out.println(tiposOp);
+                        if (tiposOp.isEmpty()){
+                            tiposOp = types.get(variablesDefinidas.indexOf(idVar));
+                        }
+                        System.out.println(tiposOp);
+                        if (!tiposOp.equals("LIST") && !tiposOp.equals("NUM")) {
+                            generateError(11, idVar);
+                        }
                     }
                 } else {
-                    type = valor;
+                    if (numbVar == -1 && igualdad.getNumeroVariable() == -99){
+                        generateError(10,idVar);
+                    }
+                    variablesDefinidas.add(idVar);
+                    if (numbVar == -1 && igualdad.getNumeroVariable() == -1){
+                        type = "NUM";
+                    }
+                    types.add(type);
+                    scopeVars.add(scopeVar);
+                    indexMatriz.add(variablesDefinidas.indexOf(idVar));
+                     matrices.add(variablesDefinidas.indexOf(idVar), igualdad.getLista());
                 }
-                if (tiposOp.equals("NA")) {
-                    tiposOp = type;
-                } else if (!type.equals(tiposOp)) {
-                    generateError(2, tiposOp + ", " + type);
+                if (!flagAccess){
+                    System.out.print("Nombre: " + idVar);
+                    System.out.print(", Scope: " + scopeVar);
+                    System.out.println(", Type: " + type);
+                } else {
+                    System.out.println("Acceso: " + idVar);
                 }
             }
-            if (variablesDefinidas.contains(idVar)) {
-                String oldType = types.get(variablesDefinidas.indexOf(idVar));
-                if (!tiposOp.equals(oldType) && !flagAccess) {
-                    generateError(3, idVar + "-" + oldType + "-" + tiposOp);
-                }
-                if (tiposOp.equals("LIST") && !flagAccess) {
-                    matrices.add(variablesDefinidas.indexOf(idVar), igualdad.getLista());
-                }
-            } else {
-                variablesDefinidas.add(idVar);
-                indexMatriz.add(variablesDefinidas.indexOf(idVar));
-                matrices.add(variablesDefinidas.indexOf(idVar), igualdad.getLista());
-                types.add(type);
-                scopeVars.add(scopeVar);
-            }
-            if (!flagAccess){
-                System.out.print("Nombre: " + idVar);
-                System.out.print(", Scope: " + scopeVar);
-                System.out.println(", Type: " + type);
-            } else {
-                System.out.println("Acceso: " + idVar);
-            }
+
         }
     }
 }

@@ -39,6 +39,9 @@ public class CeldaTablaVariables {
     }
 
     public String getIndex() {
+        if (index.isEmpty()){
+            return "NA";
+        }
         return index;
     }
 
