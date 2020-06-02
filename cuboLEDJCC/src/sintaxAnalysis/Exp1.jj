@@ -18,7 +18,7 @@ public class SyntaxChecker {
 	private static String indiceAcceso = "";
 	private static Boolean inCall = false;
 	private static ArrayList<String> valoresIgualdadTabla;
-	private static String nombreArchivo = "D:/proyects/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+	private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
 	private static TablaVariables tablaVariables = new TablaVariables();
 	public static ArrayList<String> constantesConfig = new ArrayList<String>();
 	public static Grafo grafo = new Grafo();
@@ -36,13 +36,16 @@ public class SyntaxChecker {
 			System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
-			//tablaVariables.imprimirIDS();
-			 Nodo aux = grafo.getInicial();
+			tablaVariables.imprimirIDS();
+            tablaVariables.checkVariables();
+            Nodo aux = grafo.getInicial();
+            /*
             while (aux != null){
                 System.out.println("Tipo: " + aux.getTipo());
                 System.out.println("Contenido: " + aux.getContenido());
                 aux = aux.getNext();
-            }       
+            }
+            */     
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -253,7 +256,7 @@ void Dim_Filas(): {Token filas;} { <DIM_FILAS> "=" filas = <NUM> ";" {constantes
 
 void Dim_Columnas(): {Token columnas;} { <DIM_COLUMNAS> "=" columnas = <NUM> ";" {constantesConfig.add(columnas.image);}}
 
-void Cubo(): {Token i; Token j;} { <CUBO> "=" i = <NUM> "," j = <NUM> ";" {constantesConfig.add(i.image); constantesConfig.add(j.image);}}
+void Cubo(): {Token i;} { <CUBO> "=" i = <ID> {constantesConfig.add(i.image);} ";"}
 
 void Empty() : {} { {} } 
 
@@ -287,7 +290,7 @@ void normalProc(): {} {"(" (Parametros() | Empty()) ")" "{" {scope = 1;} Exp() "
 
 void mainProc(): {} {"(" ")" "{" Exp() "}" {inMain = 0; scope = 0;}}
 
-void Call():{Token id;} {"Call" id=<ID> {tablaVariables.agregarProc(id.image,false); inCall = true;} "(" Igualdad() ")" ";" { inCall = false;}}
+void Call():{Token id;} {"Call" id=<ID> {tablaVariables.agregarProc(id.image,false); inCall = true;} "(" (Igualdad() | Empty()) ")" ";" { inCall = false; tablaVariables.checkProc();}}
 
 void Parametros(): {Token id;} { id = <ID> {tablaVariables.agregarParamProc(id.image);} ParametrosAux()}
 

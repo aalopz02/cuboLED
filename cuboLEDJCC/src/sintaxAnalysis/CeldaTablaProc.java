@@ -40,8 +40,11 @@ public class CeldaTablaProc {
     }
 
     public void setParam(ArrayList<String> contenido, int scope){
-         CeldaTablaIgualdades cell = new CeldaTablaIgualdades(scope,contenido);
-         var.add(cell);
+         if (contenido.size() != 0){
+             CeldaTablaIgualdades cell = new CeldaTablaIgualdades(scope,contenido);
+             var.add(cell);
+         }
+
     }
 
     public boolean isDcl() {

@@ -2,7 +2,7 @@ Timer = 1;
 Rango_Timer = Seg;
 Dim_Filas = 12;
 Dim_Columnas = 2;
-Cubo = 5,5;
+Cubo = p;
 
 
 x = 1;
@@ -45,44 +45,51 @@ u[:, 1] =  [];
 ac = 23;
 
 Procedure p1(a,b,c)  {
-    for x in u {
+    lista = [[true,false],[true],[]];
+    for x in lista {
         a = 1;
-        for i in u Step 2{
-            u.del(1,0);
+        for b in lista Step 2{
+            lista.del(1,0);
         }
     }
-    if  u[:, 1] ==  true    {
-        ad = t[1];
-        --ae = u[1,1];
-        af = u[:,1];
+    if  lista[:, 1] ==  true    {
+        ad = lista[1];
+        ae = lista[1];
+        af = lista[:,1];
         Blink(a[c.shapeC][ab],true);
     }
 
-	u.insert([[true, false, true]],  0);
-	u.insert([[true], [true] , [true]], 1);
-	u.insert([[false, false, false, false]],  0, 0);
-	u.insert(, 1,0);
+	lista.insert([[true, false, true]],  0);
+	lista.insert([[true], [true] , [true]], 1);
+	lista.insert([[false, false, false, false]],  0, 0);
+	lista.insert(, 1,0);
 
 }
-listaX = [[true], [true] , [true] ];
+
+Procedure miproc(q,e){
+}
+
+listaX = [true,false,true];
+
 Procedure Main()  {
     if var == 2 {
-        Call miproc(1,a,m[:,1],[[true], [true] , [true] , [true]],true);
+        Call p1(1,a,true);
     }
     for xy in a {
         Call miproc();
-        for bq in u Step 2{
+
+        for bq in lista Step 2{
             if  listaX[2] ==  true{
                  listaX.del(0,0);
                  listaX.del(1,0);
-                 Blink(a[1],true);
-                 Blink(a[1],false);
+                 Blink(listaX[1],true);
+                 Blink(listaX[1],false);
             }
 
         }
     }
-    Blink(a[1][a],5,Seg,true);
-	Call miproc(le[1][1][1],m[1]);
+    Blink(listaX[1][a],5,Seg,true);
+	Call miproc(true,1);
 }
 
 

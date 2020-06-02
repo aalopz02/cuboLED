@@ -19,6 +19,7 @@ public class TablaVariables {
     private ArrayList<String> types = new ArrayList<>();
     private ArrayList<Lista> matrices = new ArrayList<>();
     private ArrayList<Integer> indexMatriz = new ArrayList<>();
+    private int indiceProc = 0;
 
     TablaVariables() {
         validTypes.add("BOOL"); //0
@@ -36,78 +37,122 @@ public class TablaVariables {
         errors.add("Cannot compare"); //9
         errors.add("Not defined in for loop"); //10
         errors.add("Cannot be used as iterable object"); //11
+        errors.add("Method with signature"); //12
     }
 
-    public void agregarIndiceAcceso(String index){
-        tabla.get(tabla.size()-1).setIndex(index);
+    public void agregarIndiceAcceso(String index) {
+        tabla.get(tabla.size() - 1).setIndex(index);
     }
 
-    public void agregarProc(String id, boolean dcl){
+    public void agregarProc(String id, boolean dcl) {
         CeldaTablaProc cell = new CeldaTablaProc(id, dcl);
         tablaProc.add(cell);
+        indiceProc++;
     }
 
-    public void agregarParamProc(String paramIn){
-        tablaProc.get(tablaProc.size()-1).setParam(paramIn);
+    public void agregarParamProc(String paramIn) {
+        tablaProc.get(tablaProc.size() - 1).setParam(paramIn);
     }
 
-    public void agregarParamProc(ArrayList<String> paramsCall, int scope){
-        tablaProc.get(tablaProc.size()-1).setParam(paramsCall,scope);
+    public void agregarParamProc(ArrayList<String> paramsCall, int scope) {
+        tablaProc.get(tablaProc.size() - 1).setParam(paramsCall, scope);
     }
 
-    public void agregarVariable(int numeroVariable, String id, int Scope){
+    public void agregarVariable(int numeroVariable, String id, int Scope) {
         CeldaTablaVariables cell = new CeldaTablaVariables(numeroVariable, id, Scope);
         tabla.add(cell);
     }
 
-    public void agregarIgualdad(int numeroVariable, int Scope, ArrayList<String> contenido){
-        if (numeroVariable == -1){
+    public void agregarIgualdad(int numeroVariable, int Scope, ArrayList<String> contenido) {
+        if (numeroVariable == -1) {
             agregarParamProc(contenido, Scope);
         } else {
-            CeldaTablaIgualdades cell = new CeldaTablaIgualdades(numeroVariable,Scope,contenido);
+            CeldaTablaIgualdades cell = new CeldaTablaIgualdades(numeroVariable, Scope, contenido);
             tablaIgualdades.add(cell);
         }
     }
 
-    public void agregarIgualdad(int numeroVariable, int Scope, String contenido){
-        CeldaTablaIgualdades cell = new CeldaTablaIgualdades(numeroVariable,Scope,contenido);
+    public void agregarIgualdad(int numeroVariable, int Scope, String contenido) {
+        CeldaTablaIgualdades cell = new CeldaTablaIgualdades(numeroVariable, Scope, contenido);
         tablaIgualdades.add(cell);
+    }
+
+    public void checkProc() throws ParseException {
+        CeldaTablaProc call = tablaProc.get(tablaProc.size()-1);
+        String idProcCall = call.getId();
+        int cantParamCall;
+        if (call.getVars() != null){
+            cantParamCall = call.getVars().size();
+        } else {
+            cantParamCall = 0;
+        }
+        boolean flagProcFound = false;
+        int indexProc = 0;
+        for (int i = 0; i < tablaProc.size();i++){
+            CeldaTablaProc aux = tablaProc.get(i);
+            if (aux.getId().equals(idProcCall)){
+                if (aux.getParam() == null && cantParamCall == 0){
+                    flagProcFound = true;
+                    break;
+                }
+                if (aux.getParam() == null){
+                    break;
+                }
+                if (aux.getParam().size() == cantParamCall){
+                    indexProc = i;
+                    flagProcFound = true;
+                    break;
+                }
+            }
+        }
+        if (flagProcFound){
+            ArrayList<CeldaTablaIgualdades> params = call.getVars();
+            for (int i = 0; i < cantParamCall; i++){
+                String idVar = tablaProc.get(indexProc).getParam().get(i);
+                CeldaTablaVariables cellV = new CeldaTablaVariables(-5,idVar,0);
+                CeldaTablaIgualdades cellIg = params.get(i);
+                tabla.add(cellV);
+                tablaIgualdades.add(cellIg);
+            }
+        } else {
+            generateError(12,idProcCall+"-"+String.valueOf(cantParamCall));
+        }
     }
 
     public ArrayList<CeldaTablaVariables> getTabla() {
         return tabla;
     }
 
-    public void imprimirIDS(){
-        for (int i = 0; i < tabla.size(); i++){
+    public void imprimirIDS() {
+        for (int i = 0; i < tabla.size(); i++) {
             CeldaTablaVariables cellAux = tabla.get(i);
-                System.out.print("Ids: ");
-                System.out.print(cellAux.getId());
-                if (!cellAux.getIndex().equals("NA")){
-                    System.out.print(", Index: ");
-                    System.out.print(cellAux.getIndex());
-                }
-                System.out.print(", Scope: ");
-                System.out.print(cellAux.getScope());
-                System.out.print(", NUMVAR: ");
-                System.out.print(cellAux.getNumeroVariable());
-                System.out.println("");
+            System.out.print("Ids: ");
+            System.out.print(cellAux.getId());
+            if (!cellAux.getIndex().equals("NA")) {
+                System.out.print(", Index: ");
+                System.out.print(cellAux.getIndex());
+            }
+            System.out.print(", Scope: ");
+            System.out.print(cellAux.getScope());
+            System.out.print(", NUMVAR: ");
+            System.out.print(cellAux.getNumeroVariable());
+            System.out.println("");
 
             CeldaTablaIgualdades cellAuxIg = tablaIgualdades.get(i);
-                System.out.print("Contenido: ");
-                ArrayList<String> aux = cellAuxIg.getContenido();
-                for (String s : aux) {
-                    System.out.print(s);
-                    System.out.print("-");
-                }
-                System.out.print(", ScopeIg: ");
-                System.out.print(cellAuxIg.getScope());
-                System.out.print(", NUMVARIG: ");
-                System.out.print(cellAuxIg.getNumeroVariable());
-                System.out.println();
-                System.out.println("Lista");
-                cellAuxIg.checkList();
-                System.out.println();
+            System.out.print("Contenido: ");
+            ArrayList<String> aux = cellAuxIg.getContenido();
+            for (String s : aux) {
+                System.out.print(s);
+                System.out.print("-");
+            }
+            System.out.print(", ScopeIg: ");
+            System.out.print(cellAuxIg.getScope());
+            System.out.print(", NUMVARIG: ");
+            System.out.print(cellAuxIg.getNumeroVariable());
+            System.out.println();
+            System.out.println("Lista");
+            cellAuxIg.checkList();
+            System.out.println();
         }
         for (CeldaTablaProc cell : tablaProc) {
             if (cell.isDcl()) {
@@ -149,7 +194,7 @@ public class TablaVariables {
 
     }
 
-    private void generateError(int errType, String cause) throws ParseException{
+    private void generateError(int errType, String cause) throws ParseException {
         if (errType <= 1) {
             System.out.print("Variable: ");
             System.out.println(cause);
@@ -162,53 +207,58 @@ public class TablaVariables {
             System.out.print("Variable: " + erDescription[0] + ", ");
             System.out.println(errors.get(errType) + ": " + erDescription[1]);
             System.out.println("New type: " + erDescription[2]);
-        } else if (errType == 4){
+        } else if (errType == 4) {
             System.out.println(cause);
             System.out.println(errors.get(errType));
-        } else if (errType == 5){
+        } else if (errType == 5) {
             System.out.println(errors.get(errType));
             System.out.println("Tried to access: " + cause);
-        } else if (errType == 6){
-            System.out.println(errors.get(errType));
-            System.out.println("Provided with: "+ cause);
-        } else if (errType == 7){
-            System.out.println("Expresion: "+ cause);
-            System.out.println(errors.get(errType));
-        } else if (errType == 8){
+        } else if (errType == 6) {
             System.out.println(errors.get(errType));
             System.out.println("Provided with: " + cause);
-        } else if (errType == 9){
+        } else if (errType == 7) {
+            System.out.println("Expresion: " + cause);
+            System.out.println(errors.get(errType));
+        } else if (errType == 8) {
+            System.out.println(errors.get(errType));
+            System.out.println("Provided with: " + cause);
+        } else if (errType == 9) {
             System.out.println(errors.get(errType));
             String[] erDescription = cause.split("-");
             System.out.println(erDescription[0] + " with " + erDescription[1]);
-        } else if (errType == 10){
+        } else if (errType == 10) {
             System.out.println(cause + ", " + errors.get(errType));
-        } else if (errType == 11){
-            System.out.println(cause + ", " +errors.get(errType));
+        } else if (errType == 11) {
+            System.out.println(cause + ", " + errors.get(errType));
+        } else if (errType == 12){
+            System.out.println(errors.get(errType) + ": ");
+            String[] erDescription = cause.split("-");
+            System.out.println("id: " + erDescription[0] + " and " + erDescription[1] + " params");
+            System.out.println("Not defined");
         }
         ParseException e = generateParseException();
         throw e;
     }
 
-    public String checkShape(String in, boolean flagDCL){
+    public String checkShape(String in, boolean flagDCL) {
         String[] dividido = in.split("\\.");
-        if (dividido[dividido.length-1].equals("shapeF")){
-            if (flagDCL){
+        if (dividido[dividido.length - 1].equals("shapeF")) {
+            if (flagDCL) {
                 return dividido[0];
             }
-            return "f"+dividido[0];
-        } else if (dividido[dividido.length - 1].equals("shapeC")){
-            if (flagDCL){
+            return "f" + dividido[0];
+        } else if (dividido[dividido.length - 1].equals("shapeC")) {
+            if (flagDCL) {
                 return dividido[0];
             }
-            return "c"+dividido[0];
+            return "c" + dividido[0];
         }
         return "";
     }
 
-    public String checkLen(ArrayList<String> contenido, int indice){
-        String variable = contenido.get(indice+1);
-        if (variable.contains("[")){
+    public String checkLen(ArrayList<String> contenido, int indice) {
+        String variable = contenido.get(indice + 1);
+        if (variable.contains("[")) {
             //verifica con indice
             return "NUM";
         }
@@ -219,74 +269,74 @@ public class TablaVariables {
         inferTypes();
     }
 
-    private Lista lookForMatriz(int indiceId){
+    private Lista lookForMatriz(int indiceId) {
         return matrices.get(indexMatriz.indexOf(indiceId));
     }
 
     private String checkIndexAux(ArrayList<Integer> indices, String id) throws ParseException {
         Lista lista = lookForMatriz(variablesDefinidas.indexOf(id));
-        if (indices.size() == 1){
+        if (indices.size() == 1) {
             try {
-                if (lista.getContenido().charAt(indices.get(0)) == 'B'){
+                if (lista.getContenido().charAt(indices.get(0)) == 'B') {
                     return "BOOL";
                 } else {
                     return "LIST";
 
                 }
-            } catch (IndexOutOfBoundsException e){
-                generateError(5,id);
+            } catch (IndexOutOfBoundsException e) {
+                generateError(5, id);
             }
         }
-        if (indices.size() == 2){
+        if (indices.size() == 2) {
             try {
-                if (lista.getContenido().charAt(indices.get(0)) == 'L'){
+                if (lista.getContenido().charAt(indices.get(0)) == 'L') {
                     int indiceSubLista = 0;
-                    for (int d2 = 0; d2 < indices.get(0)-2; d2++){
-                        if (lista.getContenido().charAt(indices.get(d2)) == 'L'){
+                    for (int d2 = 0; d2 < indices.get(0) - 2; d2++) {
+                        if (lista.getContenido().charAt(indices.get(d2)) == 'L') {
                             indiceSubLista++;
                         }
                     }
-                    if (lista.getLista().get(indiceSubLista).getContenido().charAt(indices.get(1)) == 'B'){
+                    if (lista.getLista().get(indiceSubLista).getContenido().charAt(indices.get(1)) == 'B') {
                         return "BOOL";
                     } else {
                         return "LIST";
                     }
                 } else {
-                    generateError(4,"BOOL");
+                    generateError(4, "BOOL");
                 }
-            } catch (IndexOutOfBoundsException e){
-                generateError(5,id);
+            } catch (IndexOutOfBoundsException e) {
+                generateError(5, id);
             }
         }
-        if (indices.size() == 3){
+        if (indices.size() == 3) {
             try {
-                if (lista.getContenido().charAt(indices.get(0)) == 'L'){
+                if (lista.getContenido().charAt(indices.get(0)) == 'L') {
                     int indiceSubLista = 0;
-                    for (int d2 = 0; d2 < indices.get(0)-2; d2++){
-                        if (lista.getContenido().charAt(indices.get(d2)) == 'L'){
+                    for (int d2 = 0; d2 < indices.get(0) - 2; d2++) {
+                        if (lista.getContenido().charAt(indices.get(d2)) == 'L') {
                             indiceSubLista++;
                         }
                     }
-                    if (lista.getLista().get(indiceSubLista).getContenido().charAt(indices.get(1)) == 'L'){
+                    if (lista.getLista().get(indiceSubLista).getContenido().charAt(indices.get(1)) == 'L') {
                         int indiceSubLista3 = 0;
-                        for (int d3 = 0; d3 < indices.get(1)-2; d3++){
-                            if (lista.getContenido().charAt(indices.get(d3)) == 'L'){
+                        for (int d3 = 0; d3 < indices.get(1) - 2; d3++) {
+                            if (lista.getContenido().charAt(indices.get(d3)) == 'L') {
                                 indiceSubLista3++;
                             }
                         }
-                        if (lista.getLista().get(indiceSubLista).getLista().get(indiceSubLista3).getSize() >= indices.get(2)){
+                        if (lista.getLista().get(indiceSubLista).getLista().get(indiceSubLista3).getSize() >= indices.get(2)) {
                             return "BOOL";
                         } else {
-                            generateError(5,id);
+                            generateError(5, id);
                         }
                     } else {
-                        generateError(4,"BOOL");
+                        generateError(4, "BOOL");
                     }
                 } else {
-                    generateError(4,"BOOL");
+                    generateError(4, "BOOL");
                 }
-            } catch (IndexOutOfBoundsException e){
-                generateError(5,id);
+            } catch (IndexOutOfBoundsException e) {
+                generateError(5, id);
             }
         }
         return "BOOL";
@@ -336,18 +386,18 @@ public class TablaVariables {
                             }
                         }
                     } else {
-                        if (subindex.contains(":") || subindex.contains(",")){
-                            subindex = subindex.replace(",","");
-                            if (subindex.contains("true") || subindex.contains("false")){
-                                generateError(7,"BOOL");
+                        if (subindex.contains(":") || subindex.contains(",")) {
+                            subindex = subindex.replace(",", "");
+                            if (subindex.contains("true") || subindex.contains("false")) {
+                                generateError(7, "BOOL");
                             }
-                            String[] range =  subindex.split(":");
-                            for (String indx: range){
+                            String[] range = subindex.split(":");
+                            for (String indx : range) {
                                 if (!indx.isEmpty()) {
                                     System.out.println("Index: " + indx);
                                     ArrayList<Integer> indexRange = new ArrayList<>();
                                     indexRange.add(Integer.parseInt(indx));
-                                    checkIndexAux(indexRange,id);
+                                    checkIndexAux(indexRange, id);
                                 }
                             }
                             return "LIST";
@@ -362,16 +412,16 @@ public class TablaVariables {
         for (Integer in : indices) {
             System.out.println("Index: " + in);
         }
-        return checkIndexAux(indices,id);
+        return checkIndexAux(indices, id);
     }
 
     private String checkInsert(CeldaTablaIgualdades igualdad) throws ParseException {
         ArrayList<Integer> indexInsert = new ArrayList<>();
         ArrayList<String> contenido = igualdad.getContenido();
         String tipoInsert = contenido.get(1);
-        if (tipoInsert.equals("InsertMatriz")){
+        if (tipoInsert.equals("InsertMatriz")) {
             int columRow = Integer.parseInt(contenido.get(3));
-            if (!(columRow == 1 || columRow == 0)){
+            if (!(columRow == 1 || columRow == 0)) {
                 generateError(8, String.valueOf(columRow));
             } else {
                 igualdad.InsertMatriz();
@@ -382,11 +432,12 @@ public class TablaVariables {
         return "LIST";
     }
 
-    private String checkDel(CeldaTablaIgualdades igualdad) throws ParseException{
+    private String checkDel(CeldaTablaIgualdades igualdad) throws ParseException {
         return "LIST";
     }
 
     private void inferTypes() throws ParseException {
+        indiceProc = 0;
         for (int i = 0; i < tabla.size(); i++) {
             CeldaTablaVariables variable = tabla.get(i);
             String idVar = variable.getId();
@@ -397,34 +448,35 @@ public class TablaVariables {
             String type = "";
             String tiposOp = "NA";
             boolean flagAccess = false;
-            if (numbVar == -2){
-                igualdad = tablaIgualdades.get(i+1);
+
+            if (numbVar == -2) {
+                igualdad = tablaIgualdades.get(i + 1);
                 contenidoIg = igualdad.getContenido();
             }
-            if (numbVar != -99){
+            if (numbVar != -99) {
                 for (int j = 0; j < contenidoIg.size(); j++) {
                     String valor = contenidoIg.get(j);
-                    if (valor.equals("insert")){
+                    if (valor.equals("insert")) {
                         tiposOp = checkInsert(igualdad);
                         flagAccess = true;
-                        if (!variablesDefinidas.contains(idVar)){
-                            generateError(0,idVar);
+                        if (!variablesDefinidas.contains(idVar)) {
+                            generateError(0, idVar);
                         }
                         break;
                     }
-                    if (valor.equals("del")){
+                    if (valor.equals("del")) {
                         tiposOp = checkDel(igualdad);
                         flagAccess = true;
-                        if (!variablesDefinidas.contains(idVar)){
-                            generateError(0,idVar);
+                        if (!variablesDefinidas.contains(idVar)) {
+                            generateError(0, idVar);
                         }
                         break;
                     }
-                    if (valor.equals("Neg") || valor.equals("T") || valor.equals("F")){
-                        tiposOp = checkIndex(idVar,variable.getIndex());
+                    if (valor.equals("Neg") || valor.equals("T") || valor.equals("F")) {
+                        tiposOp = checkIndex(idVar, variable.getIndex());
                         flagAccess = true;
-                        if (!variablesDefinidas.contains(idVar)){
-                            generateError(0,idVar);
+                        if (!variablesDefinidas.contains(idVar)) {
+                            generateError(0, idVar);
                         }
                         break;
                     }
@@ -479,15 +531,17 @@ public class TablaVariables {
                     }
                 }
                 if (variablesDefinidas.contains(idVar)) {
-                    if (numbVar != -1){
+                    if (numbVar != -1) {
                         String oldType = types.get(variablesDefinidas.indexOf(idVar));
                         if (!tiposOp.equals(oldType) && !flagAccess) {
-                            if (numbVar == -2){
-                                if (!(tiposOp.equals("BOOL") && oldType.equals("LIST"))){
+                            if (numbVar == -2) {
+                                if (!(tiposOp.equals("BOOL") && oldType.equals("LIST"))) {
                                     generateError(9, oldType + "-" + tiposOp);
                                 }
                             } else {
-                                generateError(3, idVar + "-" + oldType + "-" + tiposOp);
+                                if (numbVar != -5){
+                                    generateError(3, idVar + "-" + oldType + "-" + tiposOp);
+                                }
                             }
                         }
                         if (tiposOp.equals("LIST") && !flagAccess) {
@@ -495,7 +549,7 @@ public class TablaVariables {
                         }
                     } else {
                         System.out.println(tiposOp);
-                        if (tiposOp.isEmpty()){
+                        if (tiposOp.isEmpty()) {
                             tiposOp = types.get(variablesDefinidas.indexOf(idVar));
                         }
                         System.out.println(tiposOp);
@@ -504,19 +558,19 @@ public class TablaVariables {
                         }
                     }
                 } else {
-                    if (numbVar == -1 && igualdad.getNumeroVariable() == -99){
-                        generateError(10,idVar);
+                    if (numbVar == -1 && igualdad.getNumeroVariable() == -99) {
+                        generateError(10, idVar);
                     }
                     variablesDefinidas.add(idVar);
-                    if (numbVar == -1 && igualdad.getNumeroVariable() == -1){
+                    if (numbVar == -1 && igualdad.getNumeroVariable() == -1) {
                         type = "NUM";
                     }
                     types.add(type);
                     scopeVars.add(scopeVar);
                     indexMatriz.add(variablesDefinidas.indexOf(idVar));
-                     matrices.add(variablesDefinidas.indexOf(idVar), igualdad.getLista());
+                    matrices.add(variablesDefinidas.indexOf(idVar), igualdad.getLista());
                 }
-                if (!flagAccess){
+                if (!flagAccess) {
                     System.out.print("Nombre: " + idVar);
                     System.out.print(", Scope: " + scopeVar);
                     System.out.println(", Type: " + type);
@@ -527,4 +581,5 @@ public class TablaVariables {
 
         }
     }
+
 }

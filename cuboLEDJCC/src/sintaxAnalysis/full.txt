@@ -2,7 +2,7 @@ Timer = 1; -szgfzgfvzdg
 Rango_Timer = Seg;
 Dim_Filas = 12;
 Dim_Columnas = 2;
-Cubo = 5,5;
+Cubo = p;
 
 
 x = 1;

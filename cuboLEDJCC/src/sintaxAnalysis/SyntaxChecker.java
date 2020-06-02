@@ -35,15 +35,16 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                         System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
-            tablaVariables.imprimirIDS();
+                        tablaVariables.imprimirIDS();
             tablaVariables.checkVariables();
-            /*
             Nodo aux = grafo.getInicial();
+            /*
             while (aux != null){
                 System.out.println("Tipo: " + aux.getTipo());
                 System.out.println("Contenido: " + aux.getContenido());
                 aux = aux.getNext();
-            }*/
+            }
+            */
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -774,14 +775,12 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void Cubo() throws ParseException {
-              Token i; Token j;
+              Token i;
     jj_consume_token(CUBO);
     jj_consume_token(9);
-    i = jj_consume_token(NUM);
-    jj_consume_token(8);
-    j = jj_consume_token(NUM);
+    i = jj_consume_token(ID);
+                                               constantesConfig.add(i.image);
     jj_consume_token(43);
-                                                                           constantesConfig.add(i.image); constantesConfig.add(j.image);
   }
 
   static final public void Empty() throws ParseException {
@@ -981,7 +980,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     Igualdad();
     jj_consume_token(7);
     jj_consume_token(43);
-                                                                                                                              inCall = false;
+                                                                                                                                          inCall = false; tablaVariables.checkProc();
   }
 
   static final public void Parametros() throws ParseException {

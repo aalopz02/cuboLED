@@ -8,6 +8,7 @@ public class CeldaTablaVariables {
     private String index = "NA";
     private String type = "ND";
 
+
     CeldaTablaVariables(int numeroVariable, String id, int Scope){
         setNumeroVariable(numeroVariable);
         setId(id);
