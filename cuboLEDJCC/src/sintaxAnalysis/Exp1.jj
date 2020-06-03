@@ -282,19 +282,19 @@ void Adentro_Lista(): {Token num;} {(num=<NUM> {indiceAcceso+=num.image;} | num 
 
 void Adentro_Lista_Aux1(): {Token num;} {":" {indiceAcceso+=":";} num=<NUM> {indiceAcceso+=num.image;} | "," {indiceAcceso+=",";} num=<NUM> {indiceAcceso+=num.image;} | Empty() }
 
-void Procedure(): {} {"Procedure" NombreRutina() }
+void Procedure(): {} {"Procedure" {grafo.addNodo("PRODCL","def");} NombreRutina() }
 
-void NombreRutina():{Token id;}{ id=<ID> {tablaVariables.agregarProc(id.image, true);} normalProc() | id = <MAIN> {checkMainDefined(0,id); inMain = 1;} mainProc()}
+void NombreRutina():{Token id;}{ id=<ID> {tablaVariables.agregarProc(id.image, true); grafo.addNodo("ID",id.image);} normalProc() | id = <MAIN> {checkMainDefined(0,id); inMain = 1; grafo.addNodo("ID",id.image);} mainProc()}
 
-void normalProc(): {} {"(" (Parametros() | Empty()) ")" "{" {scope = 1;} Exp() "}" {scope = 0;}}
+void normalProc(): {} {"(" {grafo.addNodo("OPENPAR","(");} (Parametros() | Empty()) ")" {grafo.addNodo("CLOSEPAR",")");} "{" {grafo.addNodo("OPENSCOPE","{"); scope = 1;} Exp() "}" {grafo.addNodo("CLOSESCOPE","}"); scope = 0;}}
 
-void mainProc(): {} {"(" ")" "{" Exp() "}" {inMain = 0; scope = 0;}}
+void mainProc(): {} {"(" ")" "{" {grafo.addNodo("MAINPAR","()"); grafo.addNodo("OPENSCOPE","{");} Exp() "}" {inMain = 0; scope = 0; grafo.addNodo("CLOSESCOPE","}");}}
 
 void Call():{Token id;} {"Call" id=<ID> {tablaVariables.agregarProc(id.image,false); inCall = true;} "(" (Igualdad()) ")" ";" { inCall = false; tablaVariables.checkProc();}}
 
-void Parametros(): {Token id;} { id = <ID> {tablaVariables.agregarParamProc(id.image);} ParametrosAux()}
+void Parametros(): {Token id;} { id = <ID> {tablaVariables.agregarParamProc(id.image); grafo.addNodo("ID",id.image);} ParametrosAux()}
 
-void ParametrosAux(): {} {"," Parametros() | Empty()}
+void ParametrosAux(): {} {"," {grafo.addNodo("COMA",",");} Parametros() | Empty()}
 
 void forFunction():{Token id;} {"for" {scope += 1;} id=<ID> {tablaVariables.agregarVariable(-1,id.image,scope); tablaVariables.agregarIgualdad(-1,scope,"");}
 								"in" {int aux = numeroVariable; numeroVariable=-1;} Iterable() {numeroVariable=aux;} 

@@ -3,43 +3,45 @@ package sintaxAnalysis;
 
 import Estructuras.Nodo;
 import Estructuras.Grafo;
+
 import java.io.*;
 import java.util.ArrayList;
 
 public class SyntaxChecker implements SyntaxCheckerConstants {
 
-        private static int sameLineDCL = 0;
-        private static int mainDefinido = 0;
-        private static int scope = 0;
-        private static int numeroVariable = 0;
-        private static int inMain = 0;
-        private static Boolean addVarFalg = true;
-        private static String indiceAcceso = "";
-        private static Boolean inCall = false;
-        private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
-        private static TablaVariables tablaVariables = new TablaVariables();
-        public static ArrayList<String> constantesConfig = new ArrayList<String>();
-        public static Grafo grafo = new Grafo();
+    private static int sameLineDCL = 0;
+    private static int mainDefinido = 0;
+    private static int scope = 0;
+    private static int numeroVariable = 0;
+    private static int inMain = 0;
+    private static Boolean addVarFalg = true;
+    private static String indiceAcceso = "";
+    private static Boolean inCall = false;
+    private static ArrayList<String> valoresIgualdadTabla;
+    private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+    private static TablaVariables tablaVariables = new TablaVariables();
+    public static ArrayList<String> constantesConfig = new ArrayList<String>();
+    public static Grafo grafo = new Grafo();
 
     public static void main(String[] args) {
         try {
-                        File file = new File(nombreArchivo);
-                        BufferedReader br = new BufferedReader(new FileReader(file));
-                        String st;
-                        String in = "";
-                        while ((st = br.readLine()) != null) {
-                                in += st;
-                                in += '\u005cn';
-                        }
-                        System.out.println(in);
+            File file = new File(nombreArchivo);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String st;
+            String in = "";
+            while ((st = br.readLine()) != null) {
+                in += st;
+                in += '\u005cn';
+            }
+            System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
             System.out.println("Syntax is okay");
-                        tablaVariables.imprimirIDS();
+            tablaVariables.imprimirIDS();
             tablaVariables.checkVariables();
+
             Nodo aux = grafo.getInicial();
 
-            while (aux != null){
+            while (aux != null) {
                 System.out.println("Tipo: " + aux.getTipo());
                 System.out.println("Contenido: " + aux.getContenido());
                 aux = aux.getNext();
@@ -51,1184 +53,1318 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         }
     }
 
-        static void checkMainDefined(int llamada, Token token) throws ParseException{
-                if (mainDefinido == 0){
-                        if (llamada ==  1){
-                                System.out.println("Main method not defined");
-                                System.out.println("In line: ");
-                            System.out.println(token.beginLine);
-                                ParseException e = generateParseException();
-                                throw e;
-                        } else {
-                                mainDefinido = 1;
-                        }
-                } else {
-                        System.out.println("Main method already defined");
-                        System.out.println("In line: ");
-                        System.out.println(token.beginLine);
-                        ParseException e = generateParseException();
-                        throw e;
-                }
+    static void checkMainDefined(int llamada, Token token) throws ParseException {
+        if (mainDefinido == 0) {
+            if (llamada == 1) {
+                System.out.println("Main method not defined");
+                System.out.println("In line: ");
+                System.out.println(token.beginLine);
+                ParseException e = generateParseException();
+                throw e;
+            } else {
+                mainDefinido = 1;
+            }
+        } else {
+            System.out.println("Main method already defined");
+            System.out.println("In line: ");
+            System.out.println(token.beginLine);
+            ParseException e = generateParseException();
+            throw e;
         }
+    }
 
-        static void checkMainDCL(Token token) throws ParseException{
-                if (inMain == 1){
-                        System.out.println("Illegal declaration in main method");
-                        System.out.println("In line: ");
-                        System.out.println(token.beginLine);
-                        ParseException e = generateParseException();
-                        throw e;
-                }
+    static void checkMainDCL(Token token) throws ParseException {
+        if (inMain == 1) {
+            System.out.println("Illegal declaration in main method");
+            System.out.println("In line: ");
+            System.out.println(token.beginLine);
+            ParseException e = generateParseException();
+            throw e;
         }
+    }
 
-        static void agregarVariable() {
-                if (addVarFalg) {
-                        tablaVariables.agregarIndiceAcceso(indiceAcceso);
-                }
+    static void agregarVariable() {
+        if (addVarFalg) {
+            tablaVariables.agregarIndiceAcceso(indiceAcceso);
         }
+    }
 
-        static void checkSameLineDCL(Token token) throws ParseException{
-                if (sameLineDCL != 0) {
-                        System.out.println("Expected same number of expresions as ids in same line declaration");
-                        System.out.println("In line: ");
-                        System.out.println(token.beginLine);
-                        ParseException e = generateParseException();
-                        throw e;
-                }
+    static void checkSameLineDCL(Token token) throws ParseException {
+        if (sameLineDCL != 0) {
+            System.out.println("Expected same number of expresions as ids in same line declaration");
+            System.out.println("In line: ");
+            System.out.println(token.beginLine);
+            ParseException e = generateParseException();
+            throw e;
         }
-
-  static final public void INICIAR() throws ParseException {
-    Constantes();
-    S();
-  }
-
-  static final public void S() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 33:
-    case ID:
-      Sder();
-      break;
-    case 0:
-      jj_consume_token(0);
-      break;
-    default:
-      jj_la1[0] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
     }
-  }
 
-  static final public void Sder() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case ID:
-      Inicial();
-      S();
-      break;
-    case 33:
-      Procedure();
-      S();
-      break;
-    default:
-      jj_la1[1] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+    static final public void INICIAR() throws ParseException {
+        Constantes();
+        S();
     }
-  }
 
-  static final public void Exp() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 32:
-      Call();
-      Exp();
-      break;
-    case ID:
-      Inicial();
-      Exp();
-      break;
-    case 31:
-      forFunction();
-      Exp();
-      break;
-    case 30:
-      ifFunction();
-      Exp();
-      break;
-    case 34:
-      Delay_Function();
-      Exp();
-      break;
-    case 37:
-      Blink_Function();
-      Exp();
-      break;
-    default:
-      jj_la1[2] = jj_gen;
-      Empty();
+    static final public void S() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 33:
+            case ID:
+                Sder();
+                break;
+            case 0:
+                jj_consume_token(0);
+                break;
+            default:
+                jj_la1[0] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
     }
-  }
 
-  static final public void Inicial() throws ParseException {
-                 Token aux;
-    Identificadores();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 12:
-      jj_consume_token(12);
-                                                        grafo.addNodo("DCL",".");
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case INSERT:
-      case DELETE:
-        OperacionesListas();
-        break;
-      case NEG:
-      case T:
-      case F:
-        FuncionesListas();
-        break;
-      default:
-        jj_la1[3] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-      break;
-    case 9:
-      aux = jj_consume_token(9);
-                                                                                                                                           grafo.addNodo("DCL","="); checkMainDCL(aux);
-      Igualdad();
-                                                                                                                                                                                                     checkSameLineDCL(aux);
-      break;
-    default:
-      jj_la1[4] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+    static final public void Sder() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case ID:
+                Inicial();
+                S();
+                break;
+            case 33:
+                Procedure();
+                S();
+                break;
+            default:
+                jj_la1[1] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
     }
-    jj_consume_token(43);
-                                                                                                                                                                                                                                    grafo.addNodo("ENDLINE","");
-  }
 
-  static final public void Identificadores() throws ParseException {
-                         Token id;
-    id = jj_consume_token(ID);
-                                                                                                tablaVariables.agregarVariable(numeroVariable,id.image,scope);
-                                                                                                grafo.addNodo("DCL",id.image);
-                                                                                                numeroVariable++;
-    IdentificadoresAux();
-  }
-
-  static final public void IdentificadoresAux() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 8:
-      jj_consume_token(8);
-                                    grafo.addNodo("DCL",","); sameLineDCL += 1;
-      Identificadores();
-      break;
-    default:
-      jj_la1[5] = jj_gen;
-                                                                                                      addVarFalg = true;
-      Listas();
-                                                                                                                                    grafo.addNodo("DCL",indiceAcceso); indiceAcceso = "";
+    static final public void Exp() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 32:
+                Call();
+                Exp();
+                break;
+            case ID:
+                Inicial();
+                Exp();
+                break;
+            case 31:
+                forFunction();
+                Exp();
+                break;
+            case 30:
+                ifFunction();
+                Exp();
+                break;
+            case 34:
+                Delay_Function();
+                Exp();
+                break;
+            case 37:
+                Blink_Function();
+                Exp();
+                break;
+            default:
+                jj_la1[2] = jj_gen;
+                Empty();
+        }
     }
-  }
 
-  static final public void IgualdadValoresOperables() throws ParseException {
-                                  Token aux; Token oper;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case ID:
-      aux = jj_consume_token(ID);
-                                                                       grafo.addNodo("ID",aux.image);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case OPERADORES:
-        oper = jj_consume_token(OPERADORES);
-                                                                                                                             grafo.addNodo("OPER",oper.image);  valoresIgualdadTabla.add(aux.image);
+    static final public void Inicial() throws ParseException {
+        Token aux;
+        Identificadores();
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 12:
+                jj_consume_token(12);
+                grafo.addNodo("DCL", ".");
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case INSERT:
+                    case DELETE:
+                        OperacionesListas();
+                        break;
+                    case NEG:
+                    case T:
+                    case F:
+                        FuncionesListas();
+                        break;
+                    default:
+                        jj_la1[3] = jj_gen;
+                        jj_consume_token(-1);
+                        throw new ParseException();
+                }
+                break;
+            case 9:
+                aux = jj_consume_token(9);
+                grafo.addNodo("DCL", "=");
+                checkMainDCL(aux);
+                Igualdad();
+                checkSameLineDCL(aux);
+                break;
+            default:
+                jj_la1[4] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+        jj_consume_token(43);
+        grafo.addNodo("ENDLINE", "");
+    }
+
+    static final public void Identificadores() throws ParseException {
+        Token id;
+        id = jj_consume_token(ID);
+        tablaVariables.agregarVariable(numeroVariable, id.image, scope);
+        grafo.addNodo("DCL", id.image);
+        numeroVariable++;
+        IdentificadoresAux();
+    }
+
+    static final public void IdentificadoresAux() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 8:
+                jj_consume_token(8);
+                grafo.addNodo("DCL", ",");
+                sameLineDCL += 1;
+                Identificadores();
+                break;
+            default:
+                jj_la1[5] = jj_gen;
+                addVarFalg = true;
+                Listas();
+                grafo.addNodo("INDEXACC", indiceAcceso);
+                indiceAcceso = "";
+        }
+    }
+
+    static final public void IgualdadValoresOperables() throws ParseException {
+        Token aux;
+        Token oper;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case ID:
+                aux = jj_consume_token(ID);
+                grafo.addNodo("ID", aux.image);
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case OPERADORES:
+                        oper = jj_consume_token(OPERADORES);
+                        grafo.addNodo("OPER", oper.image);
+                        valoresIgualdadTabla.add(aux.image);
+                        IgualdadAux();
+                        break;
+                    case 12:
+                        jj_consume_token(12);
+                        indiceAcceso += aux.image;
+                        indiceAcceso += ".";
+                        grafo.addNodo("DOT", ".");
+                        FuncionesShape();
+                        valoresIgualdadTabla.add(indiceAcceso);
+                        indiceAcceso = "";
+                        break;
+                    default:
+                        jj_la1[6] = jj_gen;
+                        indiceAcceso += aux.image;
+                        addVarFalg = false;
+                        Listas();
+                        valoresIgualdadTabla.add(indiceAcceso);
+                        grafo.addNodo("INDEX", indiceAcceso);
+                        indiceAcceso = "";
+                        addVarFalg = true;
+                }
+                break;
+            case NUM:
+                aux = jj_consume_token(NUM);
+                grafo.addNodo("NUM", aux.image);
+                valoresIgualdadTabla.add("NUM");
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case OPERADORES:
+                        aux = jj_consume_token(OPERADORES);
+                        grafo.addNodo("OPER", aux.image);
+                        IgualdadValoresOperables();
+                        break;
+                    default:
+                        jj_la1[7] = jj_gen;
+                        Empty();
+                }
+                break;
+            case 6:
+                jj_consume_token(6);
+                grafo.addNodo("OPENPAR", "(");
+                IgualdadAux();
+                jj_consume_token(7);
+                grafo.addNodo("CLOSEPAR", ")");
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case OPERADORES:
+                        aux = jj_consume_token(OPERADORES);
+                        grafo.addNodo("OPER", aux.image);
+                        IgualdadValoresOperables();
+                        break;
+                    default:
+                        jj_la1[8] = jj_gen;
+                        IgualdadValoresOperables();
+                }
+                break;
+            default:
+                jj_la1[9] = jj_gen;
+                Empty();
+        }
+    }
+
+    static final public void IgualdadAux() throws ParseException {
+        Token aux;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case BOOL:
+                aux = jj_consume_token(BOOL);
+                grafo.addNodo("BOOL", aux.image);
+                valoresIgualdadTabla.add("BOOL");
+                break;
+            case 6:
+                jj_consume_token(6);
+                grafo.addNodo("OPENPAR", "(");
+                IgualdadValoresOperables();
+                jj_consume_token(7);
+                grafo.addNodo("CLOSEPAR", ")");
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case OPERADORES:
+                        aux = jj_consume_token(OPERADORES);
+                        grafo.addNodo("OPER", aux.image);
+                        IgualdadValoresOperables();
+                        break;
+                    default:
+                        jj_la1[10] = jj_gen;
+                        IgualdadValoresOperables();
+                }
+                break;
+            case 44:
+                jj_consume_token(44);
+                indiceAcceso += "[";
+                addVarFalg = false;
+                ValoresListas();
+                jj_consume_token(45);
+                indiceAcceso += "]";
+                valoresIgualdadTabla.add(indiceAcceso);
+                grafo.addNodo("LIST", indiceAcceso);
+                indiceAcceso = "";
+                addVarFalg = true;
+                break;
+            case LIST:
+                jj_consume_token(LIST);
+                addVarFalg = false;
+                valoresIgualdadTabla.add("createList");
+                grafo.addNodo("NEWLIST", "createList");
+                CrearLista();
+                Listas();
+                addVarFalg = true;
+                break;
+            case LENGTH:
+                FuncionLen();
+                valoresIgualdadTabla.add(indiceAcceso);
+                grafo.addNodo("LIST", indiceAcceso);
+                indiceAcceso = "";
+                break;
+            default:
+                jj_la1[11] = jj_gen;
+                IgualdadValoresOperables();
+        }
+    }
+
+    static final public void Igualdad() throws ParseException {
+        Token aux;
+        valoresIgualdadTabla = new ArrayList<String>();
         IgualdadAux();
-        break;
-      case 12:
-        jj_consume_token(12);
-                                                                                                                                                       indiceAcceso += aux.image; indiceAcceso += "."; grafo.addNodo("DOT",".");
-        FuncionesShape();
-                                                                                                                                                                                                                                                     valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
-        break;
-      default:
-        jj_la1[6] = jj_gen;
-                                                                                                                                                   indiceAcceso+= aux.image; addVarFalg = false;
-        Listas();
-                                                                                                                                                                                                            valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("INDEX",indiceAcceso); indiceAcceso = ""; addVarFalg = true;
-      }
-      break;
-    case NUM:
-      aux = jj_consume_token(NUM);
-                                                                       grafo.addNodo("NUM",aux.image); valoresIgualdadTabla.add("NUM");
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case OPERADORES:
-        aux = jj_consume_token(OPERADORES);
-                                                                                                                                                              grafo.addNodo("OPER",aux.image);
-        IgualdadValoresOperables();
-        break;
-      default:
-        jj_la1[7] = jj_gen;
-        Empty();
-      }
-      break;
-    case 6:
-      jj_consume_token(6);
-                                                               grafo.addNodo("OPENPAR","(");
-      IgualdadAux();
-      jj_consume_token(7);
-                                                                                                                 grafo.addNodo("CLOSEPAR",")");
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case OPERADORES:
-        aux = jj_consume_token(OPERADORES);
-                                                                                                                                                                       grafo.addNodo("OPER",aux.image);
-        IgualdadValoresOperables();
-        break;
-      default:
-        jj_la1[8] = jj_gen;
-        IgualdadValoresOperables();
-      }
-      break;
-    default:
-      jj_la1[9] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void IgualdadAux() throws ParseException {
-                     Token aux;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case BOOL:
-      aux = jj_consume_token(BOOL);
-                                                  grafo.addNodo("BOOL",aux.image); valoresIgualdadTabla.add("BOOL");
-      break;
-    case 6:
-      jj_consume_token(6);
-                                                                               grafo.addNodo("OPENPAR","(");
-      IgualdadValoresOperables();
-      jj_consume_token(7);
-                                                                                                                                              grafo.addNodo("CLOSEPAR",")");
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case OPERADORES:
-        aux = jj_consume_token(OPERADORES);
-                                                                                                                                                                                                    grafo.addNodo("OPER",aux.image);
-        IgualdadValoresOperables();
-        break;
-      default:
-        jj_la1[10] = jj_gen;
-        IgualdadValoresOperables();
-      }
-      break;
-    case 44:
-      jj_consume_token(44);
-                                                                               indiceAcceso+="["; addVarFalg = false;
-      ValoresListas();
-      jj_consume_token(45);
-                                                                                                                                            indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("LIST",indiceAcceso); indiceAcceso = ""; addVarFalg = true;
-      break;
-    case LIST:
-      jj_consume_token(LIST);
-                                                                                  addVarFalg = false; valoresIgualdadTabla.add("createList"); grafo.addNodo("NEWLIST","createList");
-      CrearLista();
-      Listas();
-                                                                                                                                                                                                             addVarFalg = true;
-      break;
-    case LENGTH:
-      FuncionLen();
-                                                                                        valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("LIST",indiceAcceso); indiceAcceso = "";
-      break;
-    default:
-      jj_la1[11] = jj_gen;
-      IgualdadValoresOperables();
-    }
-  }
-
-  static final public void Igualdad() throws ParseException {
-                  Token aux;
-                                 valoresIgualdadTabla = new ArrayList<String>();
-    IgualdadAux();
-                                                                                                                                                                                                        if (!inCall){
-                                                                                                                                                                                                                tablaVariables.agregarIgualdad(numeroVariable-sameLineDCL,scope,valoresIgualdadTabla);
-                                                                                                                                                                                                        } else {
-                                                                                                                                                                                                                tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
-                                                                                                                                                                                                        }
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 8:
-      jj_consume_token(8);
-                                                                      grafo.addNodo("DCL",","); sameLineDCL -= 1;
-      Igualdad();
-      break;
-    default:
-      jj_la1[12] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void Listas() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 44:
-      jj_consume_token(44);
-                         indiceAcceso += "[";
-      AccesoLista();
-      jj_consume_token(45);
-                                                                  indiceAcceso += "]";
-      Listas();
-                                                                                                  agregarVariable();
-      break;
-    case LIST:
-      jj_consume_token(LIST);
-                                                                  addVarFalg = false; valoresIgualdadTabla.add("createList");
-      CrearLista();
-      Listas();
-      break;
-    default:
-      jj_la1[13] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void AccesoLista() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 46:
-      jj_consume_token(46);
-      jj_consume_token(8);
-                                                         indiceAcceso += ":,";
-      Numeros();
-      AccesoLista();
-      break;
-    case NUM:
-    case LENGTH:
-    case ID:
-      Numeros();
-      AccesoListaAux();
-      break;
-    default:
-      jj_la1[14] = jj_gen;
-      ValoresListas();
-    }
-  }
-
-  static final public void AccesoListaAux() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 46:
-      jj_consume_token(46);
-                                 indiceAcceso+=":";
-      Numeros();
-      break;
-    case 8:
-      jj_consume_token(8);
-                                                                      indiceAcceso+=",";
-      Numeros();
-      break;
-    case NUM:
-    case LENGTH:
-    case ID:
-      Numeros();
-      break;
-    default:
-      jj_la1[15] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void ValoresListas() throws ParseException {
-                       Token aux;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case BOOL:
-      aux = jj_consume_token(BOOL);
-                                                   indiceAcceso+=aux.image;
-      ValoresListasAux();
-      break;
-    default:
-      jj_la1[16] = jj_gen;
-      Listas();
-      ValoresListasAux();
-    }
-  }
-
-  static final public void ValoresListasAux() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 8:
-      jj_consume_token(8);
-                                    indiceAcceso+=",";
-      ValoresListas();
-      break;
-    default:
-      jj_la1[17] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void FuncionesListas() throws ParseException {
-                         Token aux;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case NEG:
-      aux = jj_consume_token(NEG);
-      break;
-    case T:
-      aux = jj_consume_token(T);
-      break;
-    case F:
-      aux = jj_consume_token(F);
-      break;
-    default:
-      jj_la1[18] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-                                                                             grafo.addNodo("FUNCLIST",aux.image); tablaVariables.agregarIgualdad(numeroVariable,scope,aux.image);
-  }
-
-  static final public void CrearLista() throws ParseException {
-                    Token aux;
-    jj_consume_token(6);
-    jj_consume_token(RANGO);
-    jj_consume_token(6);
-    RangeParam();
-  }
-
-  static final public void RangeParam() throws ParseException {
-                    Token n;
-    Numeros();
-                                           grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso="";
-    RangeParamVal();
-  }
-
-  static final public void RangeParamVal() throws ParseException {
-                       Token bool;
-    jj_consume_token(8);
-    bool = jj_consume_token(BOOL);
-                                                         grafo.addNodo("BOOL",bool.image); valoresIgualdadTabla.add("BOOL");
-    jj_consume_token(7);
-    jj_consume_token(7);
-  }
-
-  static final public void OperacionesListas() throws ParseException {
-                           Token aux;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case INSERT:
-      aux = jj_consume_token(INSERT);
-                                                         grafo.addNodo("FUN.INSERT","insert"); addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);
-      jj_consume_token(6);
-      valoresInsert();
-      jj_consume_token(7);
-                                                                                                                                                                                                                                  tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;
-      break;
-    case DELETE:
-      aux = jj_consume_token(DELETE);
-                                                                                                  grafo.addNodo("FUN.DEL","delete"); addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);
-      jj_consume_token(6);
-      valoresDel();
-      jj_consume_token(7);
-                                                                                                                                                                                                                                                                     tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;
-      break;
-    default:
-      jj_la1[19] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-  }
-
-  static final public void valoresInsert() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 8:
-    case LIST:
-    case 44:
-                                                         indiceAcceso = ""; valoresIgualdadTabla.add("InsertMatriz");
-      Listas();
-                                                                                                                                 grafo.addNodo("INSERT.MATRIZ",""); grafo.addNodo("VAL",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso);
-      InsertMatriz();
-      break;
-    case NUM:
-    case LENGTH:
-    case ID:
-                                                                                                                                                                                                                                                                  valoresIgualdadTabla.add("InsertListas"); grafo.addNodo("INSERT.LISTA","");
-      InsertListas();
-      break;
-    default:
-      jj_la1[20] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-  }
-
-  static final public void InsertMatriz() throws ParseException {
-    jj_consume_token(8);
-                               indiceAcceso = "";
-    Numeros();
-                                                              grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 8:
-      jj_consume_token(8);
-      Numeros();
-                                                                                                                                                                             grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
-      break;
-    default:
-      jj_la1[21] = jj_gen;
-      Empty();
-    }
-                                                                                                                                                                                                                                                                                        grafo.addNodo("ENDINSERT","");
-  }
-
-  static final public void valoresDel() throws ParseException {
-    Numeros();
-                                  grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 8:
-      jj_consume_token(8);
-      Numeros();
-                                                                                                                                                 grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
-      break;
-    default:
-      jj_la1[22] = jj_gen;
-      Empty();
-    }
-                                                                                                                                                                                                                                                           grafo.addNodo("ENDDELETE","");
-  }
-
-  static final public void InsertListas() throws ParseException {
-                      Token aux;
-                                     indiceAcceso = "";
-    Numeros();
-                                                                    grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
-    jj_consume_token(8);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case BOOL:
-      aux = jj_consume_token(BOOL);
-                                                                                       valoresIgualdadTabla.add("BOOL"); grafo.addNodo("BOOL",aux.image);
-      break;
-    default:
-      jj_la1[23] = jj_gen;
-      Listas();
-                                                                                    grafo.addNodo("VAL",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
-    }
-                                                                                                                                                                                      grafo.addNodo("ENDINSERT","");
-  }
-
-  static final public void Numeros() throws ParseException {
-                 Token index;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case NUM:
-      index = jj_consume_token(NUM);
-                                                                               indiceAcceso += index.image;
-      break;
-    case ID:
-      index = jj_consume_token(ID);
-                                                                                indiceAcceso += index.image;
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 12:
-        jj_consume_token(12);
-                                                                                                                    indiceAcceso+= ".";
-        FuncionesShape();
-        break;
-      default:
-        jj_la1[24] = jj_gen;
-        Empty();
-      }
-      break;
-    case LENGTH:
-      FuncionLen();
-      break;
-    default:
-      jj_la1[25] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-  }
-
-  static final public void FuncionesShape() throws ParseException {
-                        Token aux;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case SHAPEC:
-      aux = jj_consume_token(SHAPEC);
-      break;
-    case SHAPEF:
-      aux = jj_consume_token(SHAPEF);
-      break;
-    default:
-      jj_la1[26] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-                                                                         indiceAcceso += aux.image; grafo.addNodo("SHAPE",aux.image);
-  }
-
-  static final public void FuncionLen() throws ParseException {
-                    Token aux;
-    jj_consume_token(LENGTH);
-                                            valoresIgualdadTabla.add("len"); grafo.addNodo("LEN","len");
-    jj_consume_token(6);
-    aux = jj_consume_token(ID);
-                                                                                                                          indiceAcceso+=aux.image;
-    Listas();
-    jj_consume_token(7);
-  }
-
-  static final public void Iterable() throws ParseException {
-                 Token aux;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case ID:
-      aux = jj_consume_token(ID);
-                                          tablaVariables.agregarVariable(numeroVariable,aux.image,scope);
-      Iterable_Aux();
-                                                                                                                           tablaVariables.agregarIndiceAcceso(indiceAcceso); indiceAcceso = ""; tablaVariables.agregarIgualdad(-99,scope,"");
-      break;
-    case NUM:
-      jj_consume_token(NUM);
-                                                                 tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"NUM");
-      break;
-    case LENGTH:
-                                                           valoresIgualdadTabla = new ArrayList<String>();
-      FuncionLen();
-                                                                                                                          tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable, scope, valoresIgualdadTabla); indiceAcceso = "";
-      break;
-    default:
-      jj_la1[27] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-  }
-
-  static final public void Iterable_Aux() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 44:
-      jj_consume_token(44);
-                              indiceAcceso+="[";
-      Adentro_Lista();
-      jj_consume_token(45);
-                                                                       indiceAcceso+="]";
-      Iterable_Aux();
-      break;
-    case 12:
-      jj_consume_token(12);
-                                                                                                                  indiceAcceso+= ".";
-      FuncionesShape();
-      break;
-    default:
-      jj_la1[28] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void ifFunction() throws ParseException {
-    jj_consume_token(30);
-                              int aux = numeroVariable; numeroVariable=-2;
-    Iterable();
-    jj_consume_token(OPERADOR_COMPARADOR);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case BOOL:
-      jj_consume_token(BOOL);
-                                                                                 tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"BOOL");
-      break;
-    case NUM:
-    case LENGTH:
-    case ID:
-      Iterable();
-      break;
-    default:
-      jj_la1[29] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-                                                                   numeroVariable=aux;
-    jj_consume_token(10);
-    Exp();
-    jj_consume_token(11);
-  }
-
-  static final public void Constantes() throws ParseException {
-    Timer();
-    Rango_Timer();
-    Dim_Filas();
-    Dim_Columnas();
-    Cubo();
-  }
-
-  static final public void Timer() throws ParseException {
-               Token n;
-    jj_consume_token(TIMER);
-    jj_consume_token(9);
-    n = jj_consume_token(NUM);
-    jj_consume_token(43);
-                                                     constantesConfig.add(n.image);
-  }
-
-  static final public void Rango_Timer() throws ParseException {
-                     Token rango;
-    jj_consume_token(RANGO_TIMER);
-    jj_consume_token(9);
-    rango = jj_consume_token(OPCIONESRANGO);
-    jj_consume_token(43);
-                                                                                    constantesConfig.add(rango.image);
-  }
-
-  static final public void Dim_Filas() throws ParseException {
-                   Token filas;
-    jj_consume_token(DIM_FILAS);
-    jj_consume_token(9);
-    filas = jj_consume_token(NUM);
-    jj_consume_token(43);
-                                                                      constantesConfig.add(filas.image);
-  }
-
-  static final public void Dim_Columnas() throws ParseException {
-                      Token columnas;
-    jj_consume_token(DIM_COLUMNAS);
-    jj_consume_token(9);
-    columnas = jj_consume_token(NUM);
-    jj_consume_token(43);
-                                                                                  constantesConfig.add(columnas.image);
-  }
-
-  static final public void Cubo() throws ParseException {
-              Token i;
-    jj_consume_token(CUBO);
-    jj_consume_token(9);
-    i = jj_consume_token(ID);
-                                               constantesConfig.add(i.image);
-    jj_consume_token(43);
-  }
-
-  static final public void Empty() throws ParseException {
-
-  }
-
-  static final public void Delay_Function() throws ParseException {
-    jj_consume_token(34);
-    jj_consume_token(6);
-    Delay_Expression();
-    jj_consume_token(7);
-    jj_consume_token(43);
-  }
-
-  static final public void Delay_Expression() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case NUM:
-      jj_consume_token(NUM);
-      jj_consume_token(8);
-      jj_consume_token(OPCIONESRANGO);
-      break;
-    default:
-      jj_la1[30] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void Blink_Function() throws ParseException {
-                             tablaVariables.agregarProc("Blink",false); indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>();
-    jj_consume_token(37);
-    jj_consume_token(6);
-    Blink_Expression();
-    jj_consume_token(7);
-    jj_consume_token(43);
-  }
-
-  static final public void ListaBlink() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 44:
-      jj_consume_token(44);
-                             indiceAcceso += "[";
-      Numeros();
-      jj_consume_token(45);
-                                                                  indiceAcceso += "]";
-      ListaBlink();
-      break;
-    default:
-      jj_la1[31] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void Blink_Expression() throws ParseException {
-                          Token id;
-    id = jj_consume_token(ID);
-                                               indiceAcceso+=id.image; indiceAcceso+="[";
-    jj_consume_token(44);
-    Numeros();
-    jj_consume_token(45);
-                                                         indiceAcceso+="]";
-    ListaBlink();
-                                                                                           valoresIgualdadTabla.add(indiceAcceso); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
-    jj_consume_token(8);
-    Blink_Expression_Aux();
-  }
-
-  static final public void Blink_Expression_Aux() throws ParseException {
-                              Token num;
-                                            valoresIgualdadTabla = new ArrayList<String>();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case NUM:
-      num = jj_consume_token(NUM);
-                                                                                                                    valoresIgualdadTabla.add(num.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
-      Blink_Expression_Aux1();
-      break;
-    case BOOL:
-      jj_consume_token(BOOL);
-                                                                                                                 valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
-      break;
-    default:
-      jj_la1[32] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-  }
-
-  static final public void Blink_Expression_Aux1() throws ParseException {
-                               Token range;
-    jj_consume_token(8);
-                                                  valoresIgualdadTabla = new ArrayList<String>();
-    range = jj_consume_token(OPCIONESRANGO);
-                                                                                                                           valoresIgualdadTabla.add(range.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
-    jj_consume_token(8);
-                                                                                                                     valoresIgualdadTabla = new ArrayList<String>();
-    jj_consume_token(BOOL);
-                                                                                                                                                                              valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
-  }
-
-  static final public void Adentro_Lista() throws ParseException {
-                       Token num;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case NUM:
-      num = jj_consume_token(NUM);
-                                                indiceAcceso+=num.image;
-      break;
-    case 46:
-      num = jj_consume_token(46);
-                                                                                       indiceAcceso+=num.image;
-      break;
-    default:
-      jj_la1[33] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-    Adentro_Lista_Aux1();
-  }
-
-  static final public void Adentro_Lista_Aux1() throws ParseException {
-                            Token num;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 46:
-      jj_consume_token(46);
-                                              indiceAcceso+=":";
-      num = jj_consume_token(NUM);
-                                                                             indiceAcceso+=num.image;
-      break;
-    case 8:
-      jj_consume_token(8);
-                                                                                                              indiceAcceso+=",";
-      num = jj_consume_token(NUM);
-                                                                                                                                             indiceAcceso+=num.image;
-      break;
-    default:
-      jj_la1[34] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void Procedure() throws ParseException {
-    jj_consume_token(33);
-    NombreRutina();
-  }
-
-  static final public void NombreRutina() throws ParseException {
-                     Token id;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case ID:
-      id = jj_consume_token(ID);
-                                          tablaVariables.agregarProc(id.image, true);
-      normalProc();
-      break;
-    case MAIN:
-      id = jj_consume_token(MAIN);
-                                                                                                                   checkMainDefined(0,id); inMain = 1;
-      mainProc();
-      break;
-    default:
-      jj_la1[35] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-  }
-
-  static final public void normalProc() throws ParseException {
-    jj_consume_token(6);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case ID:
-      Parametros();
-      break;
-    default:
-      jj_la1[36] = jj_gen;
-      Empty();
-    }
-    jj_consume_token(7);
-    jj_consume_token(10);
-                                                             scope = 1;
-    Exp();
-    jj_consume_token(11);
-                                                                                    scope = 0;
-  }
-
-  static final public void mainProc() throws ParseException {
-    jj_consume_token(6);
-    jj_consume_token(7);
-    jj_consume_token(10);
-    Exp();
-    jj_consume_token(11);
-                                            inMain = 0; scope = 0;
-  }
-
-  static final public void Call() throws ParseException {
-             Token id;
-    jj_consume_token(32);
-    id = jj_consume_token(ID);
-                                         tablaVariables.agregarProc(id.image,false); inCall = true;
-    jj_consume_token(6);
-    Igualdad();
-    jj_consume_token(7);
-    jj_consume_token(43);
-                                                                                                                                inCall = false; tablaVariables.checkProc();
-  }
-
-  static final public void Parametros() throws ParseException {
-                    Token id;
-    id = jj_consume_token(ID);
-                                            tablaVariables.agregarParamProc(id.image);
-    ParametrosAux();
-  }
-
-  static final public void ParametrosAux() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 8:
-      jj_consume_token(8);
-      Parametros();
-      break;
-    default:
-      jj_la1[37] = jj_gen;
-      Empty();
-    }
-  }
-
-  static final public void forFunction() throws ParseException {
-                    Token id;
-    jj_consume_token(31);
-                                       scope += 1;
-    id = jj_consume_token(ID);
-                                                             tablaVariables.agregarVariable(-1,id.image,scope); tablaVariables.agregarIgualdad(-1,scope,"");
-    jj_consume_token(35);
-                                                                      int aux = numeroVariable; numeroVariable=-1;
-    Iterable();
-                                                                                                                                numeroVariable=aux;
-    Step();
-    jj_consume_token(10);
-    Exp();
-    jj_consume_token(11);
-                                                                                      scope -= 1;
-  }
-
-  static final public void Step() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 36:
-      jj_consume_token(36);
-      jj_consume_token(NUM);
-      break;
-    default:
-      jj_la1[38] = jj_gen;
-      Empty();
-    }
-  }
-
-  static private boolean jj_initialized_once = false;
-  /** Generated Token Manager. */
-  static public SyntaxCheckerTokenManager token_source;
-  static SimpleCharStream jj_input_stream;
-  /** Current token. */
-  static public Token token;
-  /** Next token. */
-  static public Token jj_nt;
-  static private int jj_ntk;
-  static private int jj_gen;
-  static final private int[] jj_la1 = new int[39];
-  static private int[] jj_la1_0;
-  static private int[] jj_la1_1;
-  static {
-      jj_la1_init_0();
-      jj_la1_init_1();
-   }
-   private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1,0x0,0xc0000000,0x1f000000,0x1200,0x100,0x1000,0x0,0x0,0x2040,0x0,0x20204040,0x100,0x200000,0x20002000,0x20002100,0x4000,0x100,0x7000000,0x18000000,0x20202100,0x100,0x100,0x4000,0x1000,0x20002000,0x0,0x20002000,0x1000,0x20006000,0x2000,0x0,0x6000,0x2000,0x100,0x400000,0x0,0x100,0x0,};
-   }
-   private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x102,0x102,0x125,0x0,0x0,0x0,0x200,0x200,0x200,0x100,0x200,0x1000,0x0,0x1000,0x4100,0x4100,0x0,0x0,0x0,0x0,0x1100,0x0,0x0,0x0,0x0,0x100,0xc0,0x100,0x1000,0x100,0x0,0x1000,0x0,0x4000,0x4000,0x100,0x100,0x0,0x10,};
-   }
-
-  /** Constructor with InputStream. */
-  public SyntaxChecker(java.io.InputStream stream) {
-     this(stream, null);
-  }
-  /** Constructor with InputStream and supplied encoding */
-  public SyntaxChecker(java.io.InputStream stream, String encoding) {
-    if (jj_initialized_once) {
-      System.out.println("ERROR: Second call to constructor of static parser.  ");
-      System.out.println("       You must either use ReInit() or set the JavaCC option STATIC to false");
-      System.out.println("       during parser generation.");
-      throw new Error();
-    }
-    jj_initialized_once = true;
-    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
-    token_source = new SyntaxCheckerTokenManager(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
-  }
-
-  /** Reinitialise. */
-  static public void ReInit(java.io.InputStream stream) {
-     ReInit(stream, null);
-  }
-  /** Reinitialise. */
-  static public void ReInit(java.io.InputStream stream, String encoding) {
-    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
-    token_source.ReInit(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
-  }
-
-  /** Constructor. */
-  public SyntaxChecker(java.io.Reader stream) {
-    if (jj_initialized_once) {
-      System.out.println("ERROR: Second call to constructor of static parser. ");
-      System.out.println("       You must either use ReInit() or set the JavaCC option STATIC to false");
-      System.out.println("       during parser generation.");
-      throw new Error();
-    }
-    jj_initialized_once = true;
-    jj_input_stream = new SimpleCharStream(stream, 1, 1);
-    token_source = new SyntaxCheckerTokenManager(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
-  }
-
-  /** Reinitialise. */
-  static public void ReInit(java.io.Reader stream) {
-    jj_input_stream.ReInit(stream, 1, 1);
-    token_source.ReInit(jj_input_stream);
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
-  }
-
-  /** Constructor with generated Token Manager. */
-  public SyntaxChecker(SyntaxCheckerTokenManager tm) {
-    if (jj_initialized_once) {
-      System.out.println("ERROR: Second call to constructor of static parser. ");
-      System.out.println("       You must either use ReInit() or set the JavaCC option STATIC to false");
-      System.out.println("       during parser generation.");
-      throw new Error();
-    }
-    jj_initialized_once = true;
-    token_source = tm;
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
-  }
-
-  /** Reinitialise. */
-  public void ReInit(SyntaxCheckerTokenManager tm) {
-    token_source = tm;
-    token = new Token();
-    jj_ntk = -1;
-    jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
-  }
-
-  static private Token jj_consume_token(int kind) throws ParseException {
-    Token oldToken;
-    if ((oldToken = token).next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
-    jj_ntk = -1;
-    if (token.kind == kind) {
-      jj_gen++;
-      return token;
-    }
-    token = oldToken;
-    jj_kind = kind;
-    throw generateParseException();
-  }
-
-
-/** Get the next Token. */
-  static final public Token getNextToken() {
-    if (token.next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
-    jj_ntk = -1;
-    jj_gen++;
-    return token;
-  }
-
-/** Get the specific Token. */
-  static final public Token getToken(int index) {
-    Token t = token;
-    for (int i = 0; i < index; i++) {
-      if (t.next != null) t = t.next;
-      else t = t.next = token_source.getNextToken();
-    }
-    return t;
-  }
-
-  static private int jj_ntk() {
-    if ((jj_nt=token.next) == null)
-      return (jj_ntk = (token.next=token_source.getNextToken()).kind);
-    else
-      return (jj_ntk = jj_nt.kind);
-  }
-
-  static private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
-  static private int[] jj_expentry;
-  static private int jj_kind = -1;
-
-  /** Generate ParseException. */
-  static public ParseException generateParseException() {
-    jj_expentries.clear();
-    boolean[] la1tokens = new boolean[47];
-    if (jj_kind >= 0) {
-      la1tokens[jj_kind] = true;
-      jj_kind = -1;
-    }
-    for (int i = 0; i < 39; i++) {
-      if (jj_la1[i] == jj_gen) {
-        for (int j = 0; j < 32; j++) {
-          if ((jj_la1_0[i] & (1<<j)) != 0) {
-            la1tokens[j] = true;
-          }
-          if ((jj_la1_1[i] & (1<<j)) != 0) {
-            la1tokens[32+j] = true;
-          }
+        if (!inCall) {
+            tablaVariables.agregarIgualdad(numeroVariable - sameLineDCL, scope, valoresIgualdadTabla);
+        } else {
+            tablaVariables.agregarParamProc(valoresIgualdadTabla, scope);
         }
-      }
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 8:
+                jj_consume_token(8);
+                grafo.addNodo("DCL", ",");
+                sameLineDCL -= 1;
+                Igualdad();
+                break;
+            default:
+                jj_la1[12] = jj_gen;
+                Empty();
+        }
     }
-    for (int i = 0; i < 47; i++) {
-      if (la1tokens[i]) {
-        jj_expentry = new int[1];
-        jj_expentry[0] = i;
-        jj_expentries.add(jj_expentry);
-      }
-    }
-    int[][] exptokseq = new int[jj_expentries.size()][];
-    for (int i = 0; i < jj_expentries.size(); i++) {
-      exptokseq[i] = jj_expentries.get(i);
-    }
-    return new ParseException(token, exptokseq, tokenImage);
-  }
 
-  /** Enable tracing. */
-  static final public void enable_tracing() {
-  }
+    static final public void Listas() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 44:
+                jj_consume_token(44);
+                indiceAcceso += "[";
+                AccesoLista();
+                jj_consume_token(45);
+                indiceAcceso += "]";
+                Listas();
+                agregarVariable();
+                break;
+            case LIST:
+                jj_consume_token(LIST);
+                addVarFalg = false;
+                valoresIgualdadTabla.add("createList");
+                CrearLista();
+                Listas();
+                break;
+            default:
+                jj_la1[13] = jj_gen;
+                Empty();
+        }
+    }
 
-  /** Disable tracing. */
-  static final public void disable_tracing() {
-  }
+    static final public void AccesoLista() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 46:
+                jj_consume_token(46);
+                jj_consume_token(8);
+                indiceAcceso += ":,";
+                Numeros();
+                AccesoLista();
+                break;
+            case NUM:
+            case LENGTH:
+            case ID:
+                Numeros();
+                AccesoListaAux();
+                break;
+            default:
+                jj_la1[14] = jj_gen;
+                ValoresListas();
+        }
+    }
+
+    static final public void AccesoListaAux() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 46:
+                jj_consume_token(46);
+                indiceAcceso += ":";
+                Numeros();
+                break;
+            case 8:
+                jj_consume_token(8);
+                indiceAcceso += ",";
+                Numeros();
+                break;
+            case NUM:
+            case LENGTH:
+            case ID:
+                Numeros();
+                break;
+            default:
+                jj_la1[15] = jj_gen;
+                Empty();
+        }
+    }
+
+    static final public void ValoresListas() throws ParseException {
+        Token aux;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case BOOL:
+                aux = jj_consume_token(BOOL);
+                indiceAcceso += aux.image;
+                ValoresListasAux();
+                break;
+            default:
+                jj_la1[16] = jj_gen;
+                Listas();
+                ValoresListasAux();
+        }
+    }
+
+    static final public void ValoresListasAux() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 8:
+                jj_consume_token(8);
+                indiceAcceso += ",";
+                ValoresListas();
+                break;
+            default:
+                jj_la1[17] = jj_gen;
+                Empty();
+        }
+    }
+
+    static final public void FuncionesListas() throws ParseException {
+        Token aux;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case NEG:
+                aux = jj_consume_token(NEG);
+                break;
+            case T:
+                aux = jj_consume_token(T);
+                break;
+            case F:
+                aux = jj_consume_token(F);
+                break;
+            default:
+                jj_la1[18] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+        grafo.addNodo("FUNCLIST", aux.image);
+        tablaVariables.agregarIgualdad(numeroVariable, scope, aux.image);
+    }
+
+    static final public void CrearLista() throws ParseException {
+        Token aux;
+        jj_consume_token(6);
+        jj_consume_token(RANGO);
+        jj_consume_token(6);
+        RangeParam();
+    }
+
+    static final public void RangeParam() throws ParseException {
+        Token n;
+        Numeros();
+        grafo.addNodo("NUM", indiceAcceso);
+        valoresIgualdadTabla.add(indiceAcceso);
+        indiceAcceso = "";
+        RangeParamVal();
+    }
+
+    static final public void RangeParamVal() throws ParseException {
+        Token bool;
+        jj_consume_token(8);
+        bool = jj_consume_token(BOOL);
+        grafo.addNodo("BOOL", bool.image);
+        valoresIgualdadTabla.add("BOOL");
+        jj_consume_token(7);
+        jj_consume_token(7);
+    }
+
+    static final public void OperacionesListas() throws ParseException {
+        Token aux;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case INSERT:
+                aux = jj_consume_token(INSERT);
+                grafo.addNodo("FUN.INSERT", "insert");
+                addVarFalg = false;
+                valoresIgualdadTabla = new ArrayList<String>();
+                valoresIgualdadTabla.add(aux.image);
+                jj_consume_token(6);
+                valoresInsert();
+                jj_consume_token(7);
+                tablaVariables.agregarIgualdad(numeroVariable, scope, valoresIgualdadTabla);
+                addVarFalg = true;
+                break;
+            case DELETE:
+                aux = jj_consume_token(DELETE);
+                grafo.addNodo("FUN.DEL", "delete");
+                addVarFalg = false;
+                valoresIgualdadTabla = new ArrayList<String>();
+                valoresIgualdadTabla.add(aux.image);
+                jj_consume_token(6);
+                valoresDel();
+                jj_consume_token(7);
+                tablaVariables.agregarIgualdad(numeroVariable, scope, valoresIgualdadTabla);
+                addVarFalg = true;
+                break;
+            default:
+                jj_la1[19] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+    }
+
+    static final public void valoresInsert() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 8:
+            case LIST:
+            case 44:
+                indiceAcceso = "";
+                valoresIgualdadTabla.add("InsertMatriz");
+                Listas();
+                grafo.addNodo("INSERT.MATRIZ", "");
+                grafo.addNodo("VAL", indiceAcceso);
+                valoresIgualdadTabla.add(indiceAcceso);
+                InsertMatriz();
+                break;
+            case NUM:
+            case LENGTH:
+            case ID:
+                valoresIgualdadTabla.add("InsertListas");
+                grafo.addNodo("INSERT.LISTA", "");
+                InsertListas();
+                break;
+            default:
+                jj_la1[20] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+    }
+
+    static final public void InsertMatriz() throws ParseException {
+        jj_consume_token(8);
+        indiceAcceso = "";
+        Numeros();
+        grafo.addNodo("NUM", indiceAcceso);
+        valoresIgualdadTabla.add(indiceAcceso);
+        indiceAcceso = "";
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 8:
+                jj_consume_token(8);
+                Numeros();
+                grafo.addNodo("NUM", indiceAcceso);
+                valoresIgualdadTabla.add(indiceAcceso);
+                indiceAcceso = "";
+                break;
+            default:
+                jj_la1[21] = jj_gen;
+                Empty();
+        }
+        grafo.addNodo("ENDINSERT", "");
+    }
+
+    static final public void valoresDel() throws ParseException {
+        Numeros();
+        grafo.addNodo("NUM", indiceAcceso);
+        valoresIgualdadTabla.add(indiceAcceso);
+        indiceAcceso = "";
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 8:
+                jj_consume_token(8);
+                Numeros();
+                grafo.addNodo("NUM", indiceAcceso);
+                valoresIgualdadTabla.add(indiceAcceso);
+                indiceAcceso = "";
+                break;
+            default:
+                jj_la1[22] = jj_gen;
+                Empty();
+        }
+        grafo.addNodo("ENDDELETE", "");
+    }
+
+    static final public void InsertListas() throws ParseException {
+        Token aux;
+        indiceAcceso = "";
+        Numeros();
+        grafo.addNodo("NUM", indiceAcceso);
+        valoresIgualdadTabla.add(indiceAcceso);
+        indiceAcceso = "";
+        jj_consume_token(8);
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case BOOL:
+                aux = jj_consume_token(BOOL);
+                valoresIgualdadTabla.add("BOOL");
+                grafo.addNodo("BOOL", aux.image);
+                break;
+            default:
+                jj_la1[23] = jj_gen;
+                Listas();
+                grafo.addNodo("VAL", indiceAcceso);
+                valoresIgualdadTabla.add(indiceAcceso);
+                indiceAcceso = "";
+        }
+        grafo.addNodo("ENDINSERT", "");
+    }
+
+    static final public void Numeros() throws ParseException {
+        Token index;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case NUM:
+                index = jj_consume_token(NUM);
+                indiceAcceso += index.image;
+                break;
+            case ID:
+                index = jj_consume_token(ID);
+                indiceAcceso += index.image;
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case 12:
+                        jj_consume_token(12);
+                        indiceAcceso += ".";
+                        FuncionesShape();
+                        break;
+                    default:
+                        jj_la1[24] = jj_gen;
+                        Empty();
+                }
+                break;
+            case LENGTH:
+                FuncionLen();
+                break;
+            default:
+                jj_la1[25] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+    }
+
+    static final public void FuncionesShape() throws ParseException {
+        Token aux;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case SHAPEC:
+                aux = jj_consume_token(SHAPEC);
+                break;
+            case SHAPEF:
+                aux = jj_consume_token(SHAPEF);
+                break;
+            default:
+                jj_la1[26] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+        indiceAcceso += aux.image;
+        grafo.addNodo("SHAPE", aux.image);
+    }
+
+    static final public void FuncionLen() throws ParseException {
+        Token aux;
+        jj_consume_token(LENGTH);
+        valoresIgualdadTabla.add("len");
+        grafo.addNodo("LEN", "len");
+        jj_consume_token(6);
+        aux = jj_consume_token(ID);
+        indiceAcceso += aux.image;
+        Listas();
+        jj_consume_token(7);
+    }
+
+    static final public void Iterable() throws ParseException {
+        Token aux;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case ID:
+                aux = jj_consume_token(ID);
+                tablaVariables.agregarVariable(numeroVariable, aux.image, scope);
+                Iterable_Aux();
+                tablaVariables.agregarIndiceAcceso(indiceAcceso);
+                indiceAcceso = "";
+                tablaVariables.agregarIgualdad(-99, scope, "");
+                break;
+            case NUM:
+                jj_consume_token(NUM);
+                tablaVariables.agregarVariable(-99, "", scope);
+                tablaVariables.agregarIgualdad(numeroVariable, scope, "NUM");
+                break;
+            case LENGTH:
+                valoresIgualdadTabla = new ArrayList<String>();
+                FuncionLen();
+                tablaVariables.agregarVariable(-99, "", scope);
+                tablaVariables.agregarIgualdad(numeroVariable, scope, valoresIgualdadTabla);
+                indiceAcceso = "";
+                break;
+            default:
+                jj_la1[27] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+    }
+
+    static final public void Iterable_Aux() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 44:
+                jj_consume_token(44);
+                indiceAcceso += "[";
+                Adentro_Lista();
+                jj_consume_token(45);
+                indiceAcceso += "]";
+                Iterable_Aux();
+                break;
+            case 12:
+                jj_consume_token(12);
+                indiceAcceso += ".";
+                FuncionesShape();
+                break;
+            default:
+                jj_la1[28] = jj_gen;
+                Empty();
+        }
+    }
+
+    static final public void ifFunction() throws ParseException {
+        jj_consume_token(30);
+        int aux = numeroVariable;
+        numeroVariable = -2;
+        Iterable();
+        jj_consume_token(OPERADOR_COMPARADOR);
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case BOOL:
+                jj_consume_token(BOOL);
+                tablaVariables.agregarVariable(-99, "", scope);
+                tablaVariables.agregarIgualdad(numeroVariable, scope, "BOOL");
+                break;
+            case NUM:
+            case LENGTH:
+            case ID:
+                Iterable();
+                break;
+            default:
+                jj_la1[29] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+        numeroVariable = aux;
+        jj_consume_token(10);
+        Exp();
+        jj_consume_token(11);
+    }
+
+    static final public void Constantes() throws ParseException {
+        Timer();
+        Rango_Timer();
+        Dim_Filas();
+        Dim_Columnas();
+        Cubo();
+    }
+
+    static final public void Timer() throws ParseException {
+        Token n;
+        jj_consume_token(TIMER);
+        jj_consume_token(9);
+        n = jj_consume_token(NUM);
+        jj_consume_token(43);
+        constantesConfig.add(n.image);
+    }
+
+    static final public void Rango_Timer() throws ParseException {
+        Token rango;
+        jj_consume_token(RANGO_TIMER);
+        jj_consume_token(9);
+        rango = jj_consume_token(OPCIONESRANGO);
+        jj_consume_token(43);
+        constantesConfig.add(rango.image);
+    }
+
+    static final public void Dim_Filas() throws ParseException {
+        Token filas;
+        jj_consume_token(DIM_FILAS);
+        jj_consume_token(9);
+        filas = jj_consume_token(NUM);
+        jj_consume_token(43);
+        constantesConfig.add(filas.image);
+    }
+
+    static final public void Dim_Columnas() throws ParseException {
+        Token columnas;
+        jj_consume_token(DIM_COLUMNAS);
+        jj_consume_token(9);
+        columnas = jj_consume_token(NUM);
+        jj_consume_token(43);
+        constantesConfig.add(columnas.image);
+    }
+
+    static final public void Cubo() throws ParseException {
+        Token i;
+        jj_consume_token(CUBO);
+        jj_consume_token(9);
+        i = jj_consume_token(ID);
+        constantesConfig.add(i.image);
+        jj_consume_token(43);
+    }
+
+    static final public void Empty() throws ParseException {
+
+    }
+
+    static final public void Delay_Function() throws ParseException {
+        jj_consume_token(34);
+        jj_consume_token(6);
+        Delay_Expression();
+        jj_consume_token(7);
+        jj_consume_token(43);
+    }
+
+    static final public void Delay_Expression() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case NUM:
+                jj_consume_token(NUM);
+                jj_consume_token(8);
+                jj_consume_token(OPCIONESRANGO);
+                break;
+            default:
+                jj_la1[30] = jj_gen;
+                Empty();
+        }
+    }
+
+    static final public void Blink_Function() throws ParseException {
+        tablaVariables.agregarProc("Blink", false);
+        indiceAcceso = "";
+        valoresIgualdadTabla = new ArrayList<String>();
+        jj_consume_token(37);
+        jj_consume_token(6);
+        Blink_Expression();
+        jj_consume_token(7);
+        jj_consume_token(43);
+    }
+
+    static final public void ListaBlink() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 44:
+                jj_consume_token(44);
+                indiceAcceso += "[";
+                Numeros();
+                jj_consume_token(45);
+                indiceAcceso += "]";
+                ListaBlink();
+                break;
+            default:
+                jj_la1[31] = jj_gen;
+                Empty();
+        }
+    }
+
+    static final public void Blink_Expression() throws ParseException {
+        Token id;
+        id = jj_consume_token(ID);
+        indiceAcceso += id.image;
+        indiceAcceso += "[";
+        jj_consume_token(44);
+        Numeros();
+        jj_consume_token(45);
+        indiceAcceso += "]";
+        ListaBlink();
+        valoresIgualdadTabla.add(indiceAcceso);
+        tablaVariables.agregarParamProc(valoresIgualdadTabla, scope);
+        jj_consume_token(8);
+        Blink_Expression_Aux();
+    }
+
+    static final public void Blink_Expression_Aux() throws ParseException {
+        Token num;
+        valoresIgualdadTabla = new ArrayList<String>();
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case NUM:
+                num = jj_consume_token(NUM);
+                valoresIgualdadTabla.add(num.image);
+                tablaVariables.agregarParamProc(valoresIgualdadTabla, scope);
+                Blink_Expression_Aux1();
+                break;
+            case BOOL:
+                jj_consume_token(BOOL);
+                valoresIgualdadTabla.add("BOOL");
+                tablaVariables.agregarParamProc(valoresIgualdadTabla, scope);
+                break;
+            default:
+                jj_la1[32] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+    }
+
+    static final public void Blink_Expression_Aux1() throws ParseException {
+        Token range;
+        jj_consume_token(8);
+        valoresIgualdadTabla = new ArrayList<String>();
+        range = jj_consume_token(OPCIONESRANGO);
+        valoresIgualdadTabla.add(range.image);
+        tablaVariables.agregarParamProc(valoresIgualdadTabla, scope);
+        jj_consume_token(8);
+        valoresIgualdadTabla = new ArrayList<String>();
+        jj_consume_token(BOOL);
+        valoresIgualdadTabla.add("BOOL");
+        tablaVariables.agregarParamProc(valoresIgualdadTabla, scope);
+    }
+
+    static final public void Adentro_Lista() throws ParseException {
+        Token num;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case NUM:
+                num = jj_consume_token(NUM);
+                indiceAcceso += num.image;
+                break;
+            case 46:
+                num = jj_consume_token(46);
+                indiceAcceso += num.image;
+                break;
+            default:
+                jj_la1[33] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+        Adentro_Lista_Aux1();
+    }
+
+    static final public void Adentro_Lista_Aux1() throws ParseException {
+        Token num;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 46:
+                jj_consume_token(46);
+                indiceAcceso += ":";
+                num = jj_consume_token(NUM);
+                indiceAcceso += num.image;
+                break;
+            case 8:
+                jj_consume_token(8);
+                indiceAcceso += ",";
+                num = jj_consume_token(NUM);
+                indiceAcceso += num.image;
+                break;
+            default:
+                jj_la1[34] = jj_gen;
+                Empty();
+        }
+    }
+
+    static final public void Procedure() throws ParseException {
+        jj_consume_token(33);
+        grafo.addNodo("PRODCL", "def");
+        NombreRutina();
+    }
+
+    static final public void NombreRutina() throws ParseException {
+        Token id;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case ID:
+                id = jj_consume_token(ID);
+                tablaVariables.agregarProc(id.image, true);
+                grafo.addNodo("ID", id.image);
+                normalProc();
+                break;
+            case MAIN:
+                id = jj_consume_token(MAIN);
+                checkMainDefined(0, id);
+                inMain = 1;
+                grafo.addNodo("ID", id.image);
+                mainProc();
+                break;
+            default:
+                jj_la1[35] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+    }
+
+    static final public void normalProc() throws ParseException {
+        jj_consume_token(6);
+        grafo.addNodo("OPENPAR", "(");
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case ID:
+                Parametros();
+                break;
+            default:
+                jj_la1[36] = jj_gen;
+                Empty();
+        }
+        jj_consume_token(7);
+        grafo.addNodo("CLOSEPAR", ")");
+        jj_consume_token(10);
+        grafo.addNodo("OPENSCOPE", "{");
+        scope = 1;
+        Exp();
+        jj_consume_token(11);
+        grafo.addNodo("CLOSESCOPE", "}");
+        scope = 0;
+    }
+
+    static final public void mainProc() throws ParseException {
+        jj_consume_token(6);
+        jj_consume_token(7);
+        jj_consume_token(10);
+        grafo.addNodo("MAINPAR", "()");
+        grafo.addNodo("OPENSCOPE", "{");
+        Exp();
+        jj_consume_token(11);
+        inMain = 0;
+        scope = 0;
+        grafo.addNodo("CLOSESCOPE", "}");
+    }
+
+    static final public void Call() throws ParseException {
+        Token id;
+        jj_consume_token(32);
+        id = jj_consume_token(ID);
+        tablaVariables.agregarProc(id.image, false);
+        inCall = true;
+        jj_consume_token(6);
+        Igualdad();
+        jj_consume_token(7);
+        jj_consume_token(43);
+        inCall = false;
+        tablaVariables.checkProc();
+    }
+
+    static final public void Parametros() throws ParseException {
+        Token id;
+        id = jj_consume_token(ID);
+        tablaVariables.agregarParamProc(id.image);
+        grafo.addNodo("ID", id.image);
+        ParametrosAux();
+    }
+
+    static final public void ParametrosAux() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 8:
+                jj_consume_token(8);
+                grafo.addNodo("COMA", ",");
+                Parametros();
+                break;
+            default:
+                jj_la1[37] = jj_gen;
+                Empty();
+        }
+    }
+
+    static final public void forFunction() throws ParseException {
+        Token id;
+        jj_consume_token(31);
+        scope += 1;
+        id = jj_consume_token(ID);
+        tablaVariables.agregarVariable(-1, id.image, scope);
+        tablaVariables.agregarIgualdad(-1, scope, "");
+        jj_consume_token(35);
+        int aux = numeroVariable;
+        numeroVariable = -1;
+        Iterable();
+        numeroVariable = aux;
+        Step();
+        jj_consume_token(10);
+        Exp();
+        jj_consume_token(11);
+        scope -= 1;
+    }
+
+    static final public void Step() throws ParseException {
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case 36:
+                jj_consume_token(36);
+                jj_consume_token(NUM);
+                break;
+            default:
+                jj_la1[38] = jj_gen;
+                Empty();
+        }
+    }
+
+    static private boolean jj_initialized_once = false;
+    /**
+     * Generated Token Manager.
+     */
+    static public SyntaxCheckerTokenManager token_source;
+    static SimpleCharStream jj_input_stream;
+    /**
+     * Current token.
+     */
+    static public Token token;
+    /**
+     * Next token.
+     */
+    static public Token jj_nt;
+    static private int jj_ntk;
+    static private int jj_gen;
+    static final private int[] jj_la1 = new int[39];
+    static private int[] jj_la1_0;
+    static private int[] jj_la1_1;
+
+    static {
+        jj_la1_init_0();
+        jj_la1_init_1();
+    }
+
+    private static void jj_la1_init_0() {
+        jj_la1_0 = new int[]{0x1, 0x0, 0xc0000000, 0x1f000000, 0x1200, 0x100, 0x1000, 0x0, 0x0, 0x2040, 0x0, 0x20204040, 0x100, 0x200000, 0x20002000, 0x20002100, 0x4000, 0x100, 0x7000000, 0x18000000, 0x20202100, 0x100, 0x100, 0x4000, 0x1000, 0x20002000, 0x0, 0x20002000, 0x1000, 0x20006000, 0x2000, 0x0, 0x6000, 0x2000, 0x100, 0x400000, 0x0, 0x100, 0x0,};
+    }
+
+    private static void jj_la1_init_1() {
+        jj_la1_1 = new int[]{0x102, 0x102, 0x125, 0x0, 0x0, 0x0, 0x200, 0x200, 0x200, 0x100, 0x200, 0x1000, 0x0, 0x1000, 0x4100, 0x4100, 0x0, 0x0, 0x0, 0x0, 0x1100, 0x0, 0x0, 0x0, 0x0, 0x100, 0xc0, 0x100, 0x1000, 0x100, 0x0, 0x1000, 0x0, 0x4000, 0x4000, 0x100, 0x100, 0x0, 0x10,};
+    }
+
+    /**
+     * Constructor with InputStream.
+     */
+    public SyntaxChecker(java.io.InputStream stream) {
+        this(stream, null);
+    }
+
+    /**
+     * Constructor with InputStream and supplied encoding
+     */
+    public SyntaxChecker(java.io.InputStream stream, String encoding) {
+        if (jj_initialized_once) {
+            System.out.println("ERROR: Second call to constructor of static parser.  ");
+            System.out.println("       You must either use ReInit() or set the JavaCC option STATIC to false");
+            System.out.println("       during parser generation.");
+            throw new Error();
+        }
+        jj_initialized_once = true;
+        try {
+            jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1);
+        } catch (java.io.UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        token_source = new SyntaxCheckerTokenManager(jj_input_stream);
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    }
+
+    /**
+     * Reinitialise.
+     */
+    static public void ReInit(java.io.InputStream stream) {
+        ReInit(stream, null);
+    }
+
+    /**
+     * Reinitialise.
+     */
+    static public void ReInit(java.io.InputStream stream, String encoding) {
+        try {
+            jj_input_stream.ReInit(stream, encoding, 1, 1);
+        } catch (java.io.UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        token_source.ReInit(jj_input_stream);
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    }
+
+    /**
+     * Constructor.
+     */
+    public SyntaxChecker(java.io.Reader stream) {
+        if (jj_initialized_once) {
+            System.out.println("ERROR: Second call to constructor of static parser. ");
+            System.out.println("       You must either use ReInit() or set the JavaCC option STATIC to false");
+            System.out.println("       during parser generation.");
+            throw new Error();
+        }
+        jj_initialized_once = true;
+        jj_input_stream = new SimpleCharStream(stream, 1, 1);
+        token_source = new SyntaxCheckerTokenManager(jj_input_stream);
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    }
+
+    /**
+     * Reinitialise.
+     */
+    static public void ReInit(java.io.Reader stream) {
+        jj_input_stream.ReInit(stream, 1, 1);
+        token_source.ReInit(jj_input_stream);
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    }
+
+    /**
+     * Constructor with generated Token Manager.
+     */
+    public SyntaxChecker(SyntaxCheckerTokenManager tm) {
+        if (jj_initialized_once) {
+            System.out.println("ERROR: Second call to constructor of static parser. ");
+            System.out.println("       You must either use ReInit() or set the JavaCC option STATIC to false");
+            System.out.println("       during parser generation.");
+            throw new Error();
+        }
+        jj_initialized_once = true;
+        token_source = tm;
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    }
+
+    /**
+     * Reinitialise.
+     */
+    public void ReInit(SyntaxCheckerTokenManager tm) {
+        token_source = tm;
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    }
+
+    static private Token jj_consume_token(int kind) throws ParseException {
+        Token oldToken;
+        if ((oldToken = token).next != null) token = token.next;
+        else token = token.next = token_source.getNextToken();
+        jj_ntk = -1;
+        if (token.kind == kind) {
+            jj_gen++;
+            return token;
+        }
+        token = oldToken;
+        jj_kind = kind;
+        throw generateParseException();
+    }
+
+
+    /**
+     * Get the next Token.
+     */
+    static final public Token getNextToken() {
+        if (token.next != null) token = token.next;
+        else token = token.next = token_source.getNextToken();
+        jj_ntk = -1;
+        jj_gen++;
+        return token;
+    }
+
+    /**
+     * Get the specific Token.
+     */
+    static final public Token getToken(int index) {
+        Token t = token;
+        for (int i = 0; i < index; i++) {
+            if (t.next != null) t = t.next;
+            else t = t.next = token_source.getNextToken();
+        }
+        return t;
+    }
+
+    static private int jj_ntk() {
+        if ((jj_nt = token.next) == null)
+            return (jj_ntk = (token.next = token_source.getNextToken()).kind);
+        else
+            return (jj_ntk = jj_nt.kind);
+    }
+
+    static private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+    static private int[] jj_expentry;
+    static private int jj_kind = -1;
+
+    /**
+     * Generate ParseException.
+     */
+    static public ParseException generateParseException() {
+        jj_expentries.clear();
+        boolean[] la1tokens = new boolean[47];
+        if (jj_kind >= 0) {
+            la1tokens[jj_kind] = true;
+            jj_kind = -1;
+        }
+        for (int i = 0; i < 39; i++) {
+            if (jj_la1[i] == jj_gen) {
+                for (int j = 0; j < 32; j++) {
+                    if ((jj_la1_0[i] & (1 << j)) != 0) {
+                        la1tokens[j] = true;
+                    }
+                    if ((jj_la1_1[i] & (1 << j)) != 0) {
+                        la1tokens[32 + j] = true;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < 47; i++) {
+            if (la1tokens[i]) {
+                jj_expentry = new int[1];
+                jj_expentry[0] = i;
+                jj_expentries.add(jj_expentry);
+            }
+        }
+        int[][] exptokseq = new int[jj_expentries.size()][];
+        for (int i = 0; i < jj_expentries.size(); i++) {
+            exptokseq[i] = jj_expentries.get(i);
+        }
+        return new ParseException(token, exptokseq, tokenImage);
+    }
+
+    /**
+     * Enable tracing.
+     */
+    static final public void enable_tracing() {
+    }
+
+    /**
+     * Disable tracing.
+     */
+    static final public void disable_tracing() {
+    }
 
 }

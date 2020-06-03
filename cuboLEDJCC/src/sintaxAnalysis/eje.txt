@@ -4,6 +4,7 @@ Dim_Filas = 12;
 Dim_Columnas = 2;
 Cubo = p;
 
+
 x = 1;
 y = 0;
 a = x + y * 10 / 4 ;
@@ -20,7 +21,7 @@ ah = [];
 ah.insert([[true], [true] , [true]], 1);
 l = [];
 l.insert(2,false);
-m = [];
+m = [true,[false,true,false],[false,true]];
 m.insert(len(a[1][t]),false);
 al = [];
 al.del(0,0);
@@ -42,5 +43,30 @@ u[1][1][1] = le[1][1][1];
 y = 1;
 u[:, 1] =  [];
 ac = 23;
+asdasdasd
+    asadasdad
+        adadasd
+            asdadasd
 
+Procedure p1(a,b,c):
+    lista = [true,false];
+    for x in lista {
+        a = 1;
+        for b in lista Step 2{
+            lista.del(1,0);
+        }
+    }
 
+    if  lista[:, 1] ==  true    {
+        ad = u[1];
+        ae = u[0];
+        af = u[:,1];
+        Blink(a[c.shapeC][ab],true);
+    }
+
+	u.insert([[true, false, true]],  0);
+	u.insert([[true], [true] , [true]], 1);
+	u.insert([[false, false, false, false]],  0, 0);
+	u.insert(, 1,0);
+
+}
