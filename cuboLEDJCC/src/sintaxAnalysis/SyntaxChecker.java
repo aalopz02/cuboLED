@@ -38,13 +38,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                         tablaVariables.imprimirIDS();
             tablaVariables.checkVariables();
             Nodo aux = grafo.getInicial();
-            /*
+
             while (aux != null){
                 System.out.println("Tipo: " + aux.getTipo());
                 System.out.println("Contenido: " + aux.getContenido());
                 aux = aux.getNext();
             }
-            */
+
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
@@ -230,27 +230,28 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void IgualdadValoresOperables() throws ParseException {
-                                  Token aux;
+                                  Token aux; Token oper;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ID:
       aux = jj_consume_token(ID);
+                                                                       grafo.addNodo("ID",aux.image);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OPERADORES:
-        jj_consume_token(OPERADORES);
-                                                                         valoresIgualdadTabla.add(aux.image);
+        oper = jj_consume_token(OPERADORES);
+                                                                                                                             grafo.addNodo("OPER",oper.image);  valoresIgualdadTabla.add(aux.image);
         IgualdadAux();
         break;
       case 12:
         jj_consume_token(12);
-                                                                                                                                                       indiceAcceso += aux.image; indiceAcceso += ".";
+                                                                                                                                                       indiceAcceso += aux.image; indiceAcceso += "."; grafo.addNodo("DOT",".");
         FuncionesShape();
-                                                                                                                                                                                                                          valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
+                                                                                                                                                                                                                                                     valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
         break;
       default:
         jj_la1[6] = jj_gen;
                                                                                                                                                    indiceAcceso+= aux.image; addVarFalg = false;
         Listas();
-                                                                                                                                                                                                            valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;
+                                                                                                                                                                                                            valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("INDEX",indiceAcceso); indiceAcceso = ""; addVarFalg = true;
       }
       break;
     case NUM:
@@ -319,18 +320,18 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                                                                                indiceAcceso+="["; addVarFalg = false;
       ValoresListas();
       jj_consume_token(45);
-                                                                                                                                            indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = ""; addVarFalg = true;
+                                                                                                                                            indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("LIST",indiceAcceso); indiceAcceso = ""; addVarFalg = true;
       break;
     case LIST:
       jj_consume_token(LIST);
-                                                                                  addVarFalg = false; valoresIgualdadTabla.add("createList");
+                                                                                  addVarFalg = false; valoresIgualdadTabla.add("createList"); grafo.addNodo("NEWLIST","createList");
       CrearLista();
       Listas();
-                                                                                                                                                                      addVarFalg = true;
+                                                                                                                                                                                                             addVarFalg = true;
       break;
     case LENGTH:
       FuncionLen();
-                                                                                        valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
+                                                                                        valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("LIST",indiceAcceso); indiceAcceso = "";
       break;
     default:
       jj_la1[11] = jj_gen;
@@ -471,7 +472,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-                                                                             tablaVariables.agregarIgualdad(numeroVariable,scope,aux.image);
+                                                                             grafo.addNodo("FUNCLIST",aux.image); tablaVariables.agregarIgualdad(numeroVariable,scope,aux.image);
   }
 
   static final public void CrearLista() throws ParseException {
@@ -485,14 +486,15 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void RangeParam() throws ParseException {
                     Token n;
     Numeros();
-                                           valoresIgualdadTabla.add(indiceAcceso); indiceAcceso="";
+                                           grafo.addNodo("NUM",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso); indiceAcceso="";
     RangeParamVal();
   }
 
   static final public void RangeParamVal() throws ParseException {
+                       Token bool;
     jj_consume_token(8);
-    jj_consume_token(BOOL);
-                                       valoresIgualdadTabla.add("BOOL");
+    bool = jj_consume_token(BOOL);
+                                                         grafo.addNodo("BOOL",bool.image); valoresIgualdadTabla.add("BOOL");
     jj_consume_token(7);
     jj_consume_token(7);
   }
@@ -644,16 +646,16 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-                                                                         indiceAcceso += aux.image;
+                                                                         indiceAcceso += aux.image; grafo.addNodo("SHAPE",aux.image);
   }
 
   static final public void FuncionLen() throws ParseException {
                     Token aux;
     jj_consume_token(LENGTH);
-                                            valoresIgualdadTabla.add("len");
+                                            valoresIgualdadTabla.add("len"); grafo.addNodo("LEN","len");
     jj_consume_token(6);
     aux = jj_consume_token(ID);
-                                                                                              indiceAcceso+=aux.image;
+                                                                                                                          indiceAcceso+=aux.image;
     Listas();
     jj_consume_token(7);
   }
@@ -980,7 +982,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     Igualdad();
     jj_consume_token(7);
     jj_consume_token(43);
-                                                                                                                                          inCall = false; tablaVariables.checkProc();
+                                                                                                                                inCall = false; tablaVariables.checkProc();
   }
 
   static final public void Parametros() throws ParseException {

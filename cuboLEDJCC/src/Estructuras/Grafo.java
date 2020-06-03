@@ -10,6 +10,7 @@ public class Grafo {
     }
 
     public void addNodo(String tipo, String contenido){
+        if (contenido.isEmpty() && !tipo.equals("ENDLINE")){return;}
         Nodo aux = new Nodo(tipo,contenido);
         aux.setPrev(actual);
         actual.setNext(aux);
