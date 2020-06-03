@@ -235,16 +235,16 @@ void FuncionesShape(): {Token aux;} { (aux = <SHAPEC> | aux = <SHAPEF>) {indiceA
 	
 void FuncionLen(): {Token aux;} { <LENGTH> {valoresIgualdadTabla.add("len"); grafo.addNodo("LEN","len");} "(" aux = <ID> {indiceAcceso+=aux.image;} Listas() ")"}	
 
-void Iterable():{Token aux;}{ aux = <ID> {tablaVariables.agregarVariable(numeroVariable,aux.image,scope);} Iterable_Aux() {tablaVariables.agregarIndiceAcceso(indiceAcceso); indiceAcceso = ""; tablaVariables.agregarIgualdad(-99,scope,""); }
-							| <NUM> {tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"NUM");}
+void Iterable():{Token aux;}{ aux = <ID> {grafo.addNodo("ID",aux.image); tablaVariables.agregarVariable(numeroVariable,aux.image,scope);} Iterable_Aux() {tablaVariables.agregarIndiceAcceso(indiceAcceso); grafo.addNodo("INDEXACC",indiceAcceso); indiceAcceso = ""; tablaVariables.agregarIgualdad(-99,scope,""); }
+							| aux = <NUM> {grafo.addNodo("NUM",aux.image); tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"NUM");}
 							| {valoresIgualdadTabla = new ArrayList<String>();} FuncionLen() {tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable, scope, valoresIgualdadTabla); indiceAcceso = "";}}
 
 void Iterable_Aux(): {} {"[" {indiceAcceso+="[";} Adentro_Lista() "]" {indiceAcceso+="]";} Iterable_Aux() | "."  {indiceAcceso+= ".";} FuncionesShape() | Empty()}
 
-void ifFunction(): {} {"if"  {int aux = numeroVariable; numeroVariable=-2;} Iterable() <OPERADOR_COMPARADOR> 
-									(<BOOL> {tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"BOOL");} 
+void ifFunction(): {Token bool; Token oper;} {"if"  {grafo.addNodo("IF","if"); int aux = numeroVariable; numeroVariable=-2;} Iterable() oper = <OPERADOR_COMPARADOR> {grafo.addNodo("COMPOPER",oper.image);} 
+									(bool = <BOOL> {grafo.addNodo("BOOL",bool.image); tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"BOOL");} 
 									| Iterable() 
-								) {numeroVariable=aux;} "{" Exp() "}"}		
+								) {numeroVariable=aux;} "{" {grafo.addNodo("OPENSCOPE","{");} Exp() {grafo.addNodo("CLOSESCOPE","}");} "}"}		
 	
 void Constantes(): {} { Timer() Rango_Timer() Dim_Filas() Dim_Columnas() Cubo() }	
 	
@@ -290,14 +290,14 @@ void normalProc(): {} {"(" {grafo.addNodo("OPENPAR","(");} (Parametros() | Empty
 
 void mainProc(): {} {"(" ")" "{" {grafo.addNodo("MAINPAR","()"); grafo.addNodo("OPENSCOPE","{");} Exp() "}" {inMain = 0; scope = 0; grafo.addNodo("CLOSESCOPE","}");}}
 
-void Call():{Token id;} {"Call" id=<ID> {tablaVariables.agregarProc(id.image,false); inCall = true;} "(" (Igualdad()) ")" ";" { inCall = false; tablaVariables.checkProc();}}
+void Call():{Token id;} {"Call" {grafo.addNodo("CALL","call");} id=<ID> {grafo.addNodo("ID",id.image); tablaVariables.agregarProc(id.image,false); inCall = true;} "(" (Igualdad()) ")" ";" { inCall = false; tablaVariables.checkProc();}}
 
 void Parametros(): {Token id;} { id = <ID> {tablaVariables.agregarParamProc(id.image); grafo.addNodo("ID",id.image);} ParametrosAux()}
 
 void ParametrosAux(): {} {"," {grafo.addNodo("COMA",",");} Parametros() | Empty()}
 
-void forFunction():{Token id;} {"for" {scope += 1;} id=<ID> {tablaVariables.agregarVariable(-1,id.image,scope); tablaVariables.agregarIgualdad(-1,scope,"");}
-								"in" {int aux = numeroVariable; numeroVariable=-1;} Iterable() {numeroVariable=aux;} 
-								Step() "{" Exp() "}" {scope -= 1;} }
+void forFunction():{Token id;} {"for" { grafo.addNodo("FOR","for"); scope += 1;} id=<ID> {grafo.addNodo("ID",id.image); tablaVariables.agregarVariable(-1,id.image,scope); tablaVariables.agregarIgualdad(-1,scope,"");}
+								"in" {grafo.addNodo("FORIN","in");  int aux = numeroVariable; numeroVariable=-1;} Iterable() {numeroVariable=aux;} 
+								{grafo.addNodo("STEPFOR","step");} Step() "{" {grafo.addNodo("OPENSCOPE","{");} Exp() "}" {grafo.addNodo("CLOSESCOPE","}");} {scope -= 1;} }
 
-void Step():{}{"Step" <NUM> | Empty() }
+void Step():{Token num;}{"Step" num = <NUM> {grafo.addNodo("NUM",num.image);}| Empty() {grafo.addNodo("NUM","1");} }
