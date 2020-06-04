@@ -1,0 +1,90 @@
+Timer = 1; --szgfzgfvzdg
+Rango_Timer = Seg;
+Dim_Filas = 12;
+Dim_Columnas = 2;
+Cubo = p;
+
+
+x = 1;
+y = 0;
+a = x + y * 10 / 4 ;
+b = x + ((y * 10) / 4);
+c=  ((x + y) * 10) / 4;
+d, da = 20, 15;
+e = true;
+f = list(range(5,false));
+g = f[0] ;
+h = f[4];
+i = list(range(5, true)) ;
+p = i[1:4];
+ah = [];
+ah.insert([[true], [true] , [true]], 1);
+l = [];
+l.insert(2,false);
+m = [];
+m.insert(len(a[1][t]),false);
+al = [];
+al.del(0,0);
+n= [];
+n.del(2) ;
+o, p = i.shapeF,[];
+q = [true,false];
+q[1].Neg;
+r = [true,false];
+r[1].T;
+r[0].F;
+t = [true,false,true];
+a = 1;
+var1 = 2;
+t[var1].Neg;
+u = [[[true,false],[true,false]],[[true,false],[true,false]],[[true,false],[true,false]]];
+le = [[[true,false],[true,false]],[[true,false],[true,false]],[[true,false],[true,false]]];
+u[1][1][1] = le[1][1][1];
+y = 1;
+u[:, 1] =  [];
+ac = 23;
+
+Procedure p1(a,b,c)  {
+lista = [];
+    for x in lista {
+        a = 1;
+        for b in lista Step 2{
+            u.del(1,0);
+        }
+    }
+    aif = [true,false];
+    if  aif[:, 1] ==  true    {
+        ad = u[1];
+        ae = u[1];
+        af = u[:,1];
+        Blink(a[c.shapeC][ab],true);
+    }
+
+	u.insert([[true, false, true]],  0);
+	u.insert([[true], [true] , [true]], 1);
+	u.insert([[false, false, false, false]],  0, 0);
+	u.insert([], 1,0);
+
+}
+
+Procedure miproc(){
+}
+
+
+Procedure Main()  {
+    if var == 2 {
+        Call p1(1,a,m);
+    }
+    for xy in a {
+        Call miproc();
+        for bq in lista Step 2{
+            if  lista ==  true{
+                 u.del(0,0);
+                 u.del(1,0);
+                 Blink(u[1],true);
+                 Blink(u[1],false);
+            }
+
+        }
+    }
+}

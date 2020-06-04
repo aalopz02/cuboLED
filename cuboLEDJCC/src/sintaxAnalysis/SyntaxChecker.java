@@ -17,7 +17,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static String indiceAcceso = "";
         private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+        private static String nombreArchivo = "C:/Users/1001001164/Documents/GitHub/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
         private static TablaVariables tablaVariables = new TablaVariables();
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
         public static Grafo grafo = new Grafo();
@@ -30,7 +30,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                         String in = "";
                         while ((st = br.readLine()) != null) {
                                 in += st;
-                                in += '\u005cn';
+//                                in += '\u005cn';
                         }
                         System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
@@ -38,6 +38,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                         tablaVariables.imprimirIDS();
             tablaVariables.checkVariables();
             Nodo aux = grafo.getInicial();
+            Creatorpy.Crear(aux);
 
             while (aux != null){
                 System.out.println("Tipo: " + aux.getTipo());
