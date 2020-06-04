@@ -10,6 +10,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import sintaxAnalysis.SyntaxChecker;
 
+import java.io.*;
+
 import static javafx.scene.text.TextAlignment.CENTER;
 
 public class Main extends Application {
@@ -17,7 +19,7 @@ public class Main extends Application {
     Stage window;
     Scene scene1, scene2;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         launch(args);
     }
 

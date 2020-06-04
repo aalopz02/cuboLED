@@ -1,6 +1,7 @@
 package sintaxAnalysis;
 
 import Estructuras.Lista;
+import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
 
 import java.util.ArrayList;
 
@@ -233,7 +234,8 @@ public class TablaVariables {
             log += "id: " + erDescription[0] + " and " + erDescription[1] + " params" + '\n';
             log += "Not defined" + '\n';
         }
-
+        SyntaxException e = new SyntaxException(log);
+        throw e;
     }
 
     public String checkShape(String in, boolean flagDCL) {

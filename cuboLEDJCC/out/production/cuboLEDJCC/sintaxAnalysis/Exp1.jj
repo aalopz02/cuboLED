@@ -23,6 +23,44 @@ public class SyntaxChecker {
 	public static ArrayList<String> constantesConfig = new ArrayList<String>();
 	public static Grafo grafo = new Grafo();
 	
+	
+	public static String initAnalisys(String in){
+        tablaVariables = new TablaVariables();
+        constantesConfig = new ArrayList<String>();
+        sameLineDCL = 0;
+        mainDefinido = 0;
+        numeroVariable = 0;
+        addVarFalg = true;
+        grafo = new Grafo();
+        inCall = false;
+        indiceAcceso = "";
+        scope = 0;
+        String log;
+        try {
+            if (checker == null){
+                checker = new SyntaxChecker(new java.io.StringReader(in));
+            } else {
+                ReInit(new java.io.StringReader(in));
+                INICIAR();
+            }
+
+            log = "Syntax OK\n";
+            tablaVariables.imprimirIDS();
+            tablaVariables.checkVariables();
+            String varsCheck = tablaVariables.log;
+            if (varsCheck.equals("OK")){
+                log += "Verifications OK\n";
+            } else {
+                log += "Vars verification failed, cause:"+'\n';
+                log += varsCheck;
+            }
+        } catch (Throwable e) {
+            System.out.println("Syntax check failed: " + e.getMessage());
+            log = e.getMessage();
+        }
+        return log;
+    }
+	
     public static void main(String[] args) {
         try {
 			File file = new File(nombreArchivo);
@@ -33,11 +71,8 @@ public class SyntaxChecker {
 				in += st;
 				in += '\n';
 			}
-			System.out.println(in);
-            new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
+			initAnalisys();
             System.out.println("Syntax is okay");
-			tablaVariables.imprimirIDS();
-            tablaVariables.checkVariables();
             Nodo aux = grafo.getInicial();
             
             while (aux != null){

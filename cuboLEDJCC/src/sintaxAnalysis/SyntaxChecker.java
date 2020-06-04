@@ -18,12 +18,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
         private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
-        private static TablaVariables tablaVariables;
-        public static ArrayList<String> constantesConfig;
+        private static TablaVariables tablaVariables = new TablaVariables();
+        public static ArrayList<String> constantesConfig = new ArrayList<String>();
         public static Grafo grafo;
         private static SyntaxChecker checker = null;
 
-    public static String initAnalisys(String in){
+    public static String initAnalisys(String in) {
+        grafo = new Grafo();
         tablaVariables = new TablaVariables();
         constantesConfig = new ArrayList<String>();
         sameLineDCL = 0;
@@ -36,32 +37,44 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         scope = 0;
         String log;
         try {
-            if (checker == null){
+            if (checker == null) {
                 checker = new SyntaxChecker(new java.io.StringReader(in));
             } else {
                 ReInit(new java.io.StringReader(in));
                 INICIAR();
             }
 
-            log = "Syntax OK\n";
+            log = "Syntax OK\u005cn";
             tablaVariables.imprimirIDS();
             tablaVariables.checkVariables();
             String varsCheck = tablaVariables.log;
-            if (varsCheck.equals("OK")){
-                log += "Verifications OK\n";
+            if (varsCheck.equals("OK")) {
+                log += "Verifications OK\u005cn";
             } else {
-                log += "Vars verification failed, cause:"+'\n';
+                log += "Vars verification failed, cause:" + '\u005cn';
                 log += varsCheck;
             }
+            System.out.println(log);
         } catch (Throwable e) {
-            // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
             log = e.getMessage();
         }
         return log;
     }
 
-    public static void initAnalisysTest(){
+    public static void main(String[] args) {
+        grafo = new Grafo();
+        tablaVariables = new TablaVariables();
+        constantesConfig = new ArrayList<String>();
+        sameLineDCL = 0;
+        mainDefinido = 0;
+        numeroVariable = 0;
+        addVarFalg = true;
+        grafo = new Grafo();
+        inCall = false;
+        indiceAcceso = "";
+        scope = 0;
+        String log;
         try {
             File file = new File(nombreArchivo);
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -71,45 +84,47 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                 in += st;
                 in += '\u005cn';
             }
-            System.out.println(in);
             new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
+            System.out.println("Syntax is okay");
             tablaVariables.imprimirIDS();
             tablaVariables.checkVariables();
+            Creatorpy.initWriter(grafo);
+
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
         }
     }
 
-        static void checkMainDefined(int llamada, Token token) throws ParseException{
-                if (mainDefinido == 0){
-                        if (llamada ==  1){
-                                System.out.println("Main method not defined");
-                                System.out.println("In line: ");
-                            System.out.println(token.beginLine);
-                                ParseException e = generateParseException();
-                                throw e;
-                        } else {
-                                mainDefinido = 1;
-                        }
-                } else {
-                        System.out.println("Main method already defined");
-                        System.out.println("In line: ");
-                        System.out.println(token.beginLine);
-                        ParseException e = generateParseException();
-                        throw e;
-                }
+    static void checkMainDefined(int llamada, Token token) throws ParseException {
+        if (mainDefinido == 0) {
+            if (llamada == 1) {
+                System.out.println("Main method not defined");
+                System.out.println("In line: ");
+                System.out.println(token.beginLine);
+                ParseException e = generateParseException();
+                throw e;
+            } else {
+                mainDefinido = 1;
+            }
+        } else {
+            System.out.println("Main method already defined");
+            System.out.println("In line: ");
+            System.out.println(token.beginLine);
+            ParseException e = generateParseException();
+            throw e;
         }
+    }
 
-        static void checkMainDCL(Token token) throws ParseException{
-                if (inMain == 1){
-                        System.out.println("Illegal declaration in main method");
-                        System.out.println("In line: ");
-                        System.out.println(token.beginLine);
-                        ParseException e = generateParseException();
-                        throw e;
-                }
+    static void checkMainDCL(Token token) throws ParseException {
+        if (inMain == 1) {
+            System.out.println("Illegal declaration in main method");
+            System.out.println("In line: ");
+            System.out.println(token.beginLine);
+            ParseException e = generateParseException();
+            throw e;
         }
+    }
 
         static void agregarVariable() {
                 if (addVarFalg) {
