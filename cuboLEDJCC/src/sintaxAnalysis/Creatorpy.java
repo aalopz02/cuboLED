@@ -20,13 +20,15 @@ public class Creatorpy {
     private static String template;
 
     private static void writePROC() {
-        while (aux.getTipo().equals("OPENSCOPE")) {
+        while (!aux.getTipo().equals("OPENSCOPE")) {
             pw.print(aux.getContenido());
+            pw.print(" ");
             aux = aux.getNext();
         }
         pw.print(":");
         pw.println("");
         scope ++;
+        aux = aux.getNext();
     }
 
     private static void rewriteFile() {
@@ -39,7 +41,6 @@ public class Creatorpy {
                 template += st;
                 template += '\n';
             }
-            System.out.println(template);
         } catch (IOException e){
             System.out.println("Error al leer template");
         }
@@ -54,8 +55,11 @@ public class Creatorpy {
         try {
             pw = new PrintWriter(fichero);
             pw.print(template);
-            pw.print("asdcvascscsd");
+            pw.println("");
             while (aux != null) {
+                if (aux.getTipo().equals("INIT")){
+                    aux = aux.getNext();
+                }
                 if (aux.getTipo().equals("PRODCL")){
                     writePROC();
                 }
