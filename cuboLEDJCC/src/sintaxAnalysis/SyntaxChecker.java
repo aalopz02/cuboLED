@@ -96,35 +96,36 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         }
     }
 
-    static void checkMainDefined(int llamada, Token token) throws ParseException {
-        if (mainDefinido == 0) {
-            if (llamada == 1) {
-                System.out.println("Main method not defined");
-                System.out.println("In line: ");
-                System.out.println(token.beginLine);
-                ParseException e = generateParseException();
-                throw e;
-            } else {
-                mainDefinido = 1;
-            }
-        } else {
-            System.out.println("Main method already defined");
-            System.out.println("In line: ");
-            System.out.println(token.beginLine);
-            ParseException e = generateParseException();
-            throw e;
-        }
-    }
 
-    static void checkMainDCL(Token token) throws ParseException {
-        if (inMain == 1) {
-            System.out.println("Illegal declaration in main method");
-            System.out.println("In line: ");
-            System.out.println(token.beginLine);
-            ParseException e = generateParseException();
-            throw e;
+        static void checkMainDefined(int llamada, Token token) throws ParseException{
+                if (mainDefinido == 0){
+                        if (llamada ==  1){
+                                System.out.println("Main method not defined");
+                                System.out.println("In line: ");
+                            System.out.println(token.beginLine);
+                                ParseException e = generateParseException();
+                                throw e;
+                        } else {
+                                mainDefinido = 1;
+                        }
+                } else {
+                        System.out.println("Main method already defined");
+                        System.out.println("In line: ");
+                        System.out.println(token.beginLine);
+                        ParseException e = generateParseException();
+                        throw e;
+                }
         }
-    }
+
+        static void checkMainDCL(Token token) throws ParseException{
+                if (inMain == 1){
+                        System.out.println("Illegal declaration in main method");
+                        System.out.println("In line: ");
+                        System.out.println(token.beginLine);
+                        ParseException e = generateParseException();
+                        throw e;
+                }
+        }
 
         static void agregarVariable() {
                 if (addVarFalg) {
@@ -754,10 +755,10 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void ifFunction() throws ParseException {
                     Token bool; Token oper;
     jj_consume_token(30);
-                                                     grafo.addNodo("IF","if"); int aux = numeroVariable; numeroVariable=-2;
+                                                     grafo.addNodo("IF","if "); int aux = numeroVariable; numeroVariable=-2;
     Iterable();
     oper = jj_consume_token(OPERADOR_COMPARADOR);
-                                                                                                                                                                      grafo.addNodo("COMPOPER",oper.image);
+                                                                                                                                                                       grafo.addNodo("COMPOPER",oper.image);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BOOL:
       bool = jj_consume_token(BOOL);
@@ -972,7 +973,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
 
   static final public void Procedure() throws ParseException {
     jj_consume_token(33);
-                                   grafo.addNodo("PRODCL","def");
+                                   grafo.addNodo("PRODCL","def ");
     NombreRutina();
   }
 

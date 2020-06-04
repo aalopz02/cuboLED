@@ -41,7 +41,6 @@ u = [[[true,false],[true,false]],[[true,false],[true,false]],[[true,false],[true
 le = [[[true,false],[true,false]],[[true,false],[true,false]],[[true,false],[true,false]]];
 u[1][1][1] = le[1][1][1];
 y = 1;
-u[:, 1] =  [];
 ac = 23;
 
 Procedure p1(a,b,c)  {
@@ -53,15 +52,13 @@ Procedure p1(a,b,c)  {
     }
     if  aif[:, 1] ==  true    {
         ad = m[1];
-        ae = m[1,1];
-        af = m[:,1];
         Blink(a[c.shapeC][ab],true);
     }
 
 	ag.insert([[true, false, true]],  0);
 	ah.insert([[true], [true] , [true]], 1);
 	ai.insert([[false, false, false, false]],  0, 0);
-	aj.insert(, 1,0);
+	aj.insert(false, 1,0);
 
 }
 

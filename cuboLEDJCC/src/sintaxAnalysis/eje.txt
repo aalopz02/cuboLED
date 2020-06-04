@@ -4,42 +4,25 @@ Dim_Filas = 12;
 Dim_Columnas = 2;
 Cubo = p;
 
+Procedure pa(a,b,c){
+a =1;
+if a == 1{
+b = a +2+a;
+}
+for a in 10{
+b=2;
+}
+}
 
-x = 1;
-a = x * 10 / 4 ;
-d, da = 20, 15;
-e = true;
-f = list(range(5,false));
-g = f[0] ;
-p = f[1:4];
-f.insert([[true], [true] , [true]], 1);
-f.insert(2,false);
+Procedure lo(){
+c=[];
+for a in 10{
+for a in c Step 2{
+b=2;
+}
+}
+}
+
+Procedure qwe(apedo){
 m = [];
-m.insert(len(a[1][t]),false);
-al = [];
-al.del(0,0);
-n= [];
-n.del(2) ;
-o, p = f.shapeF,[];
-t = [true,false,true];
-t[x].Neg;
-le = [[[true,false],[true,false]],[[true,false],[true,false]],[[true,false],[true,false]]];
-le[1][1][1] = le[1][1][1];
-le[1].T;
-le[0].F;
-
-Procedure p1(a,b,c)  {
-	le.insert([[true, false, true]],  0);
-	le.insert([[true], [true] , [true]], 1);
-	le.insert([[false, false, false, false]],  0, 0);
-	le.insert([], 1,0);
-
-}
-
-Procedure miproc(){
-}
-
-
-Procedure Main()  {
-
 }

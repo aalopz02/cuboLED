@@ -7,24 +7,25 @@ import Estructuras.Grafo;
 import java.io.*;
 import java.util.ArrayList;
 
-public class SyntaxChecker {
+public class SyntaxChecker  {
 
-	private static int sameLineDCL = 0;
-	private static int mainDefinido = 0;
-	private static int scope = 0;
-	private static int numeroVariable = 0;
-	private static int inMain = 0;
-	private static Boolean addVarFalg = true;
-	private static String indiceAcceso = "";
-	private static Boolean inCall = false;
-	private static ArrayList<String> valoresIgualdadTabla;
-	private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
-	private static TablaVariables tablaVariables = new TablaVariables();
-	public static ArrayList<String> constantesConfig = new ArrayList<String>();
-	public static Grafo grafo = new Grafo();
-	
-	
-	public static String initAnalisys(String in){
+        private static int sameLineDCL = 0;
+        private static int mainDefinido = 0;
+        private static int scope = 0;
+        private static int numeroVariable = 0;
+        private static int inMain = 0;
+        private static Boolean addVarFalg = true;
+        private static String indiceAcceso = "";
+        private static Boolean inCall = false;
+        private static ArrayList<String> valoresIgualdadTabla;
+        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+        private static TablaVariables tablaVariables = new TablaVariables();
+        public static ArrayList<String> constantesConfig = new ArrayList<String>();
+        public static Grafo grafo;
+        private static SyntaxChecker checker = null;
+
+    public static String initAnalisys(String in) {
+        grafo = new Grafo();
         tablaVariables = new TablaVariables();
         constantesConfig = new ArrayList<String>();
         sameLineDCL = 0;
@@ -37,55 +38,65 @@ public class SyntaxChecker {
         scope = 0;
         String log;
         try {
-            if (checker == null){
+            if (checker == null) {
                 checker = new SyntaxChecker(new java.io.StringReader(in));
             } else {
                 ReInit(new java.io.StringReader(in));
                 INICIAR();
             }
 
-            log = "Syntax OK\n";
+            log = "Syntax OK\u005cn";
             tablaVariables.imprimirIDS();
             tablaVariables.checkVariables();
             String varsCheck = tablaVariables.log;
-            if (varsCheck.equals("OK")){
-                log += "Verifications OK\n";
+            if (varsCheck.equals("OK")) {
+                log += "Verifications OK\u005cn";
             } else {
-                log += "Vars verification failed, cause:"+'\n';
+                log += "Vars verification failed, cause:" + '\u005cn';
                 log += varsCheck;
             }
+            System.out.println(log);
         } catch (Throwable e) {
             System.out.println("Syntax check failed: " + e.getMessage());
             log = e.getMessage();
         }
         return log;
     }
-	
+
     public static void main(String[] args) {
+        grafo = new Grafo();
+        tablaVariables = new TablaVariables();
+        constantesConfig = new ArrayList<String>();
+        sameLineDCL = 0;
+        mainDefinido = 0;
+        numeroVariable = 0;
+        addVarFalg = true;
+        grafo = new Grafo();
+        inCall = false;
+        indiceAcceso = "";
+        scope = 0;
+        String log;
         try {
-			File file = new File(nombreArchivo);
-			BufferedReader br = new BufferedReader(new FileReader(file)); 
-			String st; 	
-			String in = "";
-			while ((st = br.readLine()) != null) {
-				in += st;
-				in += '\n';
-			}
-			initAnalisys();
-            System.out.println("Syntax is okay");
-            Nodo aux = grafo.getInicial();
-            
-            while (aux != null){
-                System.out.println("Tipo: " + aux.getTipo());
-                System.out.println("Contenido: " + aux.getContenido());
-                aux = aux.getNext();
+            File file = new File(nombreArchivo);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String st;
+            String in = "";
+            while ((st = br.readLine()) != null) {
+                in += st;
+                in += '\u005cn';
             }
-                 
+            new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
+            System.out.println("Syntax is okay");
+            tablaVariables.imprimirIDS();
+            tablaVariables.checkVariables();
+            Creatorpy.initWriter(grafo);
+
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
         }
     }
+
 	
 	static void checkMainDefined(int llamada, Token token) throws ParseException{
 		if (mainDefinido == 0){
@@ -276,7 +287,7 @@ void Iterable():{Token aux;}{ aux = <ID> {grafo.addNodo("ID",aux.image); tablaVa
 
 void Iterable_Aux(): {} {"[" {indiceAcceso+="[";} Adentro_Lista() "]" {indiceAcceso+="]";} Iterable_Aux() | "."  {indiceAcceso+= ".";} FuncionesShape() | Empty()}
 
-void ifFunction(): {Token bool; Token oper;} {"if"  {grafo.addNodo("IF","if"); int aux = numeroVariable; numeroVariable=-2;} Iterable() oper = <OPERADOR_COMPARADOR> {grafo.addNodo("COMPOPER",oper.image);} 
+void ifFunction(): {Token bool; Token oper;} {"if"  {grafo.addNodo("IF","if "); int aux = numeroVariable; numeroVariable=-2;} Iterable() oper = <OPERADOR_COMPARADOR> {grafo.addNodo("COMPOPER",oper.image);} 
 									(bool = <BOOL> {grafo.addNodo("BOOL",bool.image); tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"BOOL");} 
 									| Iterable() 
 								) {numeroVariable=aux;} "{" {grafo.addNodo("OPENSCOPE","{");} Exp() {grafo.addNodo("CLOSESCOPE","}");} "}"}		
@@ -317,7 +328,7 @@ void Adentro_Lista(): {Token num;} {(num=<NUM> {indiceAcceso+=num.image;} | num 
 
 void Adentro_Lista_Aux1(): {Token num;} {":" {indiceAcceso+=":";} num=<NUM> {indiceAcceso+=num.image;} | "," {indiceAcceso+=",";} num=<NUM> {indiceAcceso+=num.image;} | Empty() }
 
-void Procedure(): {} {"Procedure" {grafo.addNodo("PRODCL","def");} NombreRutina() }
+void Procedure(): {} {"Procedure" {grafo.addNodo("PRODCL","def ");} NombreRutina() }
 
 void NombreRutina():{Token id;}{ id=<ID> {tablaVariables.agregarProc(id.image, true); grafo.addNodo("ID",id.image);} normalProc() | id = <MAIN> {checkMainDefined(0,id); inMain = 1; grafo.addNodo("ID",id.image);} mainProc()}
 
