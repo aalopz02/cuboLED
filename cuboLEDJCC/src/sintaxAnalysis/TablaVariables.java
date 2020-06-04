@@ -19,7 +19,7 @@ public class TablaVariables {
     private ArrayList<String> types = new ArrayList<>();
     private ArrayList<Lista> matrices = new ArrayList<>();
     private ArrayList<Integer> indexMatriz = new ArrayList<>();
-    private int indiceProc = 0;
+    public String log = "OK";
 
     TablaVariables() {
         validTypes.add("BOOL"); //0
@@ -47,7 +47,6 @@ public class TablaVariables {
     public void agregarProc(String id, boolean dcl) {
         CeldaTablaProc cell = new CeldaTablaProc(id, dcl);
         tablaProc.add(cell);
-        indiceProc++;
     }
 
     public void agregarParamProc(String paramIn) {
@@ -196,48 +195,45 @@ public class TablaVariables {
 
     private void generateError(int errType, String cause) throws ParseException {
         if (errType <= 1) {
-            System.out.print("Variable: ");
-            System.out.println(cause);
-            System.out.println(errors.get(errType));
+            log = "Variable: " + cause + '\n';
+            log += errors.get(errType) + '\n';
         } else if (errType == 2) {
-            System.out.println(errors.get(errType));
-            System.out.println(cause);
+            log = errors.get(errType) + '\n';
+            log += cause+'\n';
         } else if (errType == 3) {
             String[] erDescription = cause.split("-");
-            System.out.print("Variable: " + erDescription[0] + ", ");
-            System.out.println(errors.get(errType) + ": " + erDescription[1]);
-            System.out.println("New type: " + erDescription[2]);
+            log = "Variable: " + erDescription[0] + ", " + errors.get(errType) + ": " + erDescription[1] + '\n';
+            log += "New type: " + erDescription[2] + '\n';
         } else if (errType == 4) {
-            System.out.println(cause);
-            System.out.println(errors.get(errType));
+            log = cause + '\n';
+            log += errors.get(errType) + '\n';
         } else if (errType == 5) {
-            System.out.println(errors.get(errType));
-            System.out.println("Tried to access: " + cause);
+            log = errors.get(errType) + '\n';
+            log += "Tried to access: " + cause + '\n';
         } else if (errType == 6) {
-            System.out.println(errors.get(errType));
-            System.out.println("Provided with: " + cause);
+            log = errors.get(errType) + '\n';
+            log += "Provided with: " + cause + '\n';
         } else if (errType == 7) {
-            System.out.println("Expresion: " + cause);
-            System.out.println(errors.get(errType));
+            log = "Expresion: " + cause + '\n';
+            log += errors.get(errType) + '\n';
         } else if (errType == 8) {
-            System.out.println(errors.get(errType));
-            System.out.println("Provided with: " + cause);
+            log = errors.get(errType) + '\n';
+            log += "Provided with: " + cause + '\n';
         } else if (errType == 9) {
-            System.out.println(errors.get(errType));
+            log = errors.get(errType) + '\n';
             String[] erDescription = cause.split("-");
-            System.out.println(erDescription[0] + " with " + erDescription[1]);
+            log += erDescription[0] + " with " + erDescription[1] + '\n';
         } else if (errType == 10) {
-            System.out.println(cause + ", " + errors.get(errType));
+            log = cause + ", " + errors.get(errType) + '\n';
         } else if (errType == 11) {
-            System.out.println(cause + ", " + errors.get(errType));
+            log = cause + ", " + errors.get(errType) + '\n';
         } else if (errType == 12){
-            System.out.println(errors.get(errType) + ": ");
+            log = errors.get(errType) + ": " + '\n';
             String[] erDescription = cause.split("-");
-            System.out.println("id: " + erDescription[0] + " and " + erDescription[1] + " params");
-            System.out.println("Not defined");
+            log += "id: " + erDescription[0] + " and " + erDescription[1] + " params" + '\n';
+            log += "Not defined" + '\n';
         }
-        ParseException e = generateParseException();
-        throw e;
+
     }
 
     public String checkShape(String in, boolean flagDCL) {
@@ -437,7 +433,6 @@ public class TablaVariables {
     }
 
     private void inferTypes() throws ParseException {
-        indiceProc = 0;
         for (int i = 0; i < tabla.size(); i++) {
             CeldaTablaVariables variable = tabla.get(i);
             String idVar = variable.getId();

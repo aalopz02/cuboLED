@@ -8,6 +8,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import sintaxAnalysis.SyntaxChecker;
+
 import static javafx.scene.text.TextAlignment.CENTER;
 
 public class Main extends Application {
@@ -71,7 +73,12 @@ public class Main extends Application {
         newButton.setOnAction(e->userText.setText(""));
         //el userText.getText() es para jalar el String que
         // le entra por el Text Area, entonces acá en lugar de un system se debe enviar ese string a donde lo ocupes
-        pushButton.setOnAction(e->System.out.println(userText.getText()));//Pasarselo a donde lo necesite Andres
+        pushButton.setOnAction(e-> {
+            String errLog = SyntaxChecker.initAnalisys(userText.getText());
+            answer.setText("");
+            answer.setText(errLog);
+        });
+        //Pasarselo a donde lo necesite Andres
         //cuando verifica la sintaxis lo envia al label
         //pushButton.setOnAction(answer.setText(responseOfSyntax)); ese response of syntax es la respues que da el interprete,
         //digamos si da error o si dice que es valido se debe enviar por el set text

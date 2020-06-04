@@ -17,35 +17,64 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static String indiceAcceso = "";
         private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "C:/Users/1001001164/Documents/GitHub/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
-        private static TablaVariables tablaVariables = new TablaVariables();
-        public static ArrayList<String> constantesConfig = new ArrayList<String>();
-        public static Grafo grafo = new Grafo();
+        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+        private static TablaVariables tablaVariables;
+        public static ArrayList<String> constantesConfig;
+        public static Grafo grafo;
+        private static SyntaxChecker checker = null;
 
-    public static void main(String[] args) {
+    public static String initAnalisys(String in){
+        tablaVariables = new TablaVariables();
+        constantesConfig = new ArrayList<String>();
+        sameLineDCL = 0;
+        mainDefinido = 0;
+        numeroVariable = 0;
+        addVarFalg = true;
+        grafo = new Grafo();
+        inCall = false;
+        indiceAcceso = "";
+        scope = 0;
+        String log;
         try {
-                        File file = new File(nombreArchivo);
-                        BufferedReader br = new BufferedReader(new FileReader(file));
-                        String st;
-                        String in = "";
-                        while ((st = br.readLine()) != null) {
-                                in += st;
-//                                in += '\u005cn';
-                        }
-                        System.out.println(in);
-            new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
-            System.out.println("Syntax is okay");
-                        tablaVariables.imprimirIDS();
-            tablaVariables.checkVariables();
-            Nodo aux = grafo.getInicial();
-            Creatorpy.Crear(aux);
-
-            while (aux != null){
-                System.out.println("Tipo: " + aux.getTipo());
-                System.out.println("Contenido: " + aux.getContenido());
-                aux = aux.getNext();
+            if (checker == null){
+                checker = new SyntaxChecker(new java.io.StringReader(in));
+            } else {
+                ReInit(new java.io.StringReader(in));
+                INICIAR();
             }
 
+            log = "Syntax OK\n";
+            tablaVariables.imprimirIDS();
+            tablaVariables.checkVariables();
+            String varsCheck = tablaVariables.log;
+            if (varsCheck.equals("OK")){
+                log += "Verifications OK\n";
+            } else {
+                log += "Vars verification failed, cause:"+'\n';
+                log += varsCheck;
+            }
+        } catch (Throwable e) {
+            // Catching Throwable is ugly but JavaCC throws Error objects!
+            System.out.println("Syntax check failed: " + e.getMessage());
+            log = e.getMessage();
+        }
+        return log;
+    }
+
+    public static void initAnalisysTest(){
+        try {
+            File file = new File(nombreArchivo);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String st;
+            String in = "";
+            while ((st = br.readLine()) != null) {
+                in += st;
+                in += '\u005cn';
+            }
+            System.out.println(in);
+            new SyntaxChecker(new java.io.StringReader(in)).INICIAR();
+            tablaVariables.imprimirIDS();
+            tablaVariables.checkVariables();
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
             System.out.println("Syntax check failed: " + e.getMessage());
