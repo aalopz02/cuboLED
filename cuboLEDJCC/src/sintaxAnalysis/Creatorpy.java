@@ -19,6 +19,7 @@ public class Creatorpy {
     private static FileWriter fichero;
     private static String templateCOMS;
     private static String templateFuncs;
+    public static String Tabs = "";
 
 
     private static void rewriteFile() {
@@ -84,6 +85,9 @@ public class Creatorpy {
             pw.print(templateFuncs);
             pw.println("");
             while (aux != null) {
+                for(int i = 0; i != scope; i++){
+                    Tabs += "\t";
+                }
                 aux = aux.getNext();
                 if (aux == null){
                     break;
