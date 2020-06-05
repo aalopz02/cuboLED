@@ -13,13 +13,12 @@ public class Creatorpy {
     private static String filePy = "src/temp/cubo_compi1.py";
     private static String templateFile = "src/temp/template.py";
     private static Nodo aux;
-    private static int lineStart = 38;
+    private static int lineStart = 20;
     private static int scope = 0;
     private static PrintWriter pw;
     private static FileWriter fichero;
     private static String templateCOMS;
     private static String templateFuncs;
-    public static String Tabs = "";
 
 
     private static void rewriteFile() {
@@ -33,7 +32,7 @@ public class Creatorpy {
                 templateCOMS += st;
                 templateCOMS += '\n';
                 line++;
-                if (line >= 22){
+                if (line >= lineStart){
                     break;
                 }
             }
@@ -45,17 +44,23 @@ public class Creatorpy {
         } catch (IOException e){
             System.out.println("Error al leer template");
         }
+    }
 
+    private static void write(String in){
+        for(int i = 0; i != scope; i++){
+            pw.print("\t");
+        }
+        pw.print(in);
     }
 
     private static void writeFOR(){
-        pw.print("for ");
+        write("for ");
         aux = aux.getNext();
         pw.print(aux.getContenido());
         aux = aux.getNext();
         pw.print(" in ");
         aux = aux.getNext();
-        pw.print(" range(0,");
+        pw.print("range(0,");
         if (aux.getTipo().equals("NUM")){
             pw.print(aux.getContenido());
         } else {
@@ -71,23 +76,135 @@ public class Creatorpy {
         aux = aux.getNext();
     }
 
-    private static void writeIF(){
+    private static void listFunc(){
+        pw.print("=");
+        if (aux.getContenido().equals("Neg")){
+            pw.print("neg_func(");
+        }
+        if (aux.getContenido().equals("T")){
+            pw.print("hacer_true(");
+        }
+        if (aux.getContenido().equals("F")){
+            pw.print("hacer_false(");
+        }
+        if (aux.getPrev().getTipo().equals("INDEXACC")){
+            pw.print(aux.getPrev().getPrev().getContenido());
+        }
+        pw.print(aux.getPrev().getContenido());
+        pw.print(")");
+        aux = aux.getNext();
+    }
 
+    private static void writeDel(){
+        write("delete(");
+        pw.print(aux.getContenido());
+        aux = aux.getNext();
+        aux = aux.getNext();
+        pw.print(",");
+        pw.print(aux.getContenido());
+        pw.print(",");
+        aux = aux.getNext();
+        if (!aux.getTipo().equals("ENDLINE")){
+            pw.print(aux.getContenido());
+            aux = aux.getNext();
+        } else {
+            pw.print("0");
+        }
+        pw.print(")");
+    }
+
+    private static void writeNewList(){
+        pw.print("[]");
+        pw.println("");
+        write("crear_lista(");
+        pw.print(aux.getPrev().getPrev().getContenido());
+        pw.print(",");
+        aux = aux.getNext();
+        pw.print(aux.getContenido());
+        pw.print(",");
+        aux = aux.getNext();
+        if (aux.getContenido().contains("true") || aux.getContenido().contains("false")){
+            aux.setContenido(aux.getContenido().replace("true","True"));
+            aux.setContenido(aux.getContenido().replace("false","False"));
+        }
+        pw.print(aux.getContenido());
+        pw.print(")");
+        aux = aux.getNext();
+    }
+
+    public static void writeInsert(){
+        write(aux.getNext().getContenido());
+        pw.write(aux.getContenido());
+        aux=aux.getNext();
+        aux=aux.getNext();
+        pw.write(",");
+        pw.write(aux.getContenido());
+        aux=aux.getNext();
+        pw.write(",");
+        if (aux.getContenido().contains("true") || aux.getContenido().contains("false")){
+            aux.setContenido(aux.getContenido().replace("true","True"));
+            aux.setContenido(aux.getContenido().replace("false","False"));
+        }
+        pw.write(aux.getContenido());
+        pw.write(")");
+        aux=aux.getNext();
+    }
+    //insertMatriz(f,[[True],[False],[True]],-1,1)
+//	print(f)
+//	insertMatriz(f,[[True],[False],[True]],-1,1)
+//	print(f)
+
+    public static void writeInsertMat(){
+        write(aux.getNext().getContenido());
+        pw.write(aux.getContenido());
+        aux=aux.getNext();
+        aux=aux.getNext();
+        pw.write(",");
+        if (aux.getContenido().contains("true") || aux.getContenido().contains("false")){
+            aux.setContenido(aux.getContenido().replace("true","True"));
+            aux.setContenido(aux.getContenido().replace("false","False"));
+        }
+        //	insertMatriz(f,[[True],[True],[True]],/0,1)
+        //linsertLista(2False
+//	linsertMatriz([[True,False,True]]0
+//	linsertMatriz([[False,False,False,False]]00
+        pw.write(aux.getContenido());
+        aux=aux.getNext();
+        pw.write(",");
+        pw.write(aux.getContenido());
+        pw.write(",");
+        aux =aux.getNext();
+        if (aux.getTipo().equals("ENDINSERT")) {
+            aux.setContenido("-1");
+            pw.write(aux.getContenido());
+        } else {
+            pw.write(aux.getContenido());
+            aux=aux.getNext();
+        }
+        pw.write(")");
+        aux=aux.getNext();
     }
 
     public static boolean initWriter(Grafo in) throws IOException {
         rewriteFile();
+        File f = new File(filePy);
+        if(f. exists()) {
+            f.delete();
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         fichero = new FileWriter(filePy);
         grafo = in;
         aux = grafo.getInicial();
+        boolean flagNL = true;
         try {
             pw = new PrintWriter(fichero);
             pw.print(templateFuncs);
             pw.println("");
             while (aux != null) {
-                for(int i = 0; i != scope; i++){
-                    Tabs += "\t";
-                }
                 aux = aux.getNext();
                 if (aux == null){
                     break;
@@ -100,11 +217,29 @@ public class Creatorpy {
                 if (aux.getTipo().equals("FOR")){
                     writeFOR();
                 }
+                if (aux.getTipo().equals("NEWLIST")){
+                    writeNewList();
+                }
+                if (aux.getTipo().equals("FUNCLIST")){
+                    listFunc();
+                }
                 if (aux.getTipo().equals("OPENSCOPE")){
                     scope++;
                     aux.setContenido(":\n");
+                    flagNL=true;
+                }
+                if (aux.getNext() != null){
+                    if (aux.getNext().getTipo().equals("FUN.DEL")){
+                        writeDel();
+                    }else if (aux.getNext().getTipo().equals("FUN.INSERTLIST")){
+                        writeInsert();
+                    } else if (aux.getNext().getTipo().equals("FUN.INSERTMAT")){
+                        writeInsertMat();
+                    }
                 }
                 if (aux.getTipo().equals("CLOSESCOPE") || aux.getTipo().equals("ENDLINE")){
+                    if (aux.getTipo().equals("CLOSESCOPE")) scope--;
+                    flagNL=true;
                     pw.println("");
                 } else {
                     if (aux.getContenido().contains("true") || aux.getContenido().contains("false")){
@@ -114,7 +249,15 @@ public class Creatorpy {
                     if (aux.getTipo().equals("ID") && aux.getNext().getTipo().equals("INDEX")){
                         aux = aux.getNext();
                     }
-                    pw.print(aux.getContenido());
+                    if (flagNL && !aux.getTipo().equals("OPENSCOPE")) {
+                        write("");
+                        pw.print(aux.getContenido());
+                        flagNL=false;
+                    } else{
+                        if (aux.getContenido().contains("<>")) aux.setContenido(aux.getContenido().replace("<>","!="));
+                        pw.print(aux.getContenido());
+                    }
+
                 }
             }
             pw.println("");

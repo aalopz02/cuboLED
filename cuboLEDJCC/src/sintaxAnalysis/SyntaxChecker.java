@@ -219,7 +219,6 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 12:
       jj_consume_token(12);
-                                                        grafo.addNodo("DCL",".");
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INSERT:
       case DELETE:
@@ -238,9 +237,9 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       break;
     case 9:
       aux = jj_consume_token(9);
-                                                                                                                                           grafo.addNodo("DCL","="); checkMainDCL(aux);
+                                                                                                               grafo.addNodo("DCL","="); checkMainDCL(aux);
       Igualdad();
-                                                                                                                                                                                                     checkSameLineDCL(aux);
+                                                                                                                                                                         checkSameLineDCL(aux);
       break;
     default:
       jj_la1[4] = jj_gen;
@@ -248,7 +247,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       throw new ParseException();
     }
     jj_consume_token(43);
-                                                                                                                                                                                                                                    grafo.addNodo("ENDLINE","");
+                                                                                                                                                                                                        grafo.addNodo("ENDLINE","");
   }
 
   static final public void Identificadores() throws ParseException {
@@ -550,11 +549,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INSERT:
       aux = jj_consume_token(INSERT);
-                                                         grafo.addNodo("FUN.INSERT","insert"); addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);
+                                                         addVarFalg = false; valoresIgualdadTabla = new ArrayList<String>(); valoresIgualdadTabla.add(aux.image);
       jj_consume_token(6);
       valoresInsert();
       jj_consume_token(7);
-                                                                                                                                                                                                                                  tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;
+                                                                                                                                                                                            tablaVariables.agregarIgualdad(numeroVariable,scope,valoresIgualdadTabla); addVarFalg = true;
       break;
     case DELETE:
       aux = jj_consume_token(DELETE);
@@ -578,13 +577,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     case 44:
                                                          indiceAcceso = ""; valoresIgualdadTabla.add("InsertMatriz");
       Listas();
-                                                                                                                                 grafo.addNodo("INSERT.MATRIZ",""); grafo.addNodo("VAL",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso);
+                                                                                                                                 grafo.addNodo("FUN.INSERTMAT","insertMatriz("); grafo.addNodo("VAL",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso);
       InsertMatriz();
       break;
     case NUM:
     case LENGTH:
     case ID:
-                                                                                                                                                                                                                                                                  valoresIgualdadTabla.add("InsertListas"); grafo.addNodo("INSERT.LISTA","");
+                                                                                                                                                                                                                                                                               valoresIgualdadTabla.add("InsertListas"); grafo.addNodo("FUN.INSERTLIST","insertLista(");
       InsertListas();
       break;
     default:
@@ -609,7 +608,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_la1[21] = jj_gen;
       Empty();
     }
-                                                                                                                                                                                                                                                                                        grafo.addNodo("ENDINSERT","");
+                                                                                                                                                                                                                                                                                        grafo.addNodo("ENDINSERT","end");
   }
 
   static final public void valoresDel() throws ParseException {

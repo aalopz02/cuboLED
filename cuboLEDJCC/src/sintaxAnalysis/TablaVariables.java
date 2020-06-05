@@ -3,6 +3,7 @@ package sintaxAnalysis;
 import Estructuras.Lista;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
 
+import java.net.Inet4Address;
 import java.util.ArrayList;
 
 import static sintaxAnalysis.SyntaxChecker.S;
@@ -39,6 +40,7 @@ public class TablaVariables {
         errors.add("Not defined in for loop"); //10
         errors.add("Cannot be used as iterable object"); //11
         errors.add("Method with signature"); //12
+        errors.add("Expected 1 or 0 in Delete"); //13
     }
 
     public void agregarIndiceAcceso(String index) {
@@ -233,7 +235,12 @@ public class TablaVariables {
             String[] erDescription = cause.split("-");
             log += "id: " + erDescription[0] + " and " + erDescription[1] + " params" + '\n';
             log += "Not defined" + '\n';
+        } else if (errType == 13){
+            log = errors.get(errType) + '\n';
+            String[] erDescription = cause.split("-");
+            log += "for list: " + erDescription[0] + " provided with: " + erDescription[1] + '\n';
         }
+        System.out.println(log);
         SyntaxException e = new SyntaxException(log);
         throw e;
     }
@@ -341,6 +348,7 @@ public class TablaVariables {
     }
 
     private String checkIndex(String id, String index) throws ParseException {
+        if (index.equals("NA")) return types.get(variablesDefinidas.indexOf(id));
         ArrayList<Integer> indices = new ArrayList<>();
         String[] indexAux;
         if (!index.equals("")) {
@@ -430,7 +438,15 @@ public class TablaVariables {
         return "LIST";
     }
 
-    private String checkDel(CeldaTablaIgualdades igualdad) throws ParseException {
+    private String checkDel(CeldaTablaIgualdades igualdad, String id) throws ParseException {
+        ArrayList<Integer> aux = new ArrayList<>();
+        aux.add(Integer.parseInt(igualdad.getContenido().get(1)));
+        checkIndexAux(aux,id);
+        if (igualdad.getContenido().size() == 3){
+            if (!igualdad.getContenido().get(2).equals("1") && !igualdad.getContenido().get(2).equals("0")){
+                generateError(13,id+"-"+igualdad.getContenido().get(2));
+            }
+        }
         return "LIST";
     }
 
@@ -462,7 +478,7 @@ public class TablaVariables {
                         break;
                     }
                     if (valor.equals("del")) {
-                        tiposOp = checkDel(igualdad);
+                        tiposOp = checkDel(igualdad,idVar);
                         flagAccess = true;
                         if (!variablesDefinidas.contains(idVar)) {
                             generateError(0, idVar);

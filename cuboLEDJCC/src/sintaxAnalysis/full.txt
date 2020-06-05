@@ -19,14 +19,11 @@ i = list(range(5, true)) ;
 p = i[1:4];
 ah = [];
 ah.insert([[true], [true] , [true]], 1);
-l = [];
-l.insert(2,false);
-m = [];
-m.insert(len(a[1][t]),false);
+
 al = [];
-al.del(0,0);
+
 n= [];
-n.del(2) ;
+
 o, p = i.shapeF,[];
 q = [true,false];
 q[1].Neg;

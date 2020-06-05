@@ -2,27 +2,12 @@ Timer = 1; --szgfzgfvzdg
 Rango_Timer = Seg;
 Dim_Filas = 12;
 Dim_Columnas = 2;
-Cubo = p;
-
-Procedure pa(a,b,c){
-a =1;
-if a == 1{
-b = a +2+a;
-}
-for a in 10{
-b=2;
-}
-}
+Cubo = a;
 
 Procedure lo(){
-c=[];
-for a in 10{
-for a in c Step 2{
-b=2;
-}
-}
-}
-
-Procedure qwe(apedo){
-m = [];
+l = [true,false];
+l.del(0);
+l.insert(2,false);
+l.insert([[true, false, true]], 0);
+l.insert([[false, false, false, false]], 0, 0);
 }
