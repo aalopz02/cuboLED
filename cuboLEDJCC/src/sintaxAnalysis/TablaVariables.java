@@ -22,6 +22,7 @@ public class TablaVariables {
     private ArrayList<Lista> matrices = new ArrayList<>();
     private ArrayList<Integer> indexMatriz = new ArrayList<>();
     public String log = "OK";
+    private ArrayList<Integer> addExtra = new ArrayList<>();
 
     TablaVariables() {
         validTypes.add("BOOL"); //0
@@ -45,6 +46,12 @@ public class TablaVariables {
 
     public void agregarIndiceAcceso(String index) {
         tabla.get(tabla.size() - 1).setIndex(index);
+    }
+
+    public void agregarProc(int line, String id, boolean dcl) {
+        CeldaTablaProc cell = new CeldaTablaProc(id, dcl);
+        cell.setLineNumber(line);
+        tablaProc.add(cell);
     }
 
     public void agregarProc(String id, boolean dcl) {
@@ -113,8 +120,18 @@ public class TablaVariables {
                 String idVar = tablaProc.get(indexProc).getParam().get(i);
                 CeldaTablaVariables cellV = new CeldaTablaVariables(-5,idVar,0);
                 CeldaTablaIgualdades cellIg = params.get(i);
-                tabla.add(cellV);
-                tablaIgualdades.add(cellIg);
+                cellIg.checkList();
+                variablesDefinidas.add(cellV.getId());
+                if (cellIg.getContenido().get(0).equals("NUM")){
+                    types.add("NUM");
+                } else if (cellIg.getContenido().get(0).equals("BOOL")){
+                    types.add("BOOL");
+                } else {
+                    types.add("LIST");
+                }
+                scopeVars.add(0);
+                indexMatriz.add(variablesDefinidas.indexOf(idVar));
+                matrices.add(variablesDefinidas.indexOf(idVar), cellIg.getLista());
             }
         } else {
             generateError(12,idProcCall+"-"+String.valueOf(cantParamCall));
@@ -286,7 +303,6 @@ public class TablaVariables {
                     return "BOOL";
                 } else {
                     return "LIST";
-
                 }
             } catch (IndexOutOfBoundsException e) {
                 generateError(5, id);
@@ -461,7 +477,6 @@ public class TablaVariables {
             String type = "";
             String tiposOp = "NA";
             boolean flagAccess = false;
-
             if (numbVar == -2) {
                 igualdad = tablaIgualdades.get(i + 1);
                 contenidoIg = igualdad.getContenido();

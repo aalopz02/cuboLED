@@ -22,6 +22,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
         public static Grafo grafo;
         private static SyntaxChecker checker = null;
+                public static String idMatrizCubo;
 
     public static String initAnalisys(String in) {
         grafo = new Grafo();
@@ -55,6 +56,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                 log += varsCheck;
             }
             System.out.println(log);
+                        Creatorpy.initWriter(grafo,constantesConfig);
         } catch (Throwable e) {
             System.out.println("Syntax check failed: " + e.getMessage());
             log = e.getMessage();
@@ -88,7 +90,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
             System.out.println("Syntax is okay");
             tablaVariables.imprimirIDS();
             tablaVariables.checkVariables();
-            Creatorpy.initWriter(grafo);
+            Creatorpy.initWriter(grafo,constantesConfig);
 
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
@@ -376,7 +378,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       break;
     case LENGTH:
       FuncionLen();
-                                                                                        valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("LIST",indiceAcceso); indiceAcceso = "";
+                                                                                        valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";
       break;
     default:
       jj_la1[11] = jj_gen;
@@ -454,11 +456,6 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     case 46:
       jj_consume_token(46);
                                  indiceAcceso+=":";
-      Numeros();
-      break;
-    case 8:
-      jj_consume_token(8);
-                                                                      indiceAcceso+=",";
       Numeros();
       break;
     case NUM:
@@ -697,12 +694,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void FuncionLen() throws ParseException {
                     Token aux;
     jj_consume_token(LENGTH);
-                                            valoresIgualdadTabla.add("len"); grafo.addNodo("LEN","len");
+                                            valoresIgualdadTabla.add("len"); grafo.addNodo("LEN","len(");
     jj_consume_token(6);
     aux = jj_consume_token(ID);
-                                                                                                                          indiceAcceso+=aux.image;
+                                                                                                                           indiceAcceso+=aux.image;
     Listas();
     jj_consume_token(7);
+                                                                                                                                                                   grafo.addNodo("VAR",indiceAcceso); grafo.addNodo("CLOSEPAR",")");
   }
 
   static final public void Iterable() throws ParseException {
@@ -830,7 +828,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     jj_consume_token(CUBO);
     jj_consume_token(9);
     i = jj_consume_token(ID);
-                                               constantesConfig.add(i.image);
+                                               constantesConfig.add(i.image); idMatrizCubo = i.image;
     jj_consume_token(43);
   }
 
@@ -984,12 +982,12 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ID:
       id = jj_consume_token(ID);
-                                          tablaVariables.agregarProc(id.image, true); grafo.addNodo("ID",id.image);
+                                          tablaVariables.agregarProc(numeroVariable,id.image, true); grafo.addNodo("ID",id.image);
       normalProc();
       break;
     case MAIN:
       id = jj_consume_token(MAIN);
-                                                                                                                                                 checkMainDefined(0,id); inMain = 1; grafo.addNodo("ID",id.image);
+                                                                                                                                                              checkMainDefined(0,id); inMain = 1; grafo.addNodo("MAIN","main");
       mainProc();
       break;
     default:
@@ -1023,10 +1021,9 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     jj_consume_token(6);
     jj_consume_token(7);
     jj_consume_token(10);
-                                  grafo.addNodo("MAINPAR","()"); grafo.addNodo("OPENSCOPE","{");
     Exp();
     jj_consume_token(11);
-                                                                                                             inMain = 0; scope = 0; grafo.addNodo("CLOSESCOPE","}");
+                                            inMain = 0; scope = 0; grafo.addNodo("CLOSESCOPE","}");
   }
 
   static final public void Call() throws ParseException {
@@ -1117,7 +1114,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1,0x0,0xc0000000,0x1f000000,0x1200,0x100,0x1000,0x0,0x0,0x2040,0x0,0x20204040,0x100,0x200000,0x20002000,0x20002100,0x4000,0x100,0x7000000,0x18000000,0x20202100,0x100,0x100,0x4000,0x1000,0x20002000,0x0,0x20002000,0x1000,0x20006000,0x2000,0x0,0x6000,0x2000,0x100,0x400000,0x0,0x100,0x0,};
+      jj_la1_0 = new int[] {0x1,0x0,0xc0000000,0x1f000000,0x1200,0x100,0x1000,0x0,0x0,0x2040,0x0,0x20204040,0x100,0x200000,0x20002000,0x20002000,0x4000,0x100,0x7000000,0x18000000,0x20202100,0x100,0x100,0x4000,0x1000,0x20002000,0x0,0x20002000,0x1000,0x20006000,0x2000,0x0,0x6000,0x2000,0x100,0x400000,0x0,0x100,0x0,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x102,0x102,0x125,0x0,0x0,0x0,0x200,0x200,0x200,0x100,0x200,0x1000,0x0,0x1000,0x4100,0x4100,0x0,0x0,0x0,0x0,0x1100,0x0,0x0,0x0,0x0,0x100,0xc0,0x100,0x1000,0x100,0x0,0x1000,0x0,0x4000,0x4000,0x100,0x100,0x0,0x10,};

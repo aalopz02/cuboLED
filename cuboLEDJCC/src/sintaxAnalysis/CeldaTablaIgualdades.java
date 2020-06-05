@@ -88,6 +88,7 @@ public class CeldaTablaIgualdades {
             return;
         }
         for (String valor : contenido) {
+            if (valor.equals("len")) return;
             valor = valor.replace("true", "B");
             valor = valor.replace("false", "B");
             valor = valor.substring(1);

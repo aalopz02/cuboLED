@@ -13,12 +13,15 @@ public class Creatorpy {
     private static String filePy = "src/temp/cubo_compi1.py";
     private static String templateFile = "src/temp/template.py";
     private static Nodo aux;
-    private static int lineStart = 20;
+    private static int lineStart = 370;
+    private static int lineMain = 377;
     private static int scope = 0;
     private static PrintWriter pw;
     private static FileWriter fichero;
-    private static String templateCOMS;
+    private static String templateRest;
     private static String templateFuncs;
+    private static String mainHeader;
+    private static ArrayList<String> constantes;
 
 
     private static void rewriteFile() {
@@ -26,20 +29,29 @@ public class Creatorpy {
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String st;
-            templateCOMS = "";
+            templateFuncs = "";
+            templateRest = "";
+            mainHeader = "";
             int line = 0;
             while ((st = br.readLine()) != null) {
-                templateCOMS += st;
-                templateCOMS += '\n';
+                templateFuncs += st;
+                templateFuncs += '\n';
                 line++;
                 if (line >= lineStart){
                     break;
                 }
             }
-            templateFuncs = "";
+            while ((st = br.readLine()) != null){
+                if (line >= lineMain){
+                    break;
+                }
+                mainHeader+=st;
+                mainHeader+="\n";
+                line++;
+            }
             while ((st = br.readLine()) != null) {
-                templateFuncs += st;
-                templateFuncs += '\n';
+                templateRest += st;
+                templateRest += '\n';
             }
         } catch (IOException e){
             System.out.println("Error al leer template");
@@ -64,7 +76,7 @@ public class Creatorpy {
         if (aux.getTipo().equals("NUM")){
             pw.print(aux.getContenido());
         } else {
-            pw.print("len(");
+            pw.print("getLen(");
             pw.print(aux.getContenido());
             pw.print(")");
         }
@@ -178,12 +190,13 @@ public class Creatorpy {
     }
 
     private static void writeDelay(){
-        write(aux.getContenido());
         aux=aux.getNext();
-        pw.print("(");
         if (aux.getTipo().equals("ENDLINE")){
-            pw.print(")");
+            write("delayDefault()");
             return;
+        }else{
+            write(aux.getPrev().getContenido());
+            pw.print("(");
         }
         pw.print(aux.getContenido());
         pw.print(",");
@@ -199,7 +212,91 @@ public class Creatorpy {
         aux=aux.getNext();
     }
 
-    public static boolean initWriter(Grafo in) throws IOException {
+    private static void writeConstantes(){
+        pw.print("timer = " + constantes.get(0));
+        pw.println("");
+        pw.print("rango_timer = ");
+        if (constantes.get(1).equals("Seg")){
+            pw.print(1);
+        } else if (constantes.get(1).equals("Mil")){
+            pw.print(2);
+        } else {
+            pw.print(3);
+        }
+        pw.println("");
+        pw.print(constantes.get(4)+"=matriz_cubo");
+        pw.println("");
+    }
+
+    private static void writeShape(){
+        pw.print(aux.getContenido());
+        pw.print("(");
+        pw.print(aux.getPrev().getPrev().getContenido());
+        pw.print(")");
+        aux=aux.getNext();
+    }
+
+    private static String getIndex(String contenido){
+        String[] indexAux;
+        contenido = contenido.replace("]", "");
+        indexAux = contenido.split("\\[");
+        try {
+            pw.print(indexAux[1]);
+            pw.print(",");
+        } catch (IndexOutOfBoundsException e){
+            pw.print("True");
+            pw.print(",");
+        }
+        try {
+            pw.print(indexAux[2]);
+            pw.print(",");
+        } catch (IndexOutOfBoundsException e){
+            pw.print("True");
+            pw.print(",");
+        }
+        try {
+            pw.print(indexAux[3]);
+        } catch (IndexOutOfBoundsException e){
+            pw.print("True");
+        }
+        return "indice";
+    }
+
+    private static void writeBlink(){
+        write("blink_func(");
+        aux=aux.getNext();
+        getIndex(aux.getContenido());
+        pw.print(",");
+        aux=aux.getNext();
+        if (aux.getTipo().equals("NUM")){
+            pw.print(aux.getContenido());
+            pw.print(",");
+            aux=aux.getNext();
+            if (aux.getContenido().equals("Seg")){
+                pw.print(1);
+            } else if (constantes.get(1).equals("Mil")){
+                pw.print(2);
+            } else {
+                pw.print(3);
+            }
+            aux=aux.getNext();
+            pw.print(",");
+
+        } else {
+            pw.print("-1");
+            pw.print(",");
+            pw.print("-1");
+            pw.print(",");
+        }
+        aux.setContenido(aux.getContenido().replace("true","True"));
+        aux.setContenido(aux.getContenido().replace("false","False"));
+        pw.print(aux.getContenido());
+        aux=aux.getNext();
+        pw.print(")");
+    }
+
+    public static boolean initWriter(Grafo in,ArrayList<String> constantesIn) throws IOException {
+        constantes = constantesIn;
         rewriteFile();
         File f = new File(filePy);
         if(f. exists()) {
@@ -214,9 +311,11 @@ public class Creatorpy {
         grafo = in;
         aux = grafo.getInicial();
         boolean flagNL = true;
+        boolean inMain = false;
         try {
             pw = new PrintWriter(fichero);
             pw.print(templateFuncs);
+            writeConstantes();
             pw.println("");
             while (aux != null) {
                 aux = aux.getNext();
@@ -248,17 +347,35 @@ public class Creatorpy {
                     aux.setContenido(":\n");
                     flagNL=true;
                 }
+                if (aux.getTipo().equals("BLINK")){
+                    writeBlink();
+                }
                 if (aux.getNext() != null){
-                    if (aux.getNext().getTipo().equals("FUN.DEL")){
+                    if (aux.getNext().getTipo().equals("MAIN")){
+                        scope=1;
+                        pw.print(mainHeader);
+                        aux=aux.getNext().getNext();
+                        inMain = true;
+                    } else if (aux.getNext().getTipo().equals("FUN.DEL")){
                         writeDel();
                     }else if (aux.getNext().getTipo().equals("FUN.INSERTLIST")){
                         writeInsert();
                     } else if (aux.getNext().getTipo().equals("FUN.INSERTMAT")){
                         writeInsertMat();
+                    } else if (aux.getNext().getNext() != null){
+                        if (aux.getNext().getNext().getTipo().equals("SHAPE")){
+                            aux = aux.getNext().getNext();
+                            writeShape();
+                        }
                     }
                 }
                 if (aux.getTipo().equals("CLOSESCOPE") || aux.getTipo().equals("ENDLINE")){
-                    if (aux.getTipo().equals("CLOSESCOPE")) scope--;
+                    if (aux.getTipo().equals("CLOSESCOPE")) {
+                        scope--;
+                        if (inMain && scope==0){
+                            pw.println(templateRest);
+                        }
+                    }
                     flagNL=true;
                     pw.println("");
                 } else {
@@ -280,8 +397,6 @@ public class Creatorpy {
 
                 }
             }
-            pw.println("");
-            pw.print(templateCOMS);
             fichero.close();
             pw.close();
         } catch (Exception e) {

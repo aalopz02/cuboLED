@@ -8,6 +8,7 @@ public class CeldaTablaProc {
     private ArrayList<String> param = null;
     private boolean dcl;
     private ArrayList<CeldaTablaIgualdades> var = null;
+    private int lineNumber;
 
     CeldaTablaProc(String id, boolean dcl){
         this.id = id;
@@ -55,4 +56,11 @@ public class CeldaTablaProc {
         this.dcl = dcl;
     }
 
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
 }
