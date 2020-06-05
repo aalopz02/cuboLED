@@ -126,3 +126,13 @@ def insertMatriz(lista,valor,tipo,indice):
 
 def insertLista(lista,valor,indice):
     lista.insert(indice,valor)
+
+import time
+
+def delay(period,unit):
+    if (unit == 1):
+        time.sleep(period)
+    elif (unit == 2):
+        time.sleep(period/1000)
+    else:
+        time.sleep(period*60)

@@ -107,6 +107,16 @@ def insertMatriz(lista,valor,tipo,indice):
 def insertLista(lista,valor,indice):
     lista.insert(indice,valor)
 
+import time
+
+def delay(period,unit):
+    if (unit == 1):
+        time.sleep(period)
+    elif (unit == 2):
+        time.sleep(period/1000)
+    else:
+        time.sleep(period*60)
+
 x=1
 y=0
 a=x+y*10/4
@@ -155,7 +165,7 @@ def miproc(z,x,y,g,h):
 	m=[True,False]
 	if u[:,1]==True:
 		ad=m[1]
-		blinku[0]True
+		delay()
 
 
 def Main():
@@ -167,12 +177,11 @@ def Main():
 			if a!=1:
 				delete(u,0,0)
 				delete(u,1,0)
-				blinka[1]True
-				blinka[1]False
+				delay(6,1)
 
 
 
-	blinka[1][a]5SegTrue
+	delay(5,2)
 
 
 while True:

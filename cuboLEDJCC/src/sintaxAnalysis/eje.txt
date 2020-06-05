@@ -52,7 +52,7 @@ Procedure miproc(z,x,y,g,h){
     m =[true,false];
     if  u[:, 1] ==  true {
         ad = m[1];
-        Blink(u[0],true);
+        Delay();
     }
 }
 
@@ -66,13 +66,11 @@ Procedure Main()  {
             if  a <> 1{
                  u.del(0,0);
                  u.del(1,0);
-                 Blink(a[1],true);
-                 Blink(a[1],false);
+                 Delay(6,Seg);
             }
 
         }
     }
-    Blink(a[1][a],5,Seg,true);
-
+    Delay(5,Mil);
 }
 

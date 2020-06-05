@@ -177,6 +177,28 @@ public class Creatorpy {
         aux=aux.getNext();
     }
 
+    private static void writeDelay(){
+        write(aux.getContenido());
+        aux=aux.getNext();
+        pw.print("(");
+        if (aux.getTipo().equals("ENDLINE")){
+            pw.print(")");
+            return;
+        }
+        pw.print(aux.getContenido());
+        pw.print(",");
+        aux=aux.getNext();
+        if (aux.getContenido().equals("Seg")){
+            pw.print(1);
+        } else if (aux.getContenido().equals("Mil")){
+            pw.print(2);
+        } else {
+            pw.print(3);
+        }
+        pw.print(")");
+        aux=aux.getNext();
+    }
+
     public static boolean initWriter(Grafo in) throws IOException {
         rewriteFile();
         File f = new File(filePy);
@@ -217,6 +239,9 @@ public class Creatorpy {
                 }
                 if (aux.getTipo().equals("CALL")){
                     aux = aux.getNext();
+                }
+                if (aux.getTipo().equals("DELAY")){
+                    writeDelay();
                 }
                 if (aux.getTipo().equals("OPENSCOPE")){
                     scope++;
