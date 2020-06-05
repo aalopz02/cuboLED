@@ -107,8 +107,6 @@ def insertMatriz(lista,valor,tipo,indice):
 def insertLista(lista,valor,indice):
     lista.insert(indice,valor)
 
-import time
-
 def delay(period,unit):
     if (unit == 1):
         time.sleep(period)
