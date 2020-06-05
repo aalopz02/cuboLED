@@ -4,10 +4,75 @@ Dim_Filas = 12;
 Dim_Columnas = 2;
 Cubo = a;
 
-Procedure lo(){
-l = [true,false];
-l.del(0);
-l.insert(2,false);
-l.insert([[true, false, true]], 0);
-l.insert([[false, false, false, false]], 0, 0);
+x = 1;
+y = 0;
+a = x + y * 10 / 4 ;
+b = x + ((y * 10) / 4);
+c=  ((x + y) * 10) / 4;
+d, da = 20, 15;
+e = true;
+f = list(range(5,false));
+g = f[0] ;
+h = f[4];
+i = list(range(5, true)) ;
+p = i[1:4];
+ah = [];
+ah.insert([[true], [true] , [true]], 1);
+al = [];
+n= [];
+o, p = i.shapeF,[];
+q = [true,false];
+q[1].Neg;
+r = [true,false];
+r[1].T;
+r[0].F;
+t = [true,false,true];
+a = 1;
+var1 = 2;
+t[var1].Neg;
+u = [[[true,false],[true,false]],[[true,false],[true,false]],[[true,false],[true,false]]];
+le = [[[true,false],[true,false]],[[true,false],[true,false]],[[true,false],[true,false]]];
+u[1][1][1] = le[1][1][1];
+y = 1;
+ac = 23;
+
+Procedure p1(a,b,c)  {
+    for x in u {
+        a = 1;
+        for b in u Step 2{
+            u.del(1,0);
+        }
+    }
+	u.insert([[true, false, true]],  0);
+	u.insert([[true], [true] , [true]], 1);
+	u.insert([[false, false, false, false]],  0, 0);
 }
+
+Procedure miproc(z,x,y,g,h){
+    m =[true,false];
+    if  u[:, 1] ==  true {
+        ad = m[1];
+        Blink(u[0],true);
+    }
+}
+
+
+Procedure Main()  {
+    if var == 2 {
+        Call miproc(1,a,m[:,1],[[true], [true] , [true] , [true]],true);
+    }
+    for xy in a {
+        for bq in u Step 2{
+            if  a <> 1{
+                 u.del(0,0);
+                 u.del(1,0);
+                 Blink(a[1],true);
+                 Blink(a[1],false);
+            }
+
+        }
+    }
+    Blink(a[1][a],5,Seg,true);
+
+}
+

@@ -107,12 +107,72 @@ def insertMatriz(lista,valor,tipo,indice):
 def insertLista(lista,valor,indice):
     lista.insert(indice,valor)
 
-def lo():
-	l=[True,False]
-	delete(l,0,0)
-	insertLista(l,2,False)
-	insertMatriz(l,[[True,False,True]],0,-1)
-	insertMatriz(l,[[False,False,False,False]],0,0)
+x=1
+y=0
+a=x+y*10/4
+b=x+((y*10)/4)
+c=((x+y)*10)/4
+d,da=20,15
+e=True
+f=[]
+crear_lista(f,5,False)
+g=f[0]
+h=f[4]
+i=[]
+crear_lista(i,5,True)
+p=i[1:4]
+ah=[]
+insertMatriz(ah,[[True],[True],[True]],1,-1)
+al=[]
+n=[]
+o,p=i.shapeF,[]
+q=[True,False]
+q[1]=neg_func(q[1])
+r=[True,False]
+r[1]=hacer_true(r[1])
+r[0]=hacer_false(r[0])
+t=[True,False,True]
+a=1
+var1=2
+t[var1]=neg_func(t[var1])
+u=[[[True,False],[True,False]],[[True,False],[True,False]],[[True,False],[True,False]]]
+le=[[[True,False],[True,False]],[[True,False],[True,False]],[[True,False],[True,False]]]
+u[1][1][1]=le[1][1][1]
+y=1
+ac=23
+def p1(a,b,c):
+	for x in range(0,len(u),1):
+		a=1
+		for b in range(0,len(u),2):
+			delete(u,1,0)
+
+
+	insertMatriz(u,[[True,False,True]],0,-1)
+	insertMatriz(u,[[True],[True],[True]],1,-1)
+	insertMatriz(u,[[False,False,False,False]],0,0)
+
+def miproc(z,x,y,g,h):
+	m=[True,False]
+	if u[:,1]==True:
+		ad=m[1]
+		blinku[0]True
+
+
+def Main():
+	if var==2:
+		miproc(1,a,m[:,1],[[True],[True],[True],[True]],True)
+
+	for xy in range(0,len(a),1):
+		for bq in range(0,len(u),2):
+			if a!=1:
+				delete(u,0,0)
+				delete(u,1,0)
+				blinka[1]True
+				blinka[1]False
+
+
+
+	blinka[1][a]5SegTrue
 
 
 while True:

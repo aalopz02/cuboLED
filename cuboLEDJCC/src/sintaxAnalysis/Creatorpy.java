@@ -149,10 +149,6 @@ public class Creatorpy {
         pw.write(")");
         aux=aux.getNext();
     }
-    //insertMatriz(f,[[True],[False],[True]],-1,1)
-//	print(f)
-//	insertMatriz(f,[[True],[False],[True]],-1,1)
-//	print(f)
 
     public static void writeInsertMat(){
         write(aux.getNext().getContenido());
@@ -164,10 +160,6 @@ public class Creatorpy {
             aux.setContenido(aux.getContenido().replace("true","True"));
             aux.setContenido(aux.getContenido().replace("false","False"));
         }
-        //	insertMatriz(f,[[True],[True],[True]],/0,1)
-        //linsertLista(2False
-//	linsertMatriz([[True,False,True]]0
-//	linsertMatriz([[False,False,False,False]]00
         pw.write(aux.getContenido());
         aux=aux.getNext();
         pw.write(",");
@@ -222,6 +214,9 @@ public class Creatorpy {
                 }
                 if (aux.getTipo().equals("FUNCLIST")){
                     listFunc();
+                }
+                if (aux.getTipo().equals("CALL")){
+                    aux = aux.getNext();
                 }
                 if (aux.getTipo().equals("OPENSCOPE")){
                     scope++;

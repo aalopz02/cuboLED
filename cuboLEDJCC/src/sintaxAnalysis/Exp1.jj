@@ -306,23 +306,21 @@ void Cubo(): {Token i;} { <CUBO> "=" i = <ID> {constantesConfig.add(i.image);} "
 
 void Empty() : {} { {} } 
 
-void Delay_Function(): {} {"Delay"  "(" Delay_Expression() ")" ";"}
+void Delay_Function(): {} {"Delay"  {grafo.addNodo("DELAY","delay");} "(" Delay_Expression() ")" ";" {grafo.addNodo("ENDLINE","");}}
 
-void Delay_Expression(): {} {<NUM> "," <OPCIONESRANGO> |  Empty() }
+void Delay_Expression(): {Token aux;} {aux = <NUM> {grafo.addNodo("NUM",aux.image);} "," aux = <OPCIONESRANGO> {grafo.addNodo("RANGEPARAM",aux.image);} |  Empty() }
 
-void Blink_Function(): {} { {tablaVariables.agregarProc("Blink",false); indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>();} "Blink" "("  Blink_Expression() ")" ";"}
+void Blink_Function(): {} { {indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>(); grafo.addNodo("BLINK","blink");} "Blink" "("  Blink_Expression() ")" ";" {grafo.addNodo("ENDLINE",""); indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>(); }}
 
 void ListaBlink(): {} { "[" {indiceAcceso += "[";} Numeros() "]" {indiceAcceso += "]";} ListaBlink() | Empty()}
 
 void Blink_Expression(): {Token id;} {id=<ID> {indiceAcceso+=id.image; indiceAcceso+="[";} "[" Numeros() "]"
-							{indiceAcceso+="]";} ListaBlink() {valoresIgualdadTabla.add(indiceAcceso); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} "," Blink_Expression_Aux()  }
+							{indiceAcceso+="]";} ListaBlink() {valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("VAR",indiceAcceso);} "," Blink_Expression_Aux()  }
 
-void Blink_Expression_Aux(): {Token num;}{ {valoresIgualdadTabla = new ArrayList<String>();}
-													(num=<NUM> {valoresIgualdadTabla.add(num.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} Blink_Expression_Aux1() 
-													|<BOOL> {valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);})}
+void Blink_Expression_Aux(): {Token num; Token bool;}{ num=<NUM> {grafo.addNodo("NUM",num.image);} Blink_Expression_Aux1() | bool = <BOOL> {grafo.addNodo("BOOL",bool.image);}}
 
-void Blink_Expression_Aux1(): {Token range;}{"," {valoresIgualdadTabla = new ArrayList<String>();} range= <OPCIONESRANGO> {valoresIgualdadTabla.add(range.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} 
-														"," {valoresIgualdadTabla = new ArrayList<String>();} <BOOL> {valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);} }
+void Blink_Expression_Aux1(): {Token range; Token bool;}{ "," range= <OPCIONESRANGO> {grafo.addNodo("RANGEPARAM",range.image);} 
+														"," bool = <BOOL> {grafo.addNodo("BOOL",bool.image);} }
 
 void Adentro_Lista(): {Token num;} {(num=<NUM> {indiceAcceso+=num.image;} | num = ":" {indiceAcceso+=num.image;} ) Adentro_Lista_Aux1() }
 
@@ -336,7 +334,7 @@ void normalProc(): {} {"(" {grafo.addNodo("OPENPAR","(");} (Parametros() | Empty
 
 void mainProc(): {} {"(" ")" "{" {grafo.addNodo("MAINPAR","()"); grafo.addNodo("OPENSCOPE","{");} Exp() "}" {inMain = 0; scope = 0; grafo.addNodo("CLOSESCOPE","}");}}
 
-void Call():{Token id;} {"Call" {grafo.addNodo("CALL","call");} id=<ID> {grafo.addNodo("ID",id.image); tablaVariables.agregarProc(id.image,false); inCall = true;} "(" (Igualdad()) ")" ";" { inCall = false; tablaVariables.checkProc();}}
+void Call():{Token id;} {"Call" {grafo.addNodo("CALL","call");} id=<ID> {grafo.addNodo("ID",id.image); tablaVariables.agregarProc(id.image,false); inCall = true;} "(" {grafo.addNodo("OPENPAR","(");} (Igualdad()) ")" {grafo.addNodo("CLOSEPAR",")");} ";" { inCall = false; tablaVariables.checkProc(); grafo.addNodo("ENDLINE","");}}
 
 void Parametros(): {Token id;} { id = <ID> {tablaVariables.agregarParamProc(id.image); grafo.addNodo("ID",id.image);} ParametrosAux()}
 

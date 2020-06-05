@@ -840,18 +840,23 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
 
   static final public void Delay_Function() throws ParseException {
     jj_consume_token(34);
+                                     grafo.addNodo("DELAY","delay");
     jj_consume_token(6);
     Delay_Expression();
     jj_consume_token(7);
     jj_consume_token(43);
+                                                                                                      grafo.addNodo("ENDLINE","");
   }
 
   static final public void Delay_Expression() throws ParseException {
+                          Token aux;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUM:
-      jj_consume_token(NUM);
+      aux = jj_consume_token(NUM);
+                                                    grafo.addNodo("NUM",aux.image);
       jj_consume_token(8);
-      jj_consume_token(OPCIONESRANGO);
+      aux = jj_consume_token(OPCIONESRANGO);
+                                                                                                                grafo.addNodo("RANGEPARAM",aux.image);
       break;
     default:
       jj_la1[30] = jj_gen;
@@ -860,12 +865,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void Blink_Function() throws ParseException {
-                             tablaVariables.agregarProc("Blink",false); indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>();
+                             indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>(); grafo.addNodo("BLINK","blink");
     jj_consume_token(37);
     jj_consume_token(6);
     Blink_Expression();
     jj_consume_token(7);
     jj_consume_token(43);
+                                                                                                                                                                        grafo.addNodo("ENDLINE",""); indiceAcceso=""; valoresIgualdadTabla = new ArrayList<String>();
   }
 
   static final public void ListaBlink() throws ParseException {
@@ -893,23 +899,22 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     jj_consume_token(45);
                                                          indiceAcceso+="]";
     ListaBlink();
-                                                                                           valoresIgualdadTabla.add(indiceAcceso); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+                                                                                           valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("VAR",indiceAcceso);
     jj_consume_token(8);
     Blink_Expression_Aux();
   }
 
   static final public void Blink_Expression_Aux() throws ParseException {
-                              Token num;
-                                            valoresIgualdadTabla = new ArrayList<String>();
+                              Token num; Token bool;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUM:
       num = jj_consume_token(NUM);
-                                                                                                                    valoresIgualdadTabla.add(num.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+                                                                  grafo.addNodo("NUM",num.image);
       Blink_Expression_Aux1();
       break;
     case BOOL:
-      jj_consume_token(BOOL);
-                                                                                                                 valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+      bool = jj_consume_token(BOOL);
+                                                                                                                                            grafo.addNodo("BOOL",bool.image);
       break;
     default:
       jj_la1[32] = jj_gen;
@@ -919,15 +924,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   }
 
   static final public void Blink_Expression_Aux1() throws ParseException {
-                               Token range;
+                               Token range; Token bool;
     jj_consume_token(8);
-                                                  valoresIgualdadTabla = new ArrayList<String>();
     range = jj_consume_token(OPCIONESRANGO);
-                                                                                                                           valoresIgualdadTabla.add(range.image); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+                                                                                      grafo.addNodo("RANGEPARAM",range.image);
     jj_consume_token(8);
-                                                                                                                     valoresIgualdadTabla = new ArrayList<String>();
-    jj_consume_token(BOOL);
-                                                                                                                                                                              valoresIgualdadTabla.add("BOOL"); tablaVariables.agregarParamProc(valoresIgualdadTabla,scope);
+    bool = jj_consume_token(BOOL);
+                                                                                                                                   grafo.addNodo("BOOL",bool.image);
   }
 
   static final public void Adentro_Lista() throws ParseException {
@@ -1033,10 +1036,12 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     id = jj_consume_token(ID);
                                                                          grafo.addNodo("ID",id.image); tablaVariables.agregarProc(id.image,false); inCall = true;
     jj_consume_token(6);
+                                                                                                                                                                        grafo.addNodo("OPENPAR","(");
     Igualdad();
     jj_consume_token(7);
+                                                                                                                                                                                                                         grafo.addNodo("CLOSEPAR",")");
     jj_consume_token(43);
-                                                                                                                                                                                              inCall = false; tablaVariables.checkProc();
+                                                                                                                                                                                                                                                               inCall = false; tablaVariables.checkProc(); grafo.addNodo("ENDLINE","");
   }
 
   static final public void Parametros() throws ParseException {
