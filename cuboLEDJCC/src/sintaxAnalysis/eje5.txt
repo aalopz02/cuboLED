@@ -80,23 +80,3 @@ Timer = 15;
 --F14		Modificar matriz 3D con otra 3D
 			matriz3D[1][1][1] = mi_variabl[1][1][1];
 
-
-
-
-Procedure enciende () {
-x = [];
-x = [true, true, false, false, false, false, true, true, true, true];
-
-for var1 in  len(x)  {
-
-if X[x,y] ==False
-{
-X[x,y].Neg;
-
-}
-}
-Cubo[1] = X
-}
-
-
---A5 SIN MAIN

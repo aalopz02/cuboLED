@@ -212,7 +212,7 @@ void Exp(): {} {
 }
 
 
-void Inicial(): {Token aux;} { Identificadores() ( "." (OperacionesListas() | FuncionesListas()) | aux = "="  {grafo.addNodo("DCL","="); checkMainDCL(aux);} Igualdad() {checkSameLineDCL(aux);} | Empty()) ";" {grafo.addNodo("ENDLINE","");}}
+void Inicial(): {Token aux;} { Identificadores() ( "." (OperacionesListas() | FuncionesListas()) | aux = "="  {grafo.addNodo("DCL","="); checkMainDCL(aux);} Igualdad() {checkSameLineDCL(aux);} | Empty() {tablaVariables.agregarIgualdad(-99,0,"");}) ";" {grafo.addNodo("ENDLINE","");}}
 
 void type(): {Token aux;}{"type(" aux=<ID> ")" ";" {grafo.addNodo("TYPE","type(" + aux.image + ");"); grafo.addNodo("ENDLINE","");}}
 
