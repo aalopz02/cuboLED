@@ -243,7 +243,7 @@ public class Creatorpy {
             pw.print(indexAux[1] + "," + indexAux[2] + "," + indexAux[3]);
         }
         pw.print(",");
-        pw.print("Indice_" + indexAux[0]);
+        pw.print("Indices_" + indexAux[0]);
     }
 
     private static void writeBlink(){
