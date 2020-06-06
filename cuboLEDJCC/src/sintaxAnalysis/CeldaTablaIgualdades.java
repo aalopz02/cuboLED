@@ -40,6 +40,38 @@ public class CeldaTablaIgualdades {
         setContenido(contenido);
     }
 
+    CeldaTablaIgualdades(int numeroVariable, int Scope, String contenido,  int x, int y){
+        setNumeroVariable(numeroVariable);
+        setScope(Scope);
+        this.contenido = new ArrayList<String>();
+        String matriz3d = "[";
+        for (int k = 0; k < y; k++){
+            String matriz = "[";
+            for (int i = 0; i < x; i++){
+                String lista = "[";
+                for (int j = 0; j < x; j++){
+                    lista+="false";
+                    if (j < x){
+                        lista+=",";
+                    }
+                }
+                lista+="]";
+                matriz+=lista;
+                if (i < x){
+                    matriz+=",";
+                }
+            }
+            matriz += "]";
+            matriz3d+=matriz;
+            if (k < y){
+                matriz3d+=",";
+            }
+        }
+        matriz3d+="]";
+        System.out.println(matriz3d);
+        this.contenido.add(matriz3d);
+    }
+
     public int getNumeroVariable() {
         return numeroVariable;
     }

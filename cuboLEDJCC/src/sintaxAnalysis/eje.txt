@@ -2,8 +2,9 @@ Timer = 1; --szgfzgfvzdg
 Rango_Timer = Seg;
 Dim_Filas = 6;
 Dim_Columnas = 6;
-Cubo = cubo;
+Cubo = cubpo;
 
+cubpo[0][0][0] = true;
 x = 1;
 y = 0;
 a = x + y * 10 / 4 ;

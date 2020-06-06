@@ -15,6 +15,7 @@ public class CeldaTablaVariables {
         setScope(Scope);
     }
 
+
     public int getNumeroVariable() {
         return numeroVariable;
     }

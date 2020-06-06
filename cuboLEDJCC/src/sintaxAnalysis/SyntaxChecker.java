@@ -146,9 +146,9 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         }
 
         static void addIdMatriz(){
-                tablaVariables.addMatrizId(idMatrizCubo);
-                tablaVariables.agregarVariable(0,idMatrizCubo,0);
-                tablaVariables.agregarIgualdad(0,0,"[]");
+        tablaVariables.agregarVariable(0,idMatrizCubo,0);
+        tablaVariables.agregarIgualdad(0,0,"[]",constantesConfig);
+
         }
 
   static final public void INICIAR() throws ParseException {
@@ -261,9 +261,15 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void Identificadores() throws ParseException {
                          Token id;
     id = jj_consume_token(ID);
-                                                                                                tablaVariables.agregarVariable(numeroVariable,id.image,scope);
-                                                                                                grafo.addNodo("DCL",id.image);
-                                                                                                numeroVariable++;
+                                                                                                if (id.image.equals(idMatrizCubo)){
+                                                                                                        tablaVariables.agregarVariable(numeroVariable,idMatrizCubo,scope);
+                                                                                                        grafo.addNodo("DCL",id.image);
+                                                                                                        numeroVariable++;
+                                                                                                } else {
+                                                                                                        tablaVariables.agregarVariable(numeroVariable,id.image,scope);
+                                                                                                        grafo.addNodo("DCL",id.image);
+                                                                                                        numeroVariable++;
+                                                                                                }
     IdentificadoresAux();
   }
 

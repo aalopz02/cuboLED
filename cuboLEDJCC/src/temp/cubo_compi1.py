@@ -408,8 +408,9 @@ def while_cycle():
 
 timer = 1
 rango_timer = 1
-cubo=matriz_cubo
+cubpo=matriz_cubo
 
+cubpo[0][0][0]=True
 x=1
 y=0
 a=x+y*10/4
