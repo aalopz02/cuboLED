@@ -10,6 +10,9 @@ y = cubpo[3][5];
 z = cubpo[2][3][4];
 m = cubpo;
 
-Procedure Main(){
 
+Procedure Main(){
+    Blink(x[1][0][3],5,Seg,true);
+    Blink(y, false);
+    Blink(z[1],100,Mil,true);
 }

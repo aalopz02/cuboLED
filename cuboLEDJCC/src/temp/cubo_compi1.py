@@ -412,17 +412,17 @@ cubpo=matriz_cubo
 
 x=cubpo[0]
 Indices_x=[0]
-
 y=cubpo[3][5]
 Indices_y=[3,5]
-
 z=cubpo[2][3][4]
 Indices_z=[2,3,4]
-
 m=cubpo
 Indices_m=cubpo
-
+blink_fun(Indice_x,5,1,True)
+blink_fun(Indice_y,-1,-1,False)
+blink_fun(Indice_z,100,3,True)
 def MainProc():
+
 
 
 
