@@ -158,7 +158,9 @@ public class SyntaxChecker  {
 
 PARSER_END(SyntaxChecker)
 
-SKIP:  { <COMMENT: (("--")(([" ",";",",","a"-"z" ,"0"-"9" , "_","&","@","A"-"Z","+","*","-","/","%","=","(",")",".","[","]"])+))"\n" >|" " | "\t" | "\n" |"\r" }
+
+
+SKIP: {  <"--" (~["\n","\r"])* ("\n" | "\r" | "\r\n")> | "\t" | " " | "\n" | "\r"}
 
 TOKEN: { "(" | ")" | "," | "=" | "{" | "}"|"."
 		| <NUM: (["0"-"9"])+>
@@ -194,6 +196,8 @@ void S(): {} { Sder() | <EOF> }
 void Sder(): {} {
 				Inicial() S()
 				|Procedure() S()
+				|Blink_Function() S()
+				|Delay_Function() S()
 				}
 
 void Exp(): {} {
@@ -240,7 +244,11 @@ void IgualdadValoresOperables(): {Token aux; Token oper;} {aux = <ID> {grafo.add
 																																										grafo.addNodo("ENDLINE","");
 																																										grafo.addNodo("DCL","Indices_" + idAux);
 																																										grafo.addNodo("DCL","=");
-																																										grafo.addNodo("CONVERT",indiceAcceso);
+																																										if (!indiceAcceso.contains("]")){
+																																											grafo.addNodo("CONVERT","[]");
+																																										} else{
+																																											grafo.addNodo("CONVERT",indiceAcceso);
+																																										}
 																																										grafo.addNodo("ENDLINE","");
 																																										flagCubo=false;
 																																									}

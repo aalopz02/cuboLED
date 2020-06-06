@@ -17,7 +17,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static String indiceAcceso = "";
         private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje4.txt";
         private static TablaVariables tablaVariables = new TablaVariables();
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
         public static Grafo grafo;
@@ -161,6 +161,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void S() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 33:
+    case 34:
+    case 37:
     case ID:
       Sder();
       break;
@@ -182,6 +184,14 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       break;
     case 33:
       Procedure();
+      S();
+      break;
+    case 37:
+      Blink_Function();
+      S();
+      break;
+    case 34:
+      Delay_Function();
       S();
       break;
     default:
@@ -333,7 +343,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                                                                                                                                                                                                                                                                                                                                                 grafo.addNodo("ENDLINE","");
                                                                                                                                                                                                                                                                                                                                                 grafo.addNodo("DCL","Indices_" + idAux);
                                                                                                                                                                                                                                                                                                                                                 grafo.addNodo("DCL","=");
-                                                                                                                                                                                                                                                                                                                                                grafo.addNodo("CONVERT",indiceAcceso);
+                                                                                                                                                                                                                                                                                                                                                if (!indiceAcceso.contains("]")){
+                                                                                                                                                                                                                                                                                                                                                        grafo.addNodo("CONVERT","[]");
+                                                                                                                                                                                                                                                                                                                                                } else{
+                                                                                                                                                                                                                                                                                                                                                        grafo.addNodo("CONVERT",indiceAcceso);
+                                                                                                                                                                                                                                                                                                                                                }
                                                                                                                                                                                                                                                                                                                                                 grafo.addNodo("ENDLINE","");
                                                                                                                                                                                                                                                                                                                                                 flagCubo=false;
                                                                                                                                                                                                                                                                                                                                         }
@@ -1155,7 +1169,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_la1_0 = new int[] {0x1,0x0,0xc0000000,0x1f000000,0x1200,0x100,0x1000,0x0,0x0,0x2040,0x0,0x20204040,0x100,0x200000,0x20002000,0x20002000,0x4000,0x100,0x7000000,0x18000000,0x20202100,0x100,0x100,0x4000,0x1000,0x20002000,0x0,0x20002000,0x1000,0x20006000,0x2000,0x0,0x6000,0x2000,0x100,0x400000,0x0,0x100,0x0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x102,0x102,0x1125,0x0,0x0,0x0,0x200,0x200,0x200,0x100,0x200,0x2000,0x0,0x2000,0x8100,0x8100,0x0,0x0,0x0,0x0,0x2100,0x0,0x0,0x0,0x0,0x100,0xc0,0x100,0x2000,0x100,0x0,0x2000,0x0,0x8000,0x8000,0x100,0x100,0x0,0x10,};
+      jj_la1_1 = new int[] {0x126,0x126,0x1125,0x0,0x0,0x0,0x200,0x200,0x200,0x100,0x200,0x2000,0x0,0x2000,0x8100,0x8100,0x0,0x0,0x0,0x0,0x2100,0x0,0x0,0x0,0x0,0x100,0xc0,0x100,0x2000,0x100,0x0,0x2000,0x0,0x8000,0x8000,0x100,0x100,0x0,0x10,};
    }
 
   /** Constructor with InputStream. */

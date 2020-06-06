@@ -1,5 +1,102 @@
-Timer = 1; --szgfzgfvzdg
-Rango_Timer = Seg;
-Dim_Filas = 8;
-Dim_Columnas = 8;
-Cubo = cubpo;
+Timer = 15;
+	Rango_Timer = Mil;
+	Dim_Filas = 8;
+	Dim_Columnas = 8;
+	Cubo  =a;
+
+			x = x + y * 10 / 4 ;
+			x = x + ((y * 10) / 4) ;
+-- D10		Operación NEG
+			z[1]=true; -- Es True
+-- D11		Operación T
+			m[1].T ;
+-- D12		Operación F
+			milista[1].F ;
+-- D13		Operación Blink
+			Blink(x[1],5, Seg, true) ;
+-- D14		Error Operación Blink
+			Blink(x[1],5, Seg,true);
+-- D15		Operación Delay default
+			Delay( );
+-- D16		Operación Delay default
+			Delay( 5, Mil );
+-- D17		Alteración orden aritmetico
+			x=((x + y) * 10) / 4;
+
+
+
+
+-- E1		Crear una lista
+			e= [];
+-- E2		Inicializa una lista
+			x = [true, true, false, false, false, false, true, true, true, true];
+--E3		Retorna un valor de una lista
+			x=x[0];
+--E4		Retorna un conjunto de valores de la lista
+			x=x[1:4];
+--E5		Crear lista con Range
+			x = list(range(5, true));
+--E6		Modificar una lista
+			milista[0] = true;
+--E7		Modficación multiple
+			milista[1:3] = [true, false];
+--E8		Acceder a un valor de una lista fuera de rango
+			x[10000];
+--E9		Inserta un valor a una lista
+			lista.insert(2,false);
+--E10		Borra valores a una lista
+			lista.del(2);
+--E11		Longitud de una lista
+			x=len(lista);
+
+
+
+-- F1		Definición de una matriz
+			mi_variabl=[[true, false, true],[true, true, true],[false, false, true] ];
+-- F2		Accediendo al valor de una matriz
+			x=mi_variabl[1][1];
+--F3		Accede al índice 1
+			x=m[1];
+--F4		Accede a fila y columna
+			x=m[1][1];
+--F5		Accede a columna 1
+			x=m[:,1];
+--F6		Consulta numero de filas
+			 a=lista.shapeF;
+--F7		Consulta numero de columna
+			a=lista.shapeC;
+--F8		Agrega fila en matriz
+			listas.insert([[true, false, true]], 0);
+--F9		Eliminar fila en matriz
+			listas.del(0,0);
+--F10		Modifica una matriz con constante
+			mi_variabl[1][1] = tRUE;
+--F11		Modifica matriz
+			mi_variabl[1][1] = mi_variabl[1][1];
+--F12		Accediendo a una matriz 3D
+			lista=mi_variabl[1][1][1];
+--F13		Modificar matriz 3D Constante
+			matriz3D[1][1][1] = true;
+--F14		Modificar matriz 3D con otra 3D
+			matriz3D[1][1][1] = mi_variabl[1][1][1];
+
+
+
+
+Procedure enciende () {
+x = [];
+x = [true, true, false, false, false, false, true, true, true, true];
+
+for var1 in  len(x)  {
+
+if X[x,y] ==False
+{
+X[x,y].Neg;
+
+}
+}
+Cubo[1] = X
+}
+
+
+--A5 SIN MAIN
