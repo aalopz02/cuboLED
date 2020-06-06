@@ -22,7 +22,7 @@ public class TablaVariables {
     private ArrayList<Lista> matrices = new ArrayList<>();
     private ArrayList<Integer> indexMatriz = new ArrayList<>();
     public String log = "OK";
-    private ArrayList<Integer> addExtra = new ArrayList<>();
+    private String idCubo;
 
     TablaVariables() {
         validTypes.add("BOOL"); //0
@@ -42,6 +42,10 @@ public class TablaVariables {
         errors.add("Cannot be used as iterable object"); //11
         errors.add("Method with signature"); //12
         errors.add("Expected 1 or 0 in Delete"); //13
+    }
+
+    public void addMatrizId(String id){
+        this.idCubo = id;
     }
 
     public void agregarIndiceAcceso(String index) {

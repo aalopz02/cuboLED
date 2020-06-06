@@ -13,8 +13,7 @@ public class Creatorpy {
     private static String filePy = "src/temp/cubo_compi1.py";
     private static String templateFile = "src/temp/template.py";
     private static Nodo aux;
-    private static int lineStart = 370;
-    private static int lineMain = 377;
+    private static int lineStart = 408;
     private static int scope = 0;
     private static PrintWriter pw;
     private static FileWriter fichero;
@@ -22,7 +21,6 @@ public class Creatorpy {
     private static String templateFuncs;
     private static String mainHeader;
     private static ArrayList<String> constantes;
-
 
     private static void rewriteFile() {
         File file = new File(templateFile);
@@ -40,14 +38,6 @@ public class Creatorpy {
                 if (line >= lineStart){
                     break;
                 }
-            }
-            while ((st = br.readLine()) != null){
-                if (line >= lineMain){
-                    break;
-                }
-                mainHeader+=st;
-                mainHeader+="\n";
-                line++;
             }
             while ((st = br.readLine()) != null) {
                 templateRest += st;
@@ -236,10 +226,13 @@ public class Creatorpy {
         aux=aux.getNext();
     }
 
-    private static String getIndex(String contenido){
+    private static void getIndex(String contenido){
         String[] indexAux;
         contenido = contenido.replace("]", "");
         indexAux = contenido.split("\\[");
+        for (String in:indexAux){
+            System.out.println(in);
+        }
         try {
             pw.print(indexAux[1]);
             pw.print(",");
@@ -259,11 +252,11 @@ public class Creatorpy {
         } catch (IndexOutOfBoundsException e){
             pw.print("True");
         }
-        return "indice";
+
     }
 
     private static void writeBlink(){
-        write("blink_func(");
+        write("blink_fun(");
         aux=aux.getNext();
         getIndex(aux.getContenido());
         pw.print(",");
@@ -315,7 +308,11 @@ public class Creatorpy {
         try {
             pw = new PrintWriter(fichero);
             pw.print(templateFuncs);
-            writeConstantes();
+            try{
+                writeConstantes();
+            } catch (IndexOutOfBoundsException e){
+                return false;
+            }
             pw.println("");
             while (aux != null) {
                 aux = aux.getNext();
@@ -351,12 +348,7 @@ public class Creatorpy {
                     writeBlink();
                 }
                 if (aux.getNext() != null){
-                    if (aux.getNext().getTipo().equals("MAIN")){
-                        scope=1;
-                        pw.print(mainHeader);
-                        aux=aux.getNext().getNext();
-                        inMain = true;
-                    } else if (aux.getNext().getTipo().equals("FUN.DEL")){
+                    if (aux.getNext().getTipo().equals("FUN.DEL")){
                         writeDel();
                     }else if (aux.getNext().getTipo().equals("FUN.INSERTLIST")){
                         writeInsert();
@@ -372,9 +364,6 @@ public class Creatorpy {
                 if (aux.getTipo().equals("CLOSESCOPE") || aux.getTipo().equals("ENDLINE")){
                     if (aux.getTipo().equals("CLOSESCOPE")) {
                         scope--;
-                        if (inMain && scope==0){
-                            pw.println(templateRest);
-                        }
                     }
                     flagNL=true;
                     pw.println("");
@@ -397,6 +386,8 @@ public class Creatorpy {
 
                 }
             }
+            pw.println(mainHeader);
+            pw.print(templateRest);
             fichero.close();
             pw.close();
         } catch (Exception e) {

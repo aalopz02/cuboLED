@@ -23,7 +23,8 @@ public class SyntaxChecker  {
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
         public static Grafo grafo;
         private static SyntaxChecker checker = null;
-
+		public static String idMatrizCubo;
+		
     public static String initAnalisys(String in) {
         grafo = new Grafo();
         tablaVariables = new TablaVariables();
@@ -56,6 +57,7 @@ public class SyntaxChecker  {
                 log += varsCheck;
             }
             System.out.println(log);
+			Creatorpy.initWriter(grafo,constantesConfig);
         } catch (Throwable e) {
             System.out.println("Syntax check failed: " + e.getMessage());
             log = e.getMessage();
@@ -89,7 +91,7 @@ public class SyntaxChecker  {
             System.out.println("Syntax is okay");
             tablaVariables.imprimirIDS();
             tablaVariables.checkVariables();
-            Creatorpy.initWriter(grafo);
+            Creatorpy.initWriter(grafo,constantesConfig);
 
         } catch (Throwable e) {
             // Catching Throwable is ugly but JavaCC throws Error objects!
@@ -142,6 +144,12 @@ public class SyntaxChecker  {
 			ParseException e = generateParseException();  
 			throw e;
 		}
+	}
+
+	static void addIdMatriz(){
+		tablaVariables.addMatrizId(idMatrizCubo);
+		tablaVariables.agregarVariable(0,idMatrizCubo,0);
+		tablaVariables.agregarIgualdad(0,0,"[]");
 	}
 	
 }
@@ -221,7 +229,7 @@ void IgualdadAux(): {Token aux;} { aux = <BOOL> { grafo.addNodo("BOOL",aux.image
 									| "(" {grafo.addNodo("OPENPAR","(");} IgualdadValoresOperables() ")" {grafo.addNodo("CLOSEPAR",")");} ((aux = <OPERADORES> {grafo.addNodo("OPER",aux.image);} IgualdadValoresOperables()) | IgualdadValoresOperables())
 									| "[" {indiceAcceso+="["; addVarFalg = false;} ValoresListas() "]" {indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("LIST",indiceAcceso); indiceAcceso = ""; addVarFalg = true;}
 									| <LIST> {addVarFalg = false; valoresIgualdadTabla.add("createList"); grafo.addNodo("NEWLIST","createList");} CrearLista() Listas() {addVarFalg = true;}
-									| FuncionLen() {valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("LIST",indiceAcceso); indiceAcceso = "";}
+									| FuncionLen() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
 									| IgualdadValoresOperables() }
 
 void Igualdad(): {Token aux;} { {valoresIgualdadTabla = new ArrayList<String>();} IgualdadAux() {
@@ -242,7 +250,7 @@ void AccesoLista(): {} {
 						| Numeros() AccesoListaAux() 
 						| ValoresListas() }
 
-void AccesoListaAux(): {} { ":" {indiceAcceso+=":";} Numeros() | "," {indiceAcceso+=",";} Numeros() | Numeros() | Empty()}
+void AccesoListaAux(): {} { ":" {indiceAcceso+=":";} Numeros() | Numeros() | Empty()}
 
 void ValoresListas(): {Token aux;} { aux = <BOOL> {indiceAcceso+=aux.image;} ValoresListasAux()
 									| Listas() ValoresListasAux()
@@ -279,7 +287,7 @@ void Numeros(): {Token index;} {
 	
 void FuncionesShape(): {Token aux;} { (aux = <SHAPEC> | aux = <SHAPEF>) {indiceAcceso += aux.image; grafo.addNodo("SHAPE",aux.image);}}	
 	
-void FuncionLen(): {Token aux;} { <LENGTH> {valoresIgualdadTabla.add("len"); grafo.addNodo("LEN","len");} "(" aux = <ID> {indiceAcceso+=aux.image;} Listas() ")"}	
+void FuncionLen(): {Token aux;} { <LENGTH> {valoresIgualdadTabla.add("len"); grafo.addNodo("LEN","len(");} "(" aux = <ID> {indiceAcceso+=aux.image;} Listas() ")" {grafo.addNodo("VAR",indiceAcceso); grafo.addNodo("CLOSEPAR",")");}}	
 
 void Iterable():{Token aux;}{ aux = <ID> {grafo.addNodo("ID",aux.image); tablaVariables.agregarVariable(numeroVariable,aux.image,scope);} Iterable_Aux() {tablaVariables.agregarIndiceAcceso(indiceAcceso); grafo.addNodo("INDEXACC",indiceAcceso); indiceAcceso = ""; tablaVariables.agregarIgualdad(-99,scope,""); }
 							| aux = <NUM> {grafo.addNodo("NUM",aux.image); tablaVariables.agregarVariable(-99,"",scope); tablaVariables.agregarIgualdad(numeroVariable,scope,"NUM");}
@@ -302,7 +310,7 @@ void Dim_Filas(): {Token filas;} { <DIM_FILAS> "=" filas = <NUM> ";" {constantes
 
 void Dim_Columnas(): {Token columnas;} { <DIM_COLUMNAS> "=" columnas = <NUM> ";" {constantesConfig.add(columnas.image);}}
 
-void Cubo(): {Token i;} { <CUBO> "=" i = <ID> {constantesConfig.add(i.image);} ";"}
+void Cubo(): {Token i;} { <CUBO> "=" i = <ID> {constantesConfig.add(i.image); idMatrizCubo = i.image; addIdMatriz();} ";"}
 
 void Empty() : {} { {} } 
 
@@ -314,7 +322,7 @@ void Blink_Function(): {} { {indiceAcceso=""; valoresIgualdadTabla = new ArrayLi
 
 void ListaBlink(): {} { "[" {indiceAcceso += "[";} Numeros() "]" {indiceAcceso += "]";} ListaBlink() | Empty()}
 
-void Blink_Expression(): {Token id;} {id=<ID> {indiceAcceso+=id.image; indiceAcceso+="[";} "[" Numeros() "]"
+void Blink_Expression(): {Token id;} {id=<ID> {indiceAcceso+=id.image;} ListaBlink()
 							{indiceAcceso+="]";} ListaBlink() {valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("VAR",indiceAcceso);} "," Blink_Expression_Aux()  }
 
 void Blink_Expression_Aux(): {Token num; Token bool;}{ num=<NUM> {grafo.addNodo("NUM",num.image);} Blink_Expression_Aux1() | bool = <BOOL> {grafo.addNodo("BOOL",bool.image);}}
@@ -328,11 +336,11 @@ void Adentro_Lista_Aux1(): {Token num;} {":" {indiceAcceso+=":";} num=<NUM> {ind
 
 void Procedure(): {} {"Procedure" {grafo.addNodo("PRODCL","def ");} NombreRutina() }
 
-void NombreRutina():{Token id;}{ id=<ID> {tablaVariables.agregarProc(id.image, true); grafo.addNodo("ID",id.image);} normalProc() | id = <MAIN> {checkMainDefined(0,id); inMain = 1; grafo.addNodo("ID",id.image);} mainProc()}
+void NombreRutina():{Token id;}{ id=<ID> {tablaVariables.agregarProc(numeroVariable,id.image, true); grafo.addNodo("ID",id.image);} normalProc() | id=<MAIN> {checkMainDefined(0,id); inMain = 1; grafo.addNodo("MAIN","MainProc()");} mainProc()}
 
 void normalProc(): {} {"(" {grafo.addNodo("OPENPAR","(");} (Parametros() | Empty()) ")" {grafo.addNodo("CLOSEPAR",")");} "{" {grafo.addNodo("OPENSCOPE","{"); scope = 1;} Exp() "}" {grafo.addNodo("CLOSESCOPE","}"); scope = 0;}}
 
-void mainProc(): {} {"(" ")" "{" {grafo.addNodo("MAINPAR","()"); grafo.addNodo("OPENSCOPE","{");} Exp() "}" {inMain = 0; scope = 0; grafo.addNodo("CLOSESCOPE","}");}}
+void mainProc(): {} {"(" ")" {grafo.addNodo("OPENSCOPE","{");} "{" Exp() "}" {inMain = 0; scope = 0; grafo.addNodo("CLOSESCOPE","}");}}
 
 void Call():{Token id;} {"Call" {grafo.addNodo("CALL","call");} id=<ID> {grafo.addNodo("ID",id.image); tablaVariables.agregarProc(id.image,false); inCall = true;} "(" {grafo.addNodo("OPENPAR","(");} (Igualdad()) ")" {grafo.addNodo("CLOSEPAR",")");} ";" { inCall = false; tablaVariables.checkProc(); grafo.addNodo("ENDLINE","");}}
 

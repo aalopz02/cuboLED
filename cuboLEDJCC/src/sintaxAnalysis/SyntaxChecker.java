@@ -145,6 +145,12 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                 }
         }
 
+        static void addIdMatriz(){
+                tablaVariables.addMatrizId(idMatrizCubo);
+                tablaVariables.agregarVariable(0,idMatrizCubo,0);
+                tablaVariables.agregarIgualdad(0,0,"[]");
+        }
+
   static final public void INICIAR() throws ParseException {
     Constantes();
     S();
@@ -828,7 +834,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     jj_consume_token(CUBO);
     jj_consume_token(9);
     i = jj_consume_token(ID);
-                                               constantesConfig.add(i.image); idMatrizCubo = i.image;
+                                               constantesConfig.add(i.image); idMatrizCubo = i.image; addIdMatriz();
     jj_consume_token(43);
   }
 
@@ -891,10 +897,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void Blink_Expression() throws ParseException {
                           Token id;
     id = jj_consume_token(ID);
-                                               indiceAcceso+=id.image; indiceAcceso+="[";
-    jj_consume_token(44);
-    Numeros();
-    jj_consume_token(45);
+                                               indiceAcceso+=id.image;
+    ListaBlink();
                                                          indiceAcceso+="]";
     ListaBlink();
                                                                                            valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("VAR",indiceAcceso);
@@ -987,7 +991,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       break;
     case MAIN:
       id = jj_consume_token(MAIN);
-                                                                                                                                                              checkMainDefined(0,id); inMain = 1; grafo.addNodo("MAIN","main");
+                                                                                                                                                              checkMainDefined(0,id); inMain = 1; grafo.addNodo("MAIN","MainProc()");
       mainProc();
       break;
     default:
@@ -1020,10 +1024,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void mainProc() throws ParseException {
     jj_consume_token(6);
     jj_consume_token(7);
+                              grafo.addNodo("OPENSCOPE","{");
     jj_consume_token(10);
     Exp();
     jj_consume_token(11);
-                                            inMain = 0; scope = 0; grafo.addNodo("CLOSESCOPE","}");
+                                                                              inMain = 0; scope = 0; grafo.addNodo("CLOSESCOPE","}");
   }
 
   static final public void Call() throws ParseException {

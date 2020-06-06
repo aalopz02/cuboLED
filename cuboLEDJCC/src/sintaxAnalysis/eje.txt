@@ -2,7 +2,7 @@ Timer = 1; --szgfzgfvzdg
 Rango_Timer = Seg;
 Dim_Filas = 6;
 Dim_Columnas = 6;
-Cubo = a;
+Cubo = cubo;
 
 x = 1;
 y = 0;
@@ -33,6 +33,7 @@ le = [[[true,false],[true,false]],[[true,false],[true,false]],[[true,false],[tru
 u[1][1][1] = le[1][1][1];
 y = 1;
 ac = 23;
+pt = [[true , true , true ],[false , false ,false]];
 
 Procedure p1(p,lk,pu)  {
     for x in p {
@@ -42,13 +43,12 @@ Procedure p1(p,lk,pu)  {
         }
     }
     Blink(u[1][0][3],5,Seg,true);
-	u.insert([[true, false, true]],  0);
-	u.insert([[true], [true] , [true]], 1);
-	u.insert([[false, false, false, false]],  0, 0);
+	pt.insert([[true, false, true]], 0);
+	pt.insert([[true], [true] , [true]], 1);
 }
 
 Procedure miproc(z,x,y,g,h){
-    Blink(x[1], false);
+    Blink(x, false);
     m =[true,false];
     if  u ==  true {
         ad = m[z];

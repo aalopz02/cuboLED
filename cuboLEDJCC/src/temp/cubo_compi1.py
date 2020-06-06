@@ -6,6 +6,10 @@ import math
 from itertools import product
 from threading import Thread
 
+timer=1000;
+rango_timer=1
+
+
 matriz_cubo=[[[False,False,False,False,False,False,False,True],
             [False,False,False,False,False,False,False,True],
             [False,False,False,False,False,False,False,True],
@@ -60,7 +64,7 @@ matriz_cubo=[[[False,False,False,False,False,False,False,True],
             [False,False,False,False,False,False,False,False],
             [False,False,False,False,False,False,False,False]]]
 
-matriz_tiempos=[[[False,False,False,False,False,False,False,1],
+matriz_tiempos=[[[False,False,False,False,False,False,False,False],
             [False,False,False,False,False,False,False,False],
             [False,False,False,False,False,False,False,False],
             [False,False,False,False,False,False,False,False],
@@ -113,7 +117,7 @@ matriz_tiempos=[[[False,False,False,False,False,False,False,1],
             [False,False,False,False,False,False,False,False],
             [False,False,False,False,False,False,False,False],
             [False,False,False,False,False,False,False,False]]]
-matriz_tiempos_aux=[[[False,False,False,False,False,False,False,1],
+matriz_tiempos_aux=[[[False,False,False,False,False,False,False,False],
             [False,False,False,False,False,False,False,False],
             [False,False,False,False,False,False,False,False],
             [False,False,False,False,False,False,False,False],
@@ -204,18 +208,6 @@ def hacer_false(lista):
     else:
         return False
 
-def blink_fun(matriz_cub,matriz_temp,matriz_temp_aux,num,blink_value,bool_value,time_unit):
-    lista1[num]=bool_value
-    if time_unit=="Mil":
-        lista2[num]=blink_value
-        lista3[num]=blink_value
-    if time_unit=="Seg":
-        lista2[num]=blink_value*1000
-        lista3[num]=blink_value*1000
-    if time_unit=="Min":
-        lista2[num]=blink_value*1000*60
-        lista3[num]=blink_value*1000*60
-
 def delete(lista,index,tipo):
     if (tipo == 0):
         lista.pop(index)
@@ -283,21 +275,61 @@ def getLen(var):
     else:
         return var
 
-def blink_fun(i,j,k,blink_value,bool_value,time_unit):
-    if bool_value==True:
-        matriz_cubo[i][j][k]=True
-        if time_unit=="Mil":
-            matriz_tiempos[i][j][k]=int(math.ceil(blink_value/400))
-            matriz_tiempos_aux[i][j][k]=int(math.ceil(blink_value/400))
-        if time_unit=="Seg":
-            matriz_tiempos[i][j][k]=int(math.ceil((blink_value*1000)/400))
-            matriz_tiempos_aux[i][j][k]=int(math.ceil((blink_value*1000)/400))
-        if time_unit=="Min":
-            matriz_tiempos[i][j][k]=int(math.ceil((blink_value*1000*60)/400))
-            matriz_tiempos_aux[i][j][k]=int(math.ceil((blink_value*1000*60)/400))
-    elif bool_value==False:
-        matriz_tiempos[i][j][k]=False
-        matriz_tiempos_aux[i][j][k]=False
+def blink_fun(i,j,k,blink_value,time_unit,bool_value):
+    a=i
+    b=j
+    c=k
+    if type(i)==bool:
+        a=0
+        b=0
+        c=0
+        print("Entre")
+        i=6
+        j=8
+        k=8
+    else:
+        if type(i)==int:
+            i=i+1
+
+        if type(j)==int:
+            j=j+1
+        if type(j)==bool:
+            b=0
+            j=8
+
+        if type(k)==int:
+            k=k+1
+        if type(k)==bool:
+            c=0
+            k=8
+    print(a,b,c,i,j,k)
+    for z1 in range(a,i):
+        for z2 in range(b,j):
+            for z3 in range(c,k):
+                if bool_value==True:
+                    matriz_cubo[z1][z2][z3]=True
+
+                    if time_unit==-1:
+                        time_unit=rango_timer
+                        blink_value=timer
+
+                    if time_unit==1:
+                        matriz_tiempos[z1][z2][z3]=int(math.ceil(blink_value/400))
+                        matriz_tiempos_aux[z1][z2][z3]=int(math.ceil(blink_value/400))
+
+                    if time_unit==2:
+                        matriz_tiempos[z1][z2][z3]=int(math.ceil((blink_value*1000)/400))
+                        matriz_tiempos_aux[z1][z2][z3]=int(math.ceil((blink_value*1000)/400))
+                    if time_unit==3:
+                        matriz_tiempos[z1][z2][z3]=int(math.ceil((blink_value*1000*60)/400))
+                        matriz_tiempos_aux[z1][z2][z3]=int(math.ceil((blink_value*1000*60)/400))
+
+
+                elif bool_value==False:
+                    matriz_tiempos[z1][z2][z3]=False
+                    matriz_tiempos_aux[z1][z2][z3]=False
+
+
 
 def while_cycle():
     connected= False
@@ -363,14 +395,20 @@ def while_cycle():
                                     matriz_cubo[i][j][k]=True
                                 else:
                                     matriz_cubo[i][j][k]=False
-                                matriz_tiempos_aux[i][j][k]=matriz_tiempos[i][j][k]
+                                matriz_tiempos_aux[i][j][k]=matriz_tiempos[i][j][k];
+
+
+
+
         time.sleep(0.015)
+
+
     ser.close
 
 
 timer = 1
 rango_timer = 1
-a=matriz_cubo
+cubo=matriz_cubo
 
 x=1
 y=0
@@ -403,19 +441,20 @@ le=[[[True,False],[True,False]],[[True,False],[True,False]],[[True,False],[True,
 u[1][1][1]=le[1][1][1]
 y=1
 ac=23
+pt=[[True,True,True],[False,False,False]]
 def p1(p,lk,pu):
 	for x in range(0,getLen(p),1):
 		a=lk
 		for b in range(0,getLen(pu),2):
 			y=b
-	blink_func(1,0,3,5,1,True)
-	insertMatriz(u,[[True,False,True]],0,-1)
-	insertMatriz(u,[[True],[True],[True]],1,-1)
-	insertMatriz(u,[[False,False,False,False]],0,0)
+
+
+	blink_fun(1,0,3,5,1,True)
+	insertMatriz(pt,[[True,False,True]],0,-1)
+	insertMatriz(pt,[[True],[True],[True]],1,-1)
 
 def miproc(z,x,y,g,h):
-
-
+	blink_fun(True,True,True,-1,-1,False)
 	m=[True,False]
 	if u==True:
 		ad=m[z]
@@ -423,13 +462,7 @@ def miproc(z,x,y,g,h):
 
 	p1(0,0,1)
 
-
-def main():
-    time.sleep(2)
-    t = Thread(target = while_cycle, args =())
-    t.start()
-
-
+def MainProc():
 	if var1==2:
 		miproc(1,2,4,[[True],[True],[True],[True]],True)
 
@@ -443,19 +476,29 @@ def main():
 
 
 	delay(5,2)
+
+
+
+def main():
+    time.sleep(2)
+    t = Thread(target = while_cycle, args =())
+    t.start()
+    MainProc()
     hola=[]
     a=0.032;
     print(int(a))
     print(int(math.ceil(a)))
     #matriz_cubo[5][5][5]=True
     time.sleep(1);
-    blink_fun(1,1,1,400,True,"Mil")
-    blink_fun(0,0,7,400,False,"Mil")
+    blink_fun(True,True,True,400,1,True)
+
+
     p=[0,1,2,3,4]
 
 
 
 
+#delete l.pop(#)
 
-
-
+if __name__ == "__main__":
+    main()
