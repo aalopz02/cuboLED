@@ -1,0 +1,20 @@
+Timer = 1; --szgfzgfvzdg
+Rango_Timer = Seg;
+Dim_Filas = 8;
+Dim_Columnas = 8;
+Cubo = cubpo;
+
+Procedure cara(x,y,z){
+    for i in x{
+        for j in y{
+            cubpo[z][i][j] = true;
+        }
+    }
+}
+
+
+Procedure Main(){
+    for k in 6 {
+        Call cara(k,k,k);
+    }
+}

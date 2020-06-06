@@ -405,7 +405,7 @@ public class TablaVariables {
                                 generateError(4, subindex);
                             }
                         } else {
-                            if (types.get(variablesDefinidas.indexOf(subindex)).equals("NUM")) {
+                            if (types.get(variablesDefinidas.indexOf(subindex)).equals("NUM") || types.get(variablesDefinidas.indexOf(subindex)).equals("LIST")) {
                                 indices.add(0);
                             } else {
                                 generateError(6, types.get(variablesDefinidas.indexOf(subindex)));

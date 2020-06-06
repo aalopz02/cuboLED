@@ -282,6 +282,23 @@ public class Creatorpy {
         pw.print(")");
     }
 
+    private static String convertIndex(String contenido){
+        String[] indexAux;
+        contenido = contenido.replace("]", "");
+        indexAux = contenido.split("\\[");
+        String aux = "[";
+        if (indexAux.length==1){
+            return indexAux[0];
+        }
+        for (int i = 1; i < indexAux.length; i++){
+            aux+=indexAux[i];
+            if (i < indexAux.length-1){
+                aux+=",";
+            }
+        }
+        return aux+"]";
+    }
+
     public static boolean initWriter(Grafo in,ArrayList<String> constantesIn) throws IOException {
         constantes = constantesIn;
         rewriteFile();
@@ -313,8 +330,8 @@ public class Creatorpy {
                 if (aux == null){
                     break;
                 }
-                //System.out.println("TIPO: " + aux.getTipo());
-                //System.out.println("CONTENIDO: " + aux.getContenido());
+                System.out.println("TIPO: " + aux.getTipo());
+                System.out.println("CONTENIDO: " + aux.getContenido());
                 if (aux.getTipo().equals("INIT")){
                     aux = aux.getNext();
                 }
@@ -340,6 +357,9 @@ public class Creatorpy {
                 }
                 if (aux.getTipo().equals("BLINK")){
                     writeBlink();
+                }
+                if (aux.getTipo().equals("CONVERT")){
+                    aux.setContenido(convertIndex(aux.getContenido()));
                 }
                 if (aux.getNext() != null){
                     if (aux.getNext().getTipo().equals("FUN.DEL")){

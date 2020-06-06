@@ -410,74 +410,19 @@ timer = 1
 rango_timer = 1
 cubpo=matriz_cubo
 
-cubpo[0][0][0]=True
-x=1
-y=0
-a=x+y*10/4
-b=x+((y*10)/4)
-c=((x+y)*10)/4
-d,da=20,15
-e=True
-f=[]
-crear_lista(f,5,False)
-ha=f[0:1][0:1][0:1]
-i=[]
-crear_lista(i,5,True)
-lpoi=[]
-ah=[]
-insertMatriz(ah,[[True],[True],[True]],1,-1)
-al=[]
-n=[]
-o,p=shapeF(i),2
-q=[True,False]
-q[1]=neg_func(q[1])
-r=[True,False]
-r[1]=hacer_true(r[1])
-r[0]=hacer_false(r[0])
-t=[True,False,True]
-a=shapeC(q)
-var1=len(r)
-t[var1]=neg_func(t[var1])
-u=[[[True,False],[True,False]],[[True,False],[True,False]],[[True,False],[True,False]]]
-le=[[[True,False],[True,False]],[[True,False],[True,False]],[[True,False],[True,False]]]
-u[1][1][1]=le[1][1][1]
-y=1
-ac=23
-pt=[[True,True,True],[False,False,False]]
-def p1(p,lk,pu):
-	for x in range(0,getLen(p),1):
-		a=lk
-		for b in range(0,getLen(pu),2):
-			y=b
+x=cubpo[0]
+Indices_x=[0]
 
+y=cubpo[3][5]
+Indices_y=[3,5]
 
-	blink_fun(u,1,1,0,0,3,3,5,1,True)
-	insertMatriz(pt,[[True,False,True]],0,-1)
-	insertMatriz(pt,[[True],[True],[True]],1,-1)
+z=cubpo[2][3][4]
+Indices_z=[2,3,4]
 
-def miproc(z,x,y,g,h):
-	blink_fun(x,0,0,0,0,0,0,-1,-1,False)
-	m=[True,False]
-	if u==True:
-		ad=m[z]
-		delayDefault()
-
-	p1(0,0,1)
+m=cubpo
+Indices_m=cubpo
 
 def MainProc():
-	if var1==2:
-		miproc(1,2,4,[[True],[True],[True],[True]],True)
-
-	for xy in range(0,getLen(a),1):
-		for bq in range(0,getLen(u),2):
-			if a!=1:
-				delete(u,0,0)
-				delete(u,1,0)
-				delay(6,1)
-
-
-
-	delay(5,2)
 
 
 

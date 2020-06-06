@@ -1,0 +1,15 @@
+Timer = 1; --szgfzgfvzdg
+Rango_Timer = Seg;
+Dim_Filas = 8;
+Dim_Columnas = 8;
+Cubo = cubpo;
+
+
+x = cubpo[0];
+y = cubpo[3][5];
+z = cubpo[2][3][4];
+m = cubpo;
+
+Procedure Main(){
+
+}

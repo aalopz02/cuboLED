@@ -45,7 +45,7 @@ public class CeldaTablaIgualdades {
         setScope(Scope);
         this.contenido = new ArrayList<String>();
         String matriz3d = "[";
-        for (int k = 0; k < y; k++){
+        for (int k = 0; k < 6; k++){
             String matriz = "[";
             for (int i = 0; i < x; i++){
                 String lista = "[";

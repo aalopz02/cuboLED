@@ -17,12 +17,14 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static String indiceAcceso = "";
         private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
+        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje4.txt";
         private static TablaVariables tablaVariables = new TablaVariables();
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
         public static Grafo grafo;
         private static SyntaxChecker checker = null;
                 public static String idMatrizCubo;
+                private static String idAux;
+                private static boolean flagCubo = false;
 
     public static String initAnalisys(String in) {
         grafo = new Grafo();
@@ -269,6 +271,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
                                                                                                         tablaVariables.agregarVariable(numeroVariable,id.image,scope);
                                                                                                         grafo.addNodo("DCL",id.image);
                                                                                                         numeroVariable++;
+                                                                                                        idAux = id.image;
                                                                                                 }
     IdentificadoresAux();
   }
@@ -294,10 +297,13 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     case ID:
       aux = jj_consume_token(ID);
                                                                        grafo.addNodo("ID",aux.image);
+                                                                                                                                                if(aux.image.equals(idMatrizCubo)){
+                                                                                                                                                        flagCubo = true;
+                                                                                                                                                }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OPERADORES:
         oper = jj_consume_token(OPERADORES);
-                                                                                                                             grafo.addNodo("OPER",oper.image);  valoresIgualdadTabla.add(aux.image);
+                                                                                                                                                                        grafo.addNodo("OPER",oper.image);  valoresIgualdadTabla.add(aux.image);
         IgualdadAux();
         break;
       case 12:
@@ -310,7 +316,16 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         jj_la1[6] = jj_gen;
                                                                                                                                                    indiceAcceso+= aux.image; addVarFalg = false;
         Listas();
-                                                                                                                                                                                                            valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("INDEX",indiceAcceso); indiceAcceso = ""; addVarFalg = true;
+                                                                                                                                                                                                            valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("INDEX",indiceAcceso);
+                                                                                                                                                                                                                                                                                                                                        if (flagCubo){
+                                                                                                                                                                                                                                                                                                                                                grafo.addNodo("ENDLINE","");
+                                                                                                                                                                                                                                                                                                                                                grafo.addNodo("DCL","Indices_" + idAux);
+                                                                                                                                                                                                                                                                                                                                                grafo.addNodo("DCL","=");
+                                                                                                                                                                                                                                                                                                                                                grafo.addNodo("CONVERT",indiceAcceso);
+                                                                                                                                                                                                                                                                                                                                                grafo.addNodo("ENDLINE","");
+                                                                                                                                                                                                                                                                                                                                                flagCubo=false;
+                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                        indiceAcceso = ""; addVarFalg = true;
       }
       break;
     case NUM:

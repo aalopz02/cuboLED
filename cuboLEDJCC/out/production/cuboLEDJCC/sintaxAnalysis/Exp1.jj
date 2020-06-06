@@ -24,6 +24,8 @@ public class SyntaxChecker  {
         public static Grafo grafo;
         private static SyntaxChecker checker = null;
 		public static String idMatrizCubo;
+		private static String idAux;
+		private static boolean flagCubo = false;
 
     public static String initAnalisys(String in) {
         grafo = new Grafo();
@@ -216,6 +218,7 @@ void Identificadores(): {Token id;} { id=<ID> {
 													tablaVariables.agregarVariable(numeroVariable,id.image,scope);
 													grafo.addNodo("DCL",id.image);
 													numeroVariable++;
+													idAux = id.image;
 												}
 											 }
 	IdentificadoresAux()
@@ -223,9 +226,22 @@ void Identificadores(): {Token id;} { id=<ID> {
 
 void IdentificadoresAux(): {} {"," {grafo.addNodo("DCL",","); sameLineDCL += 1;} Identificadores() | {addVarFalg = true;} Listas() {grafo.addNodo("INDEXACC",indiceAcceso); indiceAcceso = "";} | Empty()}
 
-void IgualdadValoresOperables(): {Token aux; Token oper;} {aux = <ID> {grafo.addNodo("ID",aux.image);} (oper = <OPERADORES> {grafo.addNodo("OPER",oper.image);  valoresIgualdadTabla.add(aux.image);} IgualdadAux()
+void IgualdadValoresOperables(): {Token aux; Token oper;} {aux = <ID> {grafo.addNodo("ID",aux.image); 
+																		if(aux.image.equals(idMatrizCubo)){
+																			flagCubo = true;
+																		} 
+																		} (oper = <OPERADORES> {grafo.addNodo("OPER",oper.image);  valoresIgualdadTabla.add(aux.image);} IgualdadAux()
 																		| "." {indiceAcceso += aux.image; indiceAcceso += "."; grafo.addNodo("DOT","."); } FuncionesShape() {valoresIgualdadTabla.add(indiceAcceso); indiceAcceso = "";}
-																		| {indiceAcceso+= aux.image; addVarFalg = false;} Listas() {valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("INDEX",indiceAcceso); indiceAcceso = ""; addVarFalg = true; }
+																		| {indiceAcceso+= aux.image; addVarFalg = false;} Listas() {valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("INDEX",indiceAcceso); 
+																																									if (flagCubo){
+																																										grafo.addNodo("ENDLINE","");
+																																										grafo.addNodo("DCL","Indices_" + idAux);
+																																										grafo.addNodo("DCL","=");
+																																										grafo.addNodo("CONVERT",indiceAcceso);
+																																										grafo.addNodo("ENDLINE","");
+																																										flagCubo=false;
+																																									}
+																																									indiceAcceso = ""; addVarFalg = true; }
 																		| Empty())
 							| aux = <NUM> {grafo.addNodo("NUM",aux.image); valoresIgualdadTabla.add("NUM");} (aux = <OPERADORES> {grafo.addNodo("OPER",aux.image);} IgualdadValoresOperables() | Empty())
 							| "(" {grafo.addNodo("OPENPAR","(");} IgualdadAux() ")" {grafo.addNodo("CLOSEPAR",")");} ((aux = <OPERADORES> {grafo.addNodo("OPER",aux.image);} IgualdadValoresOperables()) | IgualdadValoresOperables())
