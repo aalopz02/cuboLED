@@ -15,6 +15,7 @@ e = true;
 f = list(range(5,false));
 h = f[4];
 i = list(range(5, true)) ;
+lpoi= [];
 ah = [];
 ah.insert([[true], [true] , [true]], 1);
 al = [];

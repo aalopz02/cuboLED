@@ -420,9 +420,10 @@ d,da=20,15
 e=True
 f=[]
 crear_lista(f,5,False)
-h=f[4]
+ha=f[0:1][0:1][0:1]
 i=[]
 crear_lista(i,5,True)
+lpoi=[]
 ah=[]
 insertMatriz(ah,[[True],[True],[True]],1,-1)
 al=[]
@@ -450,12 +451,12 @@ def p1(p,lk,pu):
 			y=b
 
 
-	blink_fun(1,0,3,5,1,True)
+	blink_fun(u,1,1,0,0,3,3,5,1,True)
 	insertMatriz(pt,[[True,False,True]],0,-1)
 	insertMatriz(pt,[[True],[True],[True]],1,-1)
 
 def miproc(z,x,y,g,h):
-	blink_fun(True,True,True,-1,-1,False)
+	blink_fun(x,0,0,0,0,0,0,-1,-1,False)
 	m=[True,False]
 	if u==True:
 		ad=m[z]

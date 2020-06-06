@@ -66,12 +66,12 @@ public class Main extends Application {
 
         Label answer = new Label();
         answer.setPrefHeight(100.0);
-        answer.setPrefWidth(200.0);
+        answer.setPrefWidth(380.0);
         answer.setText("Information Panel");
         answer.setTextAlignment(CENTER);
 
 
-        newButton.setOnAction(e->userText.setPromptText("Waitin for instructions..."));
+        newButton.setOnAction(e->userText.setPromptText("Waiting for instructions..."));
         newButton.setOnAction(e->userText.setText(""));
         //el userText.getText() es para jalar el String que
         // le entra por el Text Area, entonces acá en lugar de un system se debe enviar ese string a donde lo ocupes

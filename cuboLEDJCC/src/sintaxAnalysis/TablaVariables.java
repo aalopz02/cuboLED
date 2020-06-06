@@ -450,10 +450,10 @@ public class TablaVariables {
             if (!(columRow == 1 || columRow == 0)) {
                 generateError(8, String.valueOf(columRow));
             } else {
-                igualdad.InsertMatriz();
+                //lookForMatriz(variablesDefinidas.indexOf(contenido.get(0))).addList(new Lista());
             }
         } else {
-            igualdad.InsertLista();
+            //lookForMatriz(variablesDefinidas.indexOf(contenido.get(0))).addBool();
         }
         return "LIST";
     }

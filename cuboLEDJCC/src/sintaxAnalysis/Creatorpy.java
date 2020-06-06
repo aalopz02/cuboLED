@@ -233,26 +233,20 @@ public class Creatorpy {
         for (String in:indexAux){
             System.out.println(in);
         }
-        try {
-            pw.print(indexAux[1]);
-            pw.print(",");
-        } catch (IndexOutOfBoundsException e){
-            pw.print("True");
-            pw.print(",");
+        pw.print(indexAux[0]);
+        pw.print(",");
+        if (indexAux.length == 1){
+            pw.print("0,0,0,0,0,0");
         }
-        try {
-            pw.print(indexAux[2]);
-            pw.print(",");
-        } catch (IndexOutOfBoundsException e){
-            pw.print("True");
-            pw.print(",");
+        if (indexAux.length == 2){
+            pw.print("0,0,0,0," + indexAux[1] + "," + indexAux[1]);
         }
-        try {
-            pw.print(indexAux[3]);
-        } catch (IndexOutOfBoundsException e){
-            pw.print("True");
+        if (indexAux.length == 3){
+            pw.print("0,0," + indexAux[1] + "," + indexAux[1] + "," + indexAux[2] + "," + indexAux[2]);
         }
-
+        if (indexAux.length == 4){
+            pw.print(indexAux[1] + "," + indexAux[1] + "," + indexAux[2] + "," + indexAux[2] + "," +indexAux[3] + "," + indexAux[3]);
+        }
     }
 
     private static void writeBlink(){
@@ -319,8 +313,8 @@ public class Creatorpy {
                 if (aux == null){
                     break;
                 }
-                System.out.println("TIPO: " + aux.getTipo());
-                System.out.println("CONTENIDO: " + aux.getContenido());
+                //System.out.println("TIPO: " + aux.getTipo());
+                //System.out.println("CONTENIDO: " + aux.getContenido());
                 if (aux.getTipo().equals("INIT")){
                     aux = aux.getNext();
                 }

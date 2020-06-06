@@ -97,11 +97,11 @@ public class CeldaTablaIgualdades {
     }
 
     public void InsertMatriz(){
-
+        lista.addList(new Lista());
     }
 
     public void InsertLista(){
-
+        lista.addBool();
     }
 
     public void checkList() {
