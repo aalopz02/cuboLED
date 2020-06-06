@@ -17,7 +17,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         private static String indiceAcceso = "";
         private static Boolean inCall = false;
         private static ArrayList<String> valoresIgualdadTabla;
-        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje4.txt";
+        private static String nombreArchivo = "D:/proyects/cuboLED/cuboLEDJCC/src/sintaxAnalysis/eje.txt";
         private static TablaVariables tablaVariables = new TablaVariables();
         public static ArrayList<String> constantesConfig = new ArrayList<String>();
         public static Grafo grafo;
@@ -217,6 +217,10 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       Blink_Function();
       Exp();
       break;
+    case 44:
+      type();
+      Exp();
+      break;
     default:
       jj_la1[2] = jj_gen;
       Empty();
@@ -253,11 +257,19 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       break;
     default:
       jj_la1[4] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+      Empty();
     }
     jj_consume_token(43);
-                                                                                                                                                                                                        grafo.addNodo("ENDLINE","");
+                                                                                                                                                                                                                 grafo.addNodo("ENDLINE","");
+  }
+
+  static final public void type() throws ParseException {
+              Token aux;
+    jj_consume_token(44);
+    aux = jj_consume_token(ID);
+    jj_consume_token(7);
+    jj_consume_token(43);
+                                                    grafo.addNodo("TYPE","type(" + aux.image + ");"); grafo.addNodo("ENDLINE","");
   }
 
   static final public void Identificadores() throws ParseException {
@@ -389,11 +401,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         IgualdadValoresOperables();
       }
       break;
-    case 44:
-      jj_consume_token(44);
+    case 45:
+      jj_consume_token(45);
                                                                                indiceAcceso+="["; addVarFalg = false;
       ValoresListas();
-      jj_consume_token(45);
+      jj_consume_token(46);
                                                                                                                                             indiceAcceso+="]"; valoresIgualdadTabla.add(indiceAcceso); grafo.addNodo("LIST",indiceAcceso); indiceAcceso = ""; addVarFalg = true;
       break;
     case LIST:
@@ -436,11 +448,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
 
   static final public void Listas() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 44:
-      jj_consume_token(44);
+    case 45:
+      jj_consume_token(45);
                          indiceAcceso += "[";
       AccesoLista();
-      jj_consume_token(45);
+      jj_consume_token(46);
                                                                   indiceAcceso += "]";
       Listas();
                                                                                                   agregarVariable();
@@ -459,8 +471,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
 
   static final public void AccesoLista() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 46:
-      jj_consume_token(46);
+    case 47:
+      jj_consume_token(47);
       jj_consume_token(8);
                                                          indiceAcceso += ":,";
       Numeros();
@@ -480,8 +492,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
 
   static final public void AccesoListaAux() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 46:
-      jj_consume_token(46);
+    case 47:
+      jj_consume_token(47);
                                  indiceAcceso+=":";
       Numeros();
       break;
@@ -598,7 +610,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 8:
     case LIST:
-    case 44:
+    case 45:
                                                          indiceAcceso = ""; valoresIgualdadTabla.add("InsertMatriz");
       Listas();
                                                                                                                                  grafo.addNodo("FUN.INSERTMAT","insertMatriz("); grafo.addNodo("VAL",indiceAcceso); valoresIgualdadTabla.add(indiceAcceso);
@@ -757,11 +769,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
 
   static final public void Iterable_Aux() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 44:
-      jj_consume_token(44);
+    case 45:
+      jj_consume_token(45);
                               indiceAcceso+="[";
       Adentro_Lista();
-      jj_consume_token(45);
+      jj_consume_token(46);
                                                                        indiceAcceso+="]";
       Iterable_Aux();
       break;
@@ -901,11 +913,11 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
 
   static final public void ListaBlink() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 44:
-      jj_consume_token(44);
+    case 45:
+      jj_consume_token(45);
                              indiceAcceso += "[";
       Numeros();
-      jj_consume_token(45);
+      jj_consume_token(46);
                                                                   indiceAcceso += "]";
       ListaBlink();
       break;
@@ -963,8 +975,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       num = jj_consume_token(NUM);
                                                 indiceAcceso+=num.image;
       break;
-    case 46:
-      num = jj_consume_token(46);
+    case 47:
+      num = jj_consume_token(47);
                                                                                        indiceAcceso+=num.image;
       break;
     default:
@@ -978,8 +990,8 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   static final public void Adentro_Lista_Aux1() throws ParseException {
                             Token num;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 46:
-      jj_consume_token(46);
+    case 47:
+      jj_consume_token(47);
                                               indiceAcceso+=":";
       num = jj_consume_token(NUM);
                                                                              indiceAcceso+=num.image;
@@ -1143,7 +1155,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
       jj_la1_0 = new int[] {0x1,0x0,0xc0000000,0x1f000000,0x1200,0x100,0x1000,0x0,0x0,0x2040,0x0,0x20204040,0x100,0x200000,0x20002000,0x20002000,0x4000,0x100,0x7000000,0x18000000,0x20202100,0x100,0x100,0x4000,0x1000,0x20002000,0x0,0x20002000,0x1000,0x20006000,0x2000,0x0,0x6000,0x2000,0x100,0x400000,0x0,0x100,0x0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x102,0x102,0x125,0x0,0x0,0x0,0x200,0x200,0x200,0x100,0x200,0x1000,0x0,0x1000,0x4100,0x4100,0x0,0x0,0x0,0x0,0x1100,0x0,0x0,0x0,0x0,0x100,0xc0,0x100,0x1000,0x100,0x0,0x1000,0x0,0x4000,0x4000,0x100,0x100,0x0,0x10,};
+      jj_la1_1 = new int[] {0x102,0x102,0x1125,0x0,0x0,0x0,0x200,0x200,0x200,0x100,0x200,0x2000,0x0,0x2000,0x8100,0x8100,0x0,0x0,0x0,0x0,0x2100,0x0,0x0,0x0,0x0,0x100,0xc0,0x100,0x2000,0x100,0x0,0x2000,0x0,0x8000,0x8000,0x100,0x100,0x0,0x10,};
    }
 
   /** Constructor with InputStream. */
@@ -1281,7 +1293,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[47];
+    boolean[] la1tokens = new boolean[48];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -1298,7 +1310,7 @@ public class SyntaxChecker implements SyntaxCheckerConstants {
         }
       }
     }
-    for (int i = 0; i < 47; i++) {
+    for (int i = 0; i < 48; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

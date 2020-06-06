@@ -4,17 +4,26 @@ Dim_Filas = 8;
 Dim_Columnas = 8;
 Cubo = cubpo;
 
+
 Procedure cara(x,y,z){
-    for i in x{
-        for j in y{
-            cubpo[z][i][j] = true;
+        for p in x{
+            for h in y{
+                 cubpo[p][h][z] = true;
+                  Delay( 50, Mil );
+            }
+
         }
+}
+
+Procedure linea(x){
+    for i in 8{
+        Call cara(6,i,x);
     }
 }
 
-
 Procedure Main(){
-    for k in 6 {
-        Call cara(k,k,k);
+    for k in 8{
+         Call linea(k);
     }
+
 }

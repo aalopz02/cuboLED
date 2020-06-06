@@ -11,7 +11,7 @@ public interface SyntaxCheckerConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int COMMENT = 5;
+  int COMMENT = 1;
   /** RegularExpression Id. */
   int NUM = 13;
   /** RegularExpression Id. */
@@ -63,11 +63,11 @@ public interface SyntaxCheckerConstants {
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
+    "<COMMENT>",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
-    "<COMMENT>",
     "\"(\"",
     "\")\"",
     "\",\"",
@@ -106,6 +106,7 @@ public interface SyntaxCheckerConstants {
     "<OPERADORES>",
     "<OPERADOR_COMPARADOR>",
     "\";\"",
+    "\"type(\"",
     "\"[\"",
     "\"]\"",
     "\":\"",

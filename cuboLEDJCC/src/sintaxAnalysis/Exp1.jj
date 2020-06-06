@@ -158,7 +158,7 @@ public class SyntaxChecker  {
 
 PARSER_END(SyntaxChecker)
 
-SKIP:  { " " | "\t" | "\n" | "\r" | <COMMENT: (("--")([";",",","a"-"z","0"-"9","_","&","@","A"-"Z"," ","+","*","-","/","%","=","(",")",".","[","]"])+)"\n" >}
+SKIP:  { <COMMENT: (("--")(([" ",";",",","a"-"z" ,"0"-"9" , "_","&","@","A"-"Z","+","*","-","/","%","=","(",")",".","[","]"])+))"\n" >|" " | "\t" | "\n" |"\r" }
 
 TOKEN: { "(" | ")" | "," | "=" | "{" | "}"|"."
 		| <NUM: (["0"-"9"])+>
@@ -203,11 +203,14 @@ void Exp(): {} {
 				|ifFunction() Exp()
 				|Delay_Function() Exp()
 				|Blink_Function() Exp()
+				|type() Exp()
 				|Empty()
 }
 
 
-void Inicial(): {Token aux;} { Identificadores() ( "." (OperacionesListas() | FuncionesListas()) | aux = "="  {grafo.addNodo("DCL","="); checkMainDCL(aux);} Igualdad() {checkSameLineDCL(aux);} ) ";" {grafo.addNodo("ENDLINE","");}}
+void Inicial(): {Token aux;} { Identificadores() ( "." (OperacionesListas() | FuncionesListas()) | aux = "="  {grafo.addNodo("DCL","="); checkMainDCL(aux);} Igualdad() {checkSameLineDCL(aux);} | Empty()) ";" {grafo.addNodo("ENDLINE","");}}
+
+void type(): {Token aux;}{"type(" aux=<ID> ")" ";" {grafo.addNodo("TYPE","type(" + aux.image + ");"); grafo.addNodo("ENDLINE","");}}
 
 void Identificadores(): {Token id;} { id=<ID> {
 												if (id.image.equals(idMatrizCubo)){

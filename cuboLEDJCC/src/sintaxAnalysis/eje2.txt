@@ -1,5 +1,5 @@
-Timer = 1; --szgfzgfvzdg
-Rango_Timer = Seg;
+Timer = 50; --szgfzgfvzdg
+Rango_Timer = Mil;
 Dim_Filas = 8;
 Dim_Columnas = 8;
 Cubo = cubpo;
