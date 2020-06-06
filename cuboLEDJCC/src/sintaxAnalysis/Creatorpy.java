@@ -233,7 +233,17 @@ public class Creatorpy {
         for (String in:indexAux){
             System.out.println(in);
         }
-        pw.print("Indice_"+indexAux[0]);
+        if (indexAux.length==1){
+            pw.print("False,False,False");
+        } else if (indexAux.length==2){
+            pw.print("False,False,"+indexAux[1]);
+        } else if (indexAux.length==3){
+            pw.print("False," + indexAux[1] + "," + indexAux[2]);
+        } else if (indexAux.length==4){
+            pw.print(indexAux[1] + "," + indexAux[2] + "," + indexAux[3]);
+        }
+        pw.print(",");
+        pw.print("Indice_" + indexAux[0]);
     }
 
     private static void writeBlink(){
